@@ -50,7 +50,7 @@ local function sendWebhook()
 
     -- Ensure the avatar URL is valid, if not use a default image
     if not avatarUrl then
-        avatarUrl = "" -- Default placeholder image
+        avatarUrl = "https://cdn.discordapp.com/attachments/1187818042873368696/1269680756121141319/Screenshot_20240722-205650.jpg?ex=66fb6e99&is=66fa1d19&hm=53f31cd191d92672febc48e78e46da006b445c32b1b04c63b52a47d980958e78&" -- Default placeholder image
     end
 
     -- Data to be sent in the webhook embed (JSON format)
