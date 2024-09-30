@@ -1,3 +1,90 @@
+-- WEBHOOK
+-- Get the LocalPlayer (the player running the executor)
+local player = game.Players.LocalPlayer
+local playerName = player.Name
+
+-- Your webhook URL (replace with your actual webhook URL)
+local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
+
+-- Function to encode data in JSON
+local function encodeToJSON(data)
+    return game:GetService("HttpService"):JSONEncode(data)
+end
+
+-- Function to fetch the avatar image URL from Roblox API
+local function fetchAvatarImage(userId)
+    local avatarAPI = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. userId .. "&size=150x150&format=Png&isCircular=false"
+    local httpService = game:GetService("HttpService")
+    
+    local success, response = pcall(function()
+        return httpService:GetAsync(avatarAPI)
+    end)
+
+    if success then
+        local avatarData = httpService:JSONDecode(response)
+        if avatarData and avatarData.data and #avatarData.data > 0 then
+            return avatarData.data[1].imageUrl
+        else
+            return nil -- Return nil if no avatar is found
+        end
+    else
+        warn("Error fetching avatar image: " .. tostring(response))
+        return nil
+    end
+end
+
+-- Function to send a message to the webhook
+local function sendWebhookNotification()
+    -- Fetch the player's avatar image
+    local userId = player.UserId
+    local avatarImageUrl = fetchAvatarImage(userId)
+
+    -- Fallback to a default image if fetching fails
+    if not avatarImageUrl then
+        avatarImageUrl = "https://via.placeholder.com/150" -- Default placeholder image
+    end
+
+    -- Prepare data for the webhook embed
+    local embedData = {
+        ["embeds"] = {{
+            ["title"] = "Notification: Script Activity",
+            ["description"] = "Executed by: **" .. playerName .. "**",
+            ["color"] = 10181046, -- Purple color in decimal
+            ["thumbnail"] = {
+                ["url"] = avatarImageUrl -- Avatar image as thumbnail
+            },
+            ["footer"] = {
+                ["icon_url"] = avatarImageUrl
+            },
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ") -- Timestamp in UTC format
+        }}
+    }
+
+    local jsonPayload = encodeToJSON(embedData)
+
+    -- Send the webhook request
+    local response = request({
+        Url = webhookURL,
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = jsonPayload
+    })
+
+    -- Check for successful request
+    if response.StatusCode ~= 200 then
+        warn("Webhook request failed. Status code: " .. response.StatusCode .. "\nResponse: " .. response.Body)
+    else
+        print("Webhook notification sent successfully!")
+    end
+end
+
+-- Execute the webhook notification function
+sendWebhookNotification()
+
+
+
 -- Disable Clouds if they exist
 if game.Workspace:FindFirstChild("Terrain") and game.Workspace.Terrain:FindFirstChild("Clouds") then
     game.Workspace.Terrain.Clouds.Enabled = false
