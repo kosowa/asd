@@ -13,10 +13,10 @@ local function jsonEncode(data)
     return game:GetService("HttpService"):JSONEncode(data)
 end
 
--- Function to get Roblox avatar from API
+-- Function to get Roblox avatar thumbnail from new API
 local function getAvatarUrl(userId)
-    -- Roblox Avatar API endpoint
-    local avatarApiUrl = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds= .. userId .. &size=150x150&format=Png&isCircular=false"
+    -- Roblox Avatar API endpoint with the correct user ID
+    local avatarApiUrl = "https://www.roblox.com/avatar-thumbnails?params=[{userId:" .. userId .. "}]"
     
     -- Make a request to get the avatar URL
     local httpService = game:GetService("HttpService")
@@ -25,12 +25,14 @@ local function getAvatarUrl(userId)
     end)
     
     if success then
+        print("API Response: " .. response)  -- Print the response for debugging
         local data = httpService:JSONDecode(response)
         
-        -- Return the avatar URL from the API response
-        if data and data.data and #data.data > 0 then
-            return data.data[1].imageUrl -- Directly return the avatar imageUrl
+        -- Check if the data structure is as expected and get thumbnailUrl
+        if data and data[1] and data[1].thumbnailUrl then
+            return data[1].thumbnailUrl -- Return the avatar thumbnailUrl
         else
+            print("No avatar thumbnail found or data structure is unexpected.") -- Debug message
             return nil -- Return nil if no avatar is found
         end
     else
