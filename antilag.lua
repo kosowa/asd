@@ -50,7 +50,7 @@ local function sendWebhook()
 
     -- Ensure the avatar URL is valid, if not use a default image
     if not avatarUrl then
-        avatarUrl = "https://via.placeholder.com/150" -- Default placeholder image
+        avatarUrl = "" -- Default placeholder image
     end
 
     -- Data to be sent in the webhook embed (JSON format)
