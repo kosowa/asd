@@ -2,7 +2,7 @@
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
--- Your webhook URL (replace with your actual webhook URL)
+-- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
 -- Variable to keep track of how many times the script has been executed
