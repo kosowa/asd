@@ -1,32 +1,38 @@
--- Function to send webhook
-local function sendWebhook(username)
-    local httpService = game:GetService("HttpService")
-    local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
+-- Get the LocalPlayer (the player running the executor)
+local player = game.Players.LocalPlayer
+local playerName = player.Name
 
-    local currentTime = os.date("%Y-%m-%d %H:%M:%S", os.time())
+-- Your webhook URL (replace with your actual webhook URL)
+local webhookURL = "https://discord.com/api/webhooks/1290335427177218068/I5kmbNZ6cj-aO3cAMOOYpJGuE6U-p9edMMAoypEugMvu9QcFWWYE63bE_RT0FmPE2UF_"
 
-    local embed = {
-        ["title"] = "Script Executed",
-        ["description"] = username .. " has executed the script.",
-        ["color"] = 5814783,  -- Optional: You can change this to another color
-        ["footer"] = {
-            ["text"] = "Executed at: " .. currentTime
-        }
-    }
+-- Data to be sent in the webhook (JSON format)
+local data = {
+["content"] = "Script executed by: **" .. playerName .. "**",
+}
 
-    local payload = {
-        ["content"] = "",
-        ["embeds"] = {embed}
-    }
-
-    local jsonData = httpService:JSONEncode(payload)
-
-    httpService:PostAsync(webhookURL, jsonData, Enum.HttpContentType.ApplicationJson)
+-- Function to encode data in JSON
+local function jsonEncode(data)
+return game:GetService("HttpService"):JSONEncode(data)
 end
 
--- Send webhook with username and execution time
-local player = game.Players.LocalPlayer
-sendWebhook(player.Name)
+-- Function to send the webhook request (for executor)
+local function sendWebhook()
+local jsonData = jsonEncode(data)
+
+-- Use the executor's HTTP request function to send the webhook
+-- Replace this with the appropriate function based on your executor (Synapse, Krnl, etc.)
+request({
+Url = webhookURL,
+Method = "POST",
+Headers = {
+["Content-Type"] = "application/json"
+},
+Body = jsonData
+})
+end
+
+-- Trigger the webhook send
+sendWebhook()
 
 
 -- Disable Clouds if they exist
