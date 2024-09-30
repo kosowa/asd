@@ -1,95 +1,3 @@
--- WEBHOOK
--- Get the LocalPlayer (the player running the executor)
-local player = game.Players.LocalPlayer
-local playerName = player.Name
-
--- Your webhook URL (replace with your actual webhook URL)
-local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
-
--- Function to encode data in JSON
-local function jsonEncode(data)
-    return game:GetService("HttpService"):JSONEncode(data)
-end
-
--- Function to get Roblox avatar from API
-local function getAvatarUrl(userId)
-    -- Roblox Avatar API endpoint
-    local avatarApiUrl = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. userId .. "&size=150x150&format=Png&isCircular=false"
-
-    -- Make a request to get the avatar URL
-    local httpService = game:GetService("HttpService")
-    local success, response = pcall(function()
-        return httpService:GetAsync(avatarApiUrl)
-    end)
-
-    if success then
-        local data = httpService:JSONDecode(response)
-
-        -- Return the avatar URL from the API response
-        if data and data.data and #data.data > 0 then
-            return data.data[1].imageUrl
-        else
-            return nil -- Return nil if no avatar is found
-        end
-    else
-        warn("Failed to fetch avatar URL: " .. tostring(response))
-        return nil
-    end
-end
-
--- Function to send the webhook request (for executor)
-local function sendWebhook()
-    -- Fetch the player's profile picture using Roblox Avatar API
-    local userId = player.UserId
-    local avatarUrl = getAvatarUrl(userId)
-
-    -- Ensure the avatar URL is valid, if not use a default image
-    if not avatarUrl then
-        avatarUrl = "https://via.placeholder.com/150" -- Default placeholder image
-    end
-
-    -- Data to be sent in the webhook embed (JSON format)
-    local data = {
-        ["embeds"] = {{
-            ["title"] = "Script Execution Alert",
-            ["description"] = "Script executed by: **" .. playerName .. "**",
-            ["color"] = 10181046, -- Purple color in decimal format (hex: #9932CC)
-            ["thumbnail"] = {
-                ["url"] = avatarUrl -- Player's profile avatar as thumbnail
-            },
-            ["footer"] = {
-                ["icon_url"] = avatarUrl
-            },
-            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ") -- Timestamp in UTC format
-        }}
-    }
-
-    local jsonData = jsonEncode(data)
-
-    -- Use the executor's HTTP request function to send the webhook
-    local response = request({
-        Url = webhookURL,
-        Method = "POST",
-        Headers = {
-            ["Content-Type"] = "application/json"
-        },
-        Body = jsonData
-    })
-
-    -- Check if the request failed and print the response if any
-    if response.StatusCode ~= 200 then
-        warn("Webhook failed to send. Status code: " .. response.StatusCode .. "\nResponse: " .. response.Body)
-    else
-        print("Webhook sent successfully!")
-    end
-end
-
--- Trigger the webhook send
-sendWebhook()
-
-
-
-
 -- Disable Clouds if they exist
 if game.Workspace:FindFirstChild("Terrain") and game.Workspace.Terrain:FindFirstChild("Clouds") then
     game.Workspace.Terrain.Clouds.Enabled = false
@@ -319,6 +227,98 @@ button.MouseButton1Click:Connect(function()
     button.BackgroundColor3 = isBlackscreenActive and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
     if isBlackscreenActive then spawn(limitFPS) end
 end)
+
+
+
+
+-- WEBHOOK
+-- Get the LocalPlayer (the player running the executor)
+local player = game.Players.LocalPlayer
+local playerName = player.Name
+
+-- Your webhook URL (replace with your actual webhook URL)
+local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
+
+-- Function to encode data in JSON
+local function jsonEncode(data)
+    return game:GetService("HttpService"):JSONEncode(data)
+end
+
+-- Function to get Roblox avatar from API
+local function getAvatarUrl(userId)
+    -- Roblox Avatar API endpoint
+    local avatarApiUrl = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. userId .. "&size=150x150&format=Png&isCircular=false"
+
+    -- Make a request to get the avatar URL
+    local httpService = game:GetService("HttpService")
+    local success, response = pcall(function()
+        return httpService:GetAsync(avatarApiUrl)
+    end)
+
+    if success then
+        local data = httpService:JSONDecode(response)
+
+        -- Return the avatar URL from the API response
+        if data and data.data and #data.data > 0 then
+            return data.data[1].imageUrl
+        else
+            return nil -- Return nil if no avatar is found
+        end
+    else
+        warn("Failed to fetch avatar URL: " .. tostring(response))
+        return nil
+    end
+end
+
+-- Function to send the webhook request (for executor)
+local function sendWebhook()
+    -- Fetch the player's profile picture using Roblox Avatar API
+    local userId = player.UserId
+    local avatarUrl = getAvatarUrl(userId)
+
+    -- Ensure the avatar URL is valid, if not use a default image
+    if not avatarUrl then
+        avatarUrl = "https://via.placeholder.com/150" -- Default placeholder image
+    end
+
+    -- Data to be sent in the webhook embed (JSON format)
+    local data = {
+        ["embeds"] = {{
+            ["title"] = "Script Execution Alert",
+            ["description"] = "Script executed by: **" .. playerName .. "**",
+            ["color"] = 10181046, -- Purple color in decimal format (hex: #9932CC)
+            ["thumbnail"] = {
+                ["url"] = avatarUrl -- Player's profile avatar as thumbnail
+            },
+            ["footer"] = {
+                ["icon_url"] = avatarUrl
+            },
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ") -- Timestamp in UTC format
+        }}
+    }
+
+    local jsonData = jsonEncode(data)
+
+    -- Use the executor's HTTP request function to send the webhook
+    local response = request({
+        Url = webhookURL,
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = jsonData
+    })
+
+    -- Check if the request failed and print the response if any
+    if response.StatusCode ~= 200 then
+        warn("Webhook failed to send. Status code: " .. response.StatusCode .. "\nResponse: " .. response.Body)
+    else
+        print("Webhook sent successfully!")
+    end
+end
+
+-- Trigger the webhook send
+sendWebhook()
 
 -- Initial anti-lag removal
 removeLaggyObjects()
