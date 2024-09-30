@@ -16,7 +16,7 @@ end
 -- Function to get Roblox avatar from API
 local function getAvatarUrl(userId)
     -- Roblox Avatar API endpoint
-    local avatarApiUrl = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. userId .. "&size=150x150&format=Png&isCircular=false"
+    local avatarApiUrl = "https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds= .. userId .. &size=150x150&format=Png&isCircular=false"
     
     -- Make a request to get the avatar URL
     local httpService = game:GetService("HttpService")
