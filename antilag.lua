@@ -295,8 +295,10 @@ countdownText.TextColor3 = Color3.new(1, 1, 1)
 countdownText.Visible = true
 
 local function removeLaggyObjects()
-    countdownText.Text = "Executing..."  -- Display "Executing..." instead of countdown
-    wait(3)  -- Optional delay to show the text for a few seconds before proceeding
+    for i = 10, 0, -1 do
+        countdownText.Text = "Anti-lag in " .. i .. " seconds"
+        wait(1)
+    end
     countdownText.Visible = false
 
     -- Disable unnecessary visual effects
