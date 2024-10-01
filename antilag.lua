@@ -289,16 +289,15 @@ local countdownText = Instance.new("TextLabel", screenGui)
 countdownText.Size = UDim2.new(0.3, 0, 0.2, 0)
 countdownText.Position = UDim2.new(0.35, 0, 0.4, 0)
 countdownText.TextScaled = false  -- Disable automatic scaling
-countdownText.TextSize = 14  -- Set a smaller text size (adjust as needed)
+countdownText.TextSize = 14  -- Set a smaller text size (adjust this as needed)
 countdownText.BackgroundTransparency = 1
 countdownText.TextColor3 = Color3.new(1, 1, 1)
 countdownText.Visible = true
 
 local function removeLaggyObjects()
-    countdownText.Text = "Executing..."  -- Display "Executing..." 
-    wait(3)  -- Optional delay to simulate the execution time
-    countdownText.Visible = false  -- Hide the text once execution is done
-end
+    countdownText.Text = "Executing..."  -- Display "Executing..." instead of countdown
+    wait(3)  -- Optional delay to show the text for a few seconds before proceeding
+    countdownText.Visible = false
 
     -- Disable unnecessary visual effects
     for _, v in pairs(workspace:GetDescendants()) do
@@ -309,12 +308,18 @@ end
 
     -- Adjust lighting settings for anti-lag
     local lighting = game:GetService("Lighting")
-    lighting.GlobalShadows, lighting.Brightness, lighting.FogEnd = false, 8, 9e9
-    lighting.EnvironmentDiffuseScale, lighting.EnvironmentSpecularScale = 0, 0
+    lighting.GlobalShadows = false
+    lighting.Brightness = 8
+    lighting.FogEnd = 9e9
+    lighting.EnvironmentDiffuseScale = 0
+    lighting.EnvironmentSpecularScale = 0
 
     local terrain = workspace:FindFirstChild("Terrain")
     if terrain then
-        terrain.WaterTransparency, terrain.WaterWaveSize, terrain.WaterWaveSpeed, terrain.Decoration = 0, 0, 0, false
+        terrain.WaterTransparency = 0
+        terrain.WaterWaveSize = 0
+        terrain.WaterWaveSpeed = 0
+        terrain.Decoration = false
     end
 end
 
@@ -329,7 +334,8 @@ end
 -- Toggle blackscreen
 button.MouseButton1Click:Connect(function()
     isBlackscreenActive = not isBlackscreenActive
-    frame.Visible, button.Text = isBlackscreenActive, isBlackscreenActive and "Disable Black Screen" or "Enable Black Screen"
+    frame.Visible = isBlackscreenActive
+    button.Text = isBlackscreenActive and "Disable Black Screen" or "Enable Black Screen"
     button.BackgroundColor3 = isBlackscreenActive and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
     if isBlackscreenActive then spawn(limitFPS) end
 end)
