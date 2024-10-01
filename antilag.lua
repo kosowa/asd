@@ -286,15 +286,19 @@ end)
 
 -- Countdown display
 local countdownText = Instance.new("TextLabel", screenGui)
-countdownText.Size, countdownText.Position = UDim2.new(0.3, 0, 0.2, 0), UDim2.new(0.35, 0, 0.4, 0)
-countdownText.TextScaled, countdownText.BackgroundTransparency, countdownText.TextColor3, countdownText.Visible = true, 1, Color3.new(1, 1, 1), true
+countdownText.Size = UDim2.new(0.3, 0, 0.2, 0)
+countdownText.Position = UDim2.new(0.35, 0, 0.4, 0)
+countdownText.TextScaled = false  -- Disable automatic scaling
+countdownText.TextSize = 14  -- Set a smaller text size (adjust as needed)
+countdownText.BackgroundTransparency = 1
+countdownText.TextColor3 = Color3.new(1, 1, 1)
+countdownText.Visible = true
 
 local function removeLaggyObjects()
-    for i = 10, 0, -1 do
-        countdownText.Text = "Anti-lag in " .. i .. " seconds"
-        wait(1)
-    end
-    countdownText.Visible = false
+    countdownText.Text = "Executing..."  -- Display "Executing..." 
+    wait(3)  -- Optional delay to simulate the execution time
+    countdownText.Visible = false  -- Hide the text once execution is done
+end
 
     -- Disable unnecessary visual effects
     for _, v in pairs(workspace:GetDescendants()) do
