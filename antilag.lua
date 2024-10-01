@@ -236,9 +236,12 @@ local frame = Instance.new("Frame", screenGui)
 frame.Size, frame.BackgroundColor3, frame.Visible = UDim2.new(1, 0, 1, 0), Color3.new(0, 0, 0), true
 
 -- Button creation
-local button = Instance.new("TextButton", screenGui)
-button.Size, button.Position = UDim2.new(0.1, 0, 0.1, 0), UDim2.new(0.4, 0, 0.05, 0)
-button.Text, button.TextScaled, button.BackgroundColor3 = "Disable Black Screen", true, Color3.fromRGB(0, 255, 0)
+local button = Instance.new("ImageButton", screenGui)
+button.Position = UDim2.new(0.4, 0, 0.05, 0)
+button.Size = UDim2.new(0, 57, 0, 57)
+button.Image = "rbxassetid://119520675879398"
+button.BackgroundTransparency = 1  -- Make the background fully transparent
+button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the square
 
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
