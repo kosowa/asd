@@ -344,3 +344,26 @@ end)
 
 -- Initial anti-lag removal
 removeLaggyObjects()
+
+-- DISABLE TEXTURES
+local function removeTextures()
+    -- Loop through all parts in the game
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
+            -- Set the material to SmoothPlastic to reduce lag
+            part.Material = Enum.Material.SmoothPlastic
+
+            -- Remove any SurfaceGuis, Decals, and Textures
+            for _, child in pairs(part:GetDescendants()) do
+                if child:IsA("Decal") or child:IsA("Texture") or child:IsA("SurfaceGui") then
+                    child:Destroy()
+                end
+            end
+        end
+    end
+end
+
+-- Run the function to remove textures
+removeTextures()
+
+-- Optionally, connect this to a keybind or event
