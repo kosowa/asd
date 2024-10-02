@@ -95,29 +95,6 @@ end
 -- Trigger the webhook send
 sendWebhook()
 
--- DISABLE TEXTURES
-local function removeTextures()
-    -- Loop through all parts in the game
-    for _, part in pairs(workspace:GetDescendants()) do
-        if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
-            -- Set the material to SmoothPlastic to reduce lag
-            part.Material = Enum.Material.SmoothPlastic
-
-            -- Remove any SurfaceGuis, Decals, and Textures
-            for _, child in pairs(part:GetDescendants()) do
-                if child:IsA("Decal") or child:IsA("Texture") or child:IsA("SurfaceGui") then
-                    child:Destroy()
-                end
-            end
-        end
-    end
-end
-
--- Run the function to remove textures
-removeTextures()
-
--- Optionally, connect this to a keybind or event
-
 
 -- Disable Clouds if they exist
 if game.Workspace:FindFirstChild("Terrain") and game.Workspace.Terrain:FindFirstChild("Clouds") then
@@ -306,6 +283,10 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
+-- Create a ScreenGui and add it to the PlayerGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
 -- Countdown display
 local countdownText = Instance.new("TextLabel", screenGui)
 countdownText.Size = UDim2.new(0.3, 0, 0.2, 0)
@@ -313,10 +294,12 @@ countdownText.Position = UDim2.new(0.35, 0, 0.4, 0)
 countdownText.TextScaled = false  -- Disable automatic scaling
 countdownText.TextSize = 14  -- Set a smaller text size (adjust this as needed)
 countdownText.BackgroundTransparency = 1
-countdownText.TextColor3 = Color3.new(1, 1, 1)
+countdownText.TextColor3 = Color3.new(1, 1, 1)  -- White text
 countdownText.Visible = true
 
+-- Function to remove laggy objects and textures
 local function removeLaggyObjects()
+    -- Countdown before removal
     for i = 10, 0, -1 do
         countdownText.Text = "Anti-lag in " .. i .. " seconds"
         wait(1)
@@ -330,6 +313,21 @@ local function removeLaggyObjects()
         end
     end
 
+    -- Remove textures from parts and change material to SmoothPlastic
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
+            -- Set the material to SmoothPlastic to reduce lag
+            part.Material = Enum.Material.SmoothPlastic
+
+            -- Remove SurfaceGuis, Decals, and Textures
+            for _, child in pairs(part:GetDescendants()) do
+                if child:IsA("Decal") or child:IsA("Texture") or child:IsA("SurfaceGui") then
+                    child:Destroy()
+                end
+            end
+        end
+    end
+
     -- Adjust lighting settings for anti-lag
     local lighting = game:GetService("Lighting")
     lighting.GlobalShadows = false
@@ -338,6 +336,7 @@ local function removeLaggyObjects()
     lighting.EnvironmentDiffuseScale = 0
     lighting.EnvironmentSpecularScale = 0
 
+    -- Adjust terrain settings for anti-lag
     local terrain = workspace:FindFirstChild("Terrain")
     if terrain then
         terrain.WaterTransparency = 0
