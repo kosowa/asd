@@ -331,7 +331,7 @@ local function removeLaggyObjects()
     -- Adjust lighting settings for anti-lag
     local lighting = game:GetService("Lighting")
     lighting.GlobalShadows = false
-    lighting.Brightness = 2
+    lighting.Brightness = 1
     lighting.FogEnd = 9e9
     lighting.EnvironmentDiffuseScale = 0
     lighting.EnvironmentSpecularScale = 0
