@@ -58,7 +58,7 @@ local function sendWebhook()
     -- Data to be sent in the webhook embed (JSON format)
     local data = {
         ["embeds"] = {{
-            ["title"] = "Script Execution Alert",
+            ["title"] = "Script Execution",
             ["description"] = "Script executed by: **" .. playerName .. "**\nExecution count: **" .. executionCount .. "**",
             ["color"] = 10181046, -- Purple color in decimal format (hex: #9932CC)
             ["thumbnail"] = {
@@ -245,7 +245,7 @@ button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the squa
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "🤑chopaen mo ko kerps🤑", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "balik kana sakin pls", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 
 -- Draggable button logic
