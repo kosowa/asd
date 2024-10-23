@@ -227,6 +227,10 @@ else
     print("Map not found")
 end
 
+local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local screenGui = Instance.new("ScreenGui", playerGui)
+screenGui.IgnoreGuiInset, screenGui.Name = true, "BlackScreenGui"
+
 local frame = Instance.new("Frame", screenGui)
 frame.Size, frame.BackgroundColor3, frame.Visible = UDim2.new(1, 0, 1, 0), Color3.new(0, 0, 0), true
 
@@ -241,7 +245,7 @@ button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the squa
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "tESt7", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "tESt8", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 
 -- Draggable button logic
