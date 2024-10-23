@@ -227,13 +227,6 @@ else
     print("Map not found")
 end
 
-local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.IgnoreGuiInset, screenGui.Name = true, "BlackScreenGui"
-
-local frame = Instance.new("Frame", screenGui)
-frame.Size, frame.BackgroundColor3, frame.Visible = UDim2.new(1, 0, 1, 0), Color3.new(0, 0, 0), true
-
 -- Button creation
 local button = Instance.new("ImageButton", screenGui)
 button.Position = UDim2.new(0.4, 0, 0.05, 0)
