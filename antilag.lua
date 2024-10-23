@@ -245,7 +245,7 @@ button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the squa
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "test8", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "TESt9", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 
 -- Draggable button logic
@@ -288,16 +288,24 @@ local RunService = game:GetService("RunService")
 local Camera = game.Workspace.CurrentCamera
 
 local function disableRendering()
-    Camera.CameraType = Enum.CameraType.Scriptable
-    Camera.CFrame = CFrame.new(0, 0, 0)  -- Arbitrary position
-    RunService:Set3dRenderingEnabled(false)
-    print("3D rendering has been disabled.")
+    if Camera then
+        Camera.CameraType = Enum.CameraType.Scriptable
+        Camera.CFrame = CFrame.new(0, 0, 0)  -- Arbitrary position
+        RunService:Set3dRenderingEnabled(false)
+        print("3D rendering has been disabled.")
+    else
+        warn("Camera not found! 3D rendering was not disabled.")
+    end
 end
 
 local function enableRendering()
-    Camera.CameraType = Enum.CameraType.Custom  -- Reset the camera type
-    RunService:Set3dRenderingEnabled(true)
-    print("3D rendering has been re-enabled.")
+    if Camera then
+        Camera.CameraType = Enum.CameraType.Custom  -- Reset the camera type
+        RunService:Set3dRenderingEnabled(true)
+        print("3D rendering has been re-enabled.")
+    else
+        warn("Camera not found! 3D rendering was not re-enabled.")
+    end
 end
 
 -- FPS limiter when blackscreen is active
@@ -314,7 +322,7 @@ button.MouseButton1Click:Connect(function()
     frame.Visible = isBlackscreenActive
     button.Text = isBlackscreenActive and "Disable Black Screen" or "Enable Black Screen"
     button.BackgroundColor3 = isBlackscreenActive and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-    
+
     if isBlackscreenActive then
         disableRendering()
         spawn(limitFPS)
@@ -325,3 +333,4 @@ end)
 
 -- Initial anti-lag removal
 removeLaggyObjects()
+
