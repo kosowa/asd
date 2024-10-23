@@ -250,7 +250,7 @@ button.ZIndex = 3  -- Set an even higher ZIndex to ensure it stays above everyth
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "test13", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "test14", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 watermark.ZIndex = 3  -- Set a high ZIndex to ensure it stays visible
 
@@ -288,6 +288,69 @@ UIS.InputChanged:Connect(function(input)
         updateInput(input)
     end
 end)
+
+-- Create a ScreenGui and add it to the PlayerGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Countdown display
+local countdownText = Instance.new("TextLabel", screenGui)
+countdownText.Size = UDim2.new(0.3, 0, 0.2, 0)
+countdownText.Position = UDim2.new(0.35, 0, 0.4, 0)
+countdownText.TextScaled = false  -- Disable automatic scaling
+countdownText.TextSize = 14  -- Set a smaller text size (adjust this as needed)
+countdownText.BackgroundTransparency = 1
+countdownText.TextColor3 = Color3.new(1, 1, 1)  -- White text
+countdownText.Visible = true
+
+-- Function to remove laggy objects and textures
+local function removeLaggyObjects()
+    -- Countdown before removal
+    for i = 10, 0, -1 do
+        countdownText.Text = "Anti-lag in " .. i .. " seconds"
+        wait(1)
+    end
+    countdownText.Visible = false
+
+    -- Disable unnecessary visual effects
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Decal") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Texture") then
+            v:Destroy()
+        end
+    end
+
+    -- Remove textures from parts and change material to SmoothPlastic
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
+            -- Set the material to SmoothPlastic to reduce lag
+            part.Material = Enum.Material.SmoothPlastic
+
+            -- Remove SurfaceGuis, Decals, and Textures
+            for _, child in pairs(part:GetDescendants()) do
+                if child:IsA("Decal") or child:IsA("Texture") or child:IsA("SurfaceGui") then
+                    child:Destroy()
+                end
+            end
+        end
+    end
+
+    -- Adjust lighting settings for anti-lag
+    local lighting = game:GetService("Lighting")
+    lighting.GlobalShadows = false
+    lighting.Brightness = 1
+    lighting.FogEnd = 9e9
+    lighting.EnvironmentDiffuseScale = 0
+    lighting.EnvironmentSpecularScale = 0
+
+    -- Adjust terrain settings for anti-lag
+    local terrain = workspace:FindFirstChild("Terrain")
+    if terrain then
+        terrain.WaterTransparency = 0
+        terrain.WaterWaveSize = 0
+        terrain.WaterWaveSpeed = 0
+        terrain.Decoration = false
+    end
+end
 
 -- Function to disable 3D rendering and show black screen
 local RunService = game:GetService("RunService")
@@ -330,4 +393,5 @@ end)
 
 -- Initial setup (disable 3D rendering automatically on script execution)
 disableRendering()  -- Automatically disable 3D rendering when the script is executed
+removeLaggyObjects()
 
