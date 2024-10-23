@@ -245,14 +245,14 @@ button.Size = UDim2.new(0, 57, 0, 57)
 button.Image = "rbxassetid://119520675879398"
 button.BackgroundTransparency = 1  -- Make the background fully transparent
 button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the square
-button.ZIndex = 2  -- Set a higher ZIndex to ensure it is on top of the black screen
+button.ZIndex = 3  -- Set an even higher ZIndex to ensure it stays above everything
 
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "test12", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "balik kana sakin pls", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
-watermark.ZIndex = 2  -- Set a higher ZIndex to ensure it is visible on top of the black screen
+watermark.ZIndex = 3  -- Set a high ZIndex to ensure it stays visible
 
 -- Draggable button logic
 local UIS = game:GetService("UserInputService")
@@ -329,5 +329,6 @@ button.MouseButton1Click:Connect(function()
     end
 end)
 
--- Initial setup
-enableRendering()  -- Start with rendering enabled by default
+-- Initial setup (disable 3D rendering automatically on script execution)
+disableRendering()  -- Automatically disable 3D rendering when the script is executed
+
