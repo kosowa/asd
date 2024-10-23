@@ -238,7 +238,7 @@ button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the squa
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "TEST4", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "TEST5", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 
 -- Draggable button logic
@@ -331,3 +331,5 @@ button.MouseButton1Click:Connect(function()
         enableRendering()
     end
 end)
+
+removeLaggyObjects()
