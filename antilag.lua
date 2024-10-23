@@ -245,7 +245,7 @@ button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the squa
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "balik kana sakin pls", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "disabled 3d rendering UPD", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 
 -- Draggable button logic
@@ -354,14 +354,27 @@ local function limitFPS()
     end
 end
 
--- Toggle blackscreen
+-- Function to toggle 3D rendering
+local function toggle3DRendering(enabled)
+    local player = game.Players.LocalPlayer
+    player.StreamingEnabled = not enabled -- Disable 3D rendering when black screen is active
+    print("3D rendering is " .. (enabled and "enabled" or "disabled"))
+end
+
+-- Toggle blackscreen and 3D rendering
 button.MouseButton1Click:Connect(function()
     isBlackscreenActive = not isBlackscreenActive
     frame.Visible = isBlackscreenActive
     button.Text = isBlackscreenActive and "Disable Black Screen" or "Enable Black Screen"
     button.BackgroundColor3 = isBlackscreenActive and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-    if isBlackscreenActive then spawn(limitFPS) end
+    
+    toggle3DRendering(isBlackscreenActive)
+    
+    if isBlackscreenActive then 
+        spawn(limitFPS) 
+    end
 end)
 
 -- Initial anti-lag removal
 removeLaggyObjects()
+
