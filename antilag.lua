@@ -245,7 +245,7 @@ button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the squa
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "tESt8", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "test8", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 
 -- Draggable button logic
@@ -283,67 +283,21 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
--- Create a ScreenGui and add it to the PlayerGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+-- Function to disable 3D rendering
+local RunService = game:GetService("RunService")
+local Camera = game.Workspace.CurrentCamera
 
--- Countdown display
-local countdownText = Instance.new("TextLabel", screenGui)
-countdownText.Size = UDim2.new(0.3, 0, 0.2, 0)
-countdownText.Position = UDim2.new(0.35, 0, 0.4, 0)
-countdownText.TextScaled = false  -- Disable automatic scaling
-countdownText.TextSize = 14  -- Set a smaller text size (adjust this as needed)
-countdownText.BackgroundTransparency = 1
-countdownText.TextColor3 = Color3.new(1, 1, 1)  -- White text
-countdownText.Visible = true
+local function disableRendering()
+    Camera.CameraType = Enum.CameraType.Scriptable
+    Camera.CFrame = CFrame.new(0, 0, 0)  -- Arbitrary position
+    RunService:Set3dRenderingEnabled(false)
+    print("3D rendering has been disabled.")
+end
 
--- Function to remove laggy objects and textures
-local function removeLaggyObjects()
-    -- Countdown before removal
-    for i = 10, 0, -1 do
-        countdownText.Text = "Anti-lag in " .. i .. " seconds"
-        wait(1)
-    end
-    countdownText.Visible = false
-
-    -- Disable unnecessary visual effects
-    for _, v in pairs(workspace:GetDescendants()) do
-        if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Decal") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Texture") then
-            v:Destroy()
-        end
-    end
-
-    -- Remove textures from parts and change material to SmoothPlastic
-    for _, part in pairs(workspace:GetDescendants()) do
-        if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
-            -- Set the material to SmoothPlastic to reduce lag
-            part.Material = Enum.Material.SmoothPlastic
-
-            -- Remove SurfaceGuis, Decals, and Textures
-            for _, child in pairs(part:GetDescendants()) do
-                if child:IsA("Decal") or child:IsA("Texture") or child:IsA("SurfaceGui") then
-                    child:Destroy()
-                end
-            end
-        end
-    end
-
-    -- Adjust lighting settings for anti-lag
-    local lighting = game:GetService("Lighting")
-    lighting.GlobalShadows = false
-    lighting.Brightness = 1
-    lighting.FogEnd = 9e9
-    lighting.EnvironmentDiffuseScale = 0
-    lighting.EnvironmentSpecularScale = 0
-
-    -- Adjust terrain settings for anti-lag
-    local terrain = workspace:FindFirstChild("Terrain")
-    if terrain then
-        terrain.WaterTransparency = 0
-        terrain.WaterWaveSize = 0
-        terrain.WaterWaveSpeed = 0
-        terrain.Decoration = false
-    end
+local function enableRendering()
+    Camera.CameraType = Enum.CameraType.Custom  -- Reset the camera type
+    RunService:Set3dRenderingEnabled(true)
+    print("3D rendering has been re-enabled.")
 end
 
 -- FPS limiter when blackscreen is active
@@ -354,43 +308,13 @@ local function limitFPS()
     end
 end
 
--- AFK Mode: Reduce 3D Rendering
-local RunService = game:GetService("RunService")
-local Camera = game:GetService("Workspace").CurrentCamera
-
--- Function to disable rendering
-local function disableRendering()
-    -- Set the camera to a fixed point
-    Camera.CameraType = Enum.CameraType.Scriptable
-    Camera.CFrame = CFrame.new(0, 0, 0) -- Arbitrary position
-
-    -- Disable 3D rendering
-    RunService:Set3dRenderingEnabled(false)
-
-    -- Optional: print message for confirmation
-    print("3D rendering has been disabled for AFK mode.")
-end
-
--- Function to enable rendering
-local function enableRendering()
-    -- Restore the camera to default behavior
-    Camera.CameraType = Enum.CameraType.Custom
-
-    -- Enable 3D rendering
-    RunService:Set3dRenderingEnabled(true)
-
-    -- Optional: print message for confirmation
-    print("3D rendering has been enabled.")
-end
-
--- Toggle blackscreen and 3D rendering
+-- Toggle blackscreen and rendering
 button.MouseButton1Click:Connect(function()
     isBlackscreenActive = not isBlackscreenActive
     frame.Visible = isBlackscreenActive
     button.Text = isBlackscreenActive and "Disable Black Screen" or "Enable Black Screen"
     button.BackgroundColor3 = isBlackscreenActive and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-
-    -- Disable rendering if blackscreen is active, otherwise enable it
+    
     if isBlackscreenActive then
         disableRendering()
         spawn(limitFPS)
@@ -401,4 +325,3 @@ end)
 
 -- Initial anti-lag removal
 removeLaggyObjects()
-
