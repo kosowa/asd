@@ -250,7 +250,7 @@ button.ZIndex = 3  -- Set an even higher ZIndex to ensure it stays above everyth
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "balik kana sakin pls", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "test13", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 watermark.ZIndex = 3  -- Set a high ZIndex to ensure it stays visible
 
@@ -322,7 +322,6 @@ button.MouseButton1Click:Connect(function()
     isRenderingDisabled = not isRenderingDisabled
     if isRenderingDisabled then
         disableRendering()
-        button.ImageColor3 = Color3.new(0, 0, 0)  -- Make the button black when rendering is disabled
     else
         enableRendering()
         button.ImageColor3 = Color3.fromRGB(255, 255, 255)  -- Restore to white when rendering is enabled
