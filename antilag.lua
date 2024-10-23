@@ -229,10 +229,7 @@ end
 
 local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.IgnoreGuiInset, screenGui.Name = true, "BlackScreenGui"
-
-local frame = Instance.new("Frame", screenGui)
-frame.Size, frame.BackgroundColor3, frame.Visible = UDim2.new(1, 0, 1, 0), Color3.new(0, 0, 0), true
+screenGui.IgnoreGuiInset, screenGui.Name = true, "RenderingControlGui"
 
 -- Button creation
 local button = Instance.new("ImageButton", screenGui)
@@ -245,7 +242,7 @@ button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the squa
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "TESt9", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "test10", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 
 -- Draggable button logic
@@ -308,29 +305,18 @@ local function enableRendering()
     end
 end
 
--- FPS limiter when blackscreen is active
-local isBlackscreenActive = true
-local function limitFPS()
-    while isBlackscreenActive do
-        wait(0.2)  -- Mimic lower FPS
-    end
-end
-
--- Toggle blackscreen and rendering
+-- Toggle 3D rendering with button click
+local isRenderingDisabled = false
 button.MouseButton1Click:Connect(function()
-    isBlackscreenActive = not isBlackscreenActive
-    frame.Visible = isBlackscreenActive
-    button.Text = isBlackscreenActive and "Disable Black Screen" or "Enable Black Screen"
-    button.BackgroundColor3 = isBlackscreenActive and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-
-    if isBlackscreenActive then
+    isRenderingDisabled = not isRenderingDisabled
+    if isRenderingDisabled then
         disableRendering()
-        spawn(limitFPS)
+        button.ImageColor3 = Color3.fromRGB(0, 255, 0)  -- Green color to indicate rendering is disabled
     else
         enableRendering()
+        button.ImageColor3 = Color3.fromRGB(255, 0, 0)  -- Red color to indicate rendering is enabled
     end
 end)
 
--- Initial anti-lag removal
-removeLaggyObjects()
-
+-- Initial setup
+enableRendering()  -- Start with rendering enabled by default
