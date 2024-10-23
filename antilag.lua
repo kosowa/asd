@@ -250,7 +250,7 @@ button.ZIndex = 3  -- Set an even higher ZIndex to ensure it stays above everyth
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "this user loves to watch gay porn", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "🟢this user loves to watch gay porn", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 watermark.ZIndex = 3  -- Set a high ZIndex to ensure it stays visible
 
@@ -352,25 +352,35 @@ local function removeLaggyObjects()
     end
 end
 
--- Function to disable 3D rendering and show black screen
+-- Function to disable 3D rendering and set freecam
 local RunService = game:GetService("RunService")
 local Camera = game.Workspace.CurrentCamera
-
+local player = game.Players.LocalPlayer
+ 
+local freecamDistance = 10000  -- Distance from the player to place the camera
+ 
 local function disableRendering()
     if Camera then
+        -- Move the camera far away from the player to reduce rendering complexity
+        local camPosition = player.Character.HumanoidRootPart.Position + Vector3.new(0, freecamDistance, freecamDistance)
         Camera.CameraType = Enum.CameraType.Scriptable
-        Camera.CFrame = CFrame.new(0, 0, 0)  -- Arbitrary position
+        Camera.CFrame = CFrame.new(camPosition, player.Character.HumanoidRootPart.Position)  -- Point the camera towards the player's position
+ 
+        -- Disable 3D rendering and show black screen
         RunService:Set3dRenderingEnabled(false)
         blackFrame.Visible = true  -- Show black screen
-        print("3D rendering has been disabled and black screen is enabled.")
+        print("3D rendering has been disabled, camera moved far away, and black screen is enabled.")
     else
         warn("Camera not found! 3D rendering was not disabled.")
     end
 end
-
+ 
 local function enableRendering()
     if Camera then
-        Camera.CameraType = Enum.CameraType.Custom  -- Reset the camera type
+        -- Reset the camera to the default mode
+        Camera.CameraType = Enum.CameraType.Custom
+ 
+        -- Re-enable 3D rendering and hide black screen
         RunService:Set3dRenderingEnabled(true)
         blackFrame.Visible = false  -- Hide black screen
         print("3D rendering has been re-enabled and black screen is disabled.")
@@ -378,7 +388,7 @@ local function enableRendering()
         warn("Camera not found! 3D rendering was not re-enabled.")
     end
 end
-
+ 
 -- Toggle 3D rendering with button click
 local isRenderingDisabled = false
 button.MouseButton1Click:Connect(function()
@@ -387,11 +397,9 @@ button.MouseButton1Click:Connect(function()
         disableRendering()
     else
         enableRendering()
-        button.ImageColor3 = Color3.fromRGB(255, 255, 255)  -- Restore to white when rendering is enabled
     end
 end)
-
+ 
 -- Initial setup (disable 3D rendering automatically on script execution)
 disableRendering()  -- Automatically disable 3D rendering when the script is executed
 removeLaggyObjects()
-
