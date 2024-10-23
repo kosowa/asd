@@ -236,6 +236,7 @@ local blackFrame = Instance.new("Frame", screenGui)
 blackFrame.Size = UDim2.new(1, 0, 1, 0)  -- Full screen
 blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)  -- Black color
 blackFrame.Visible = false  -- Hidden by default
+blackFrame.ZIndex = 1  -- Set a lower ZIndex so that the button stays above this frame
 
 -- Button creation
 local button = Instance.new("ImageButton", screenGui)
@@ -244,12 +245,14 @@ button.Size = UDim2.new(0, 57, 0, 57)
 button.Image = "rbxassetid://119520675879398"
 button.BackgroundTransparency = 1  -- Make the background fully transparent
 button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the square
+button.ZIndex = 2  -- Set a higher ZIndex to ensure it is on top of the black screen
 
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "test11", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "test12", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
+watermark.ZIndex = 2  -- Set a higher ZIndex to ensure it is visible on top of the black screen
 
 -- Draggable button logic
 local UIS = game:GetService("UserInputService")
@@ -328,4 +331,3 @@ end)
 
 -- Initial setup
 enableRendering()  -- Start with rendering enabled by default
-
