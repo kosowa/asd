@@ -245,7 +245,7 @@ button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the squa
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "disabled 3d rendering UPD", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "disable 3d rendering TEST2", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 
 -- Draggable button logic
@@ -354,11 +354,33 @@ local function limitFPS()
     end
 end
 
--- Function to toggle 3D rendering
-local function toggle3DRendering(enabled)
-    local player = game.Players.LocalPlayer
-    player.StreamingEnabled = not enabled -- Disable 3D rendering when black screen is active
-    print("3D rendering is " .. (enabled and "enabled" or "disabled"))
+-- AFK Mode: Reduce 3D Rendering
+local RunService = game:GetService("RunService")
+local Camera = game:GetService("Workspace").CurrentCamera
+
+-- Function to disable rendering
+local function disableRendering()
+    -- Set the camera to a fixed point
+    Camera.CameraType = Enum.CameraType.Scriptable
+    Camera.CFrame = CFrame.new(0, 0, 0) -- Arbitrary position
+
+    -- Disable 3D rendering
+    RunService:Set3dRenderingEnabled(false)
+
+    -- Optional: print message for confirmation
+    print("3D rendering has been disabled for AFK mode.")
+end
+
+-- Function to enable rendering
+local function enableRendering()
+    -- Restore the camera to default behavior
+    Camera.CameraType = Enum.CameraType.Custom
+
+    -- Enable 3D rendering
+    RunService:Set3dRenderingEnabled(true)
+
+    -- Optional: print message for confirmation
+    print("3D rendering has been enabled.")
 end
 
 -- Toggle blackscreen and 3D rendering
@@ -367,14 +389,17 @@ button.MouseButton1Click:Connect(function()
     frame.Visible = isBlackscreenActive
     button.Text = isBlackscreenActive and "Disable Black Screen" or "Enable Black Screen"
     button.BackgroundColor3 = isBlackscreenActive and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 0, 0)
-    
-    toggle3DRendering(isBlackscreenActive)
-    
-    if isBlackscreenActive then 
-        spawn(limitFPS) 
+
+    -- Disable rendering if blackscreen is active, otherwise enable it
+    if isBlackscreenActive then
+        disableRendering()
+        spawn(limitFPS)
+    else
+        enableRendering()
     end
 end)
 
 -- Initial anti-lag removal
 removeLaggyObjects()
+
 
