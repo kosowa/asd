@@ -231,6 +231,12 @@ local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 local screenGui = Instance.new("ScreenGui", playerGui)
 screenGui.IgnoreGuiInset, screenGui.Name = true, "RenderingControlGui"
 
+-- Black screen frame
+local blackFrame = Instance.new("Frame", screenGui)
+blackFrame.Size = UDim2.new(1, 0, 1, 0)  -- Full screen
+blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)  -- Black color
+blackFrame.Visible = false  -- Hidden by default
+
 -- Button creation
 local button = Instance.new("ImageButton", screenGui)
 button.Position = UDim2.new(0.4, 0, 0.05, 0)
@@ -242,7 +248,7 @@ button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the squa
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "test10", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "test11", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 
 -- Draggable button logic
@@ -280,7 +286,7 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
--- Function to disable 3D rendering
+-- Function to disable 3D rendering and show black screen
 local RunService = game:GetService("RunService")
 local Camera = game.Workspace.CurrentCamera
 
@@ -289,7 +295,8 @@ local function disableRendering()
         Camera.CameraType = Enum.CameraType.Scriptable
         Camera.CFrame = CFrame.new(0, 0, 0)  -- Arbitrary position
         RunService:Set3dRenderingEnabled(false)
-        print("3D rendering has been disabled.")
+        blackFrame.Visible = true  -- Show black screen
+        print("3D rendering has been disabled and black screen is enabled.")
     else
         warn("Camera not found! 3D rendering was not disabled.")
     end
@@ -299,7 +306,8 @@ local function enableRendering()
     if Camera then
         Camera.CameraType = Enum.CameraType.Custom  -- Reset the camera type
         RunService:Set3dRenderingEnabled(true)
-        print("3D rendering has been re-enabled.")
+        blackFrame.Visible = false  -- Hide black screen
+        print("3D rendering has been re-enabled and black screen is disabled.")
     else
         warn("Camera not found! 3D rendering was not re-enabled.")
     end
@@ -311,12 +319,13 @@ button.MouseButton1Click:Connect(function()
     isRenderingDisabled = not isRenderingDisabled
     if isRenderingDisabled then
         disableRendering()
-        button.ImageColor3 = Color3.fromRGB(0, 255, 0)  -- Green color to indicate rendering is disabled
+        button.ImageColor3 = Color3.new(0, 0, 0)  -- Make the button black when rendering is disabled
     else
         enableRendering()
-        button.ImageColor3 = Color3.fromRGB(255, 0, 0)  -- Red color to indicate rendering is enabled
+        button.ImageColor3 = Color3.fromRGB(255, 255, 255)  -- Restore to white when rendering is enabled
     end
 end)
 
 -- Initial setup
 enableRendering()  -- Start with rendering enabled by default
+
