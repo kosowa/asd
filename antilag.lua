@@ -1,3 +1,4 @@
+-- GET THE HELL OUT OF HERE NIGGA 
 -- Get the LocalPlayer (the player running the executor)
 local player = game.Players.LocalPlayer
 local playerName = player.Name
