@@ -1,4 +1,4 @@
--- GET THE HELL OUT OF HERE NIGGA 
+-- 1.GET THE HELL OUT OF HERE NIGGA 
 -- Get the LocalPlayer (the player running the executor)
 local player = game.Players.LocalPlayer
 local playerName = player.Name
@@ -419,29 +419,24 @@ local function removeLaggyObjects()
     end
 end
 
--- Function to disable 3D rendering and set freecam
+-- Function to disable 3D rendering
 local RunService = game:GetService("RunService")
 local Camera = game.Workspace.CurrentCamera
 local player = game.Players.LocalPlayer
  
-local freecamDistance = 10000  -- Distance from the player to place the camera
- 
+-- Function to disable 3D rendering and show black screen
 local function disableRendering()
     if Camera then
-        -- Move the camera far away from the player to reduce rendering complexity
-        local camPosition = player.Character.HumanoidRootPart.Position + Vector3.new(0, freecamDistance, freecamDistance)
-        Camera.CameraType = Enum.CameraType.Scriptable
-        Camera.CFrame = CFrame.new(camPosition, player.Character.HumanoidRootPart.Position)  -- Point the camera towards the player's position
- 
         -- Disable 3D rendering and show black screen
         RunService:Set3dRenderingEnabled(false)
         blackFrame.Visible = true  -- Show black screen
-        print("3D rendering has been disabled, camera moved far away, and black screen is enabled.")
+        print("3D rendering has been disabled and black screen is enabled.")
     else
         warn("Camera not found! 3D rendering was not disabled.")
     end
 end
  
+-- Function to re-enable 3D rendering and hide black screen
 local function enableRendering()
     if Camera then
         -- Reset the camera to the default mode
