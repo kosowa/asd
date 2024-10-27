@@ -373,7 +373,7 @@ countdownText.Visible = true
 -- Function to remove laggy objects and textures
 local function removeLaggyObjects()
     -- Countdown before removal
-    for i = 10, 0, -1 do
+    for i = 5, 0, -1 do
         countdownText.Text = "Anti-lag in " .. i .. " seconds"
         wait(1)
     end
