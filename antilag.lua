@@ -374,7 +374,7 @@ countdownText.Visible = true
 local function removeLaggyObjects()
     -- Countdown before removal
     for i = 5, 0, -1 do
-        countdownText.Text = "Anti-lag in " .. i .. " seconds"
+        countdownText.Text = "Optimizing " .. i .. " seconds"
         wait(1)
     end
     countdownText.Visible = false
