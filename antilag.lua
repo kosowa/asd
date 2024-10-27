@@ -114,7 +114,7 @@ end
 
 -- Change Atmosphere color to black if Atmosphere exists
 if game.Lighting:FindFirstChild("Atmosphere") then
-    game.Lighting.Atmosphere.Color = Color3.new(0, 0, 0)
+    game.Lighting.Atmosphere.Color = Color3.new(255, 255, 255)
 end
 
 
@@ -156,6 +156,7 @@ end
 
 
 -- DELETE MAP AND NESTED ITEMS
+-- DEMON SLAYER MAP DELETE
 local map = game.Workspace:FindFirstChild("Map")
 
 if map then
@@ -206,7 +207,6 @@ else
     print("Map not found")
 end
 
-
 -- SAND VILLAGE DELETE
 local map = game.Workspace:FindFirstChild("Map")
 
@@ -227,6 +227,67 @@ else
     print("Map not found")
 end
 
+--SHIBUYAS STATION MAP DELETE
+local map = game.Workspace:FindFirstChild("Map")
+
+if map then
+    local building = map:FindFirstChild("Building")
+    local targets = {
+        map:FindFirstChild("Hill Spots"),
+        map:FindFirstChild("Invisible Walls"),
+        map:FindFirstChild("Pillars"),
+        map:FindFirstChild("Rails"),
+        map:FindFirstChild("Vents"),
+        building and building:FindFirstChild("Stairways"),
+        building and building:FindFirstChild("Wall Strips"),
+        building and building:FindFirstChild("Lights")
+    }
+
+    -- Find all "default" parts under "Building" and add them to targets
+    if building then
+        for _, child in ipairs(building:GetChildren()) do
+            if child.Name == "default" then
+                table.insert(targets, child)
+            end
+        end
+    end
+
+    -- Destroy each target
+    for _, target in pairs(targets) do
+        if target then
+            target:Destroy()
+            print(target.Name .. " removed")
+        else
+            print("Object not found")
+        end
+    end
+else
+    print("Map not found")
+end
+
+--SHIBUYAS LEGENDSTAGE MAP DELETE
+local map = game.Workspace:FindFirstChild("Map")
+
+if map then
+    local objects = map:FindFirstChild("Objects")
+    
+    if objects then
+        for _, part in ipairs(objects:GetChildren()) do
+            if part.Name ~= "Road Base" then
+                part:Destroy()
+                print(part.Name .. " removed")
+            else
+                print(part.Name .. " kept")
+            end
+        end
+    else
+        print("Objects not found")
+    end
+else
+    print("Map not found")
+end
+
+-- ANTI LAG PART
 local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 local screenGui = Instance.new("ScreenGui", playerGui)
 screenGui.IgnoreGuiInset, screenGui.Name = true, "RenderingControlGui"
