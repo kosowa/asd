@@ -114,7 +114,7 @@ end
 
 -- Change Atmosphere color to black if Atmosphere exists
 if game.Lighting:FindFirstChild("Atmosphere") then
-    game.Lighting.Atmosphere.Color = Color3.new(255, 255, 255)
+    game.Lighting.Atmosphere.Color = Color3.new(85, 255, 255)
 end
 
 
