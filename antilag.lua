@@ -112,11 +112,16 @@ if game.Lighting:FindFirstChild("SunRays") then
     game.Lighting.SunRays.Enabled = false
 end
 
--- Change Atmosphere color to black if Atmosphere exists
-if game.Lighting:FindFirstChild("Atmosphere") then
-    game.Lighting.Atmosphere.Color = Color3.new(85, 255, 255)
-end
+-- delete atmosphere
+local lighting = game:GetService("Lighting")
+local atmosphere = lighting:FindFirstChildOfClass("Atmosphere")
 
+if atmosphere then
+    atmosphere:Destroy()
+    print("Atmosphere removed")
+else
+    print("Atmosphere not found")
+end
 
 -- LOBBY BUILDINGS REMOVE
 if game.Workspace:FindFirstChild("MainLobby") then
