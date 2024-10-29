@@ -125,29 +125,53 @@ else
 end
 
 -- LOBBY BUILDINGS REMOVE
-if game.Workspace:FindFirstChild("MainLobby") then
+local lobby = game.Workspace:FindFirstChild("MainLobby")
 
+if lobby then
     local targets = {
-        game.Workspace.MainLobby:FindFirstChild("Buildings"),
-        game.Workspace.MainLobby:FindFirstChild("Circles"),
-        game.Workspace.MainLobby:FindFirstChild("Effects"),
-        game.Workspace.MainLobby:FindFirstChild("ExpensiveTrees"),
-        game.Workspace.MainLobby:FindFirstChild("Fireflies"),
-        game.Workspace.MainLobby:FindFirstChild("Folliage"),
-        game.Workspace.MainLobby:FindFirstChild("Lights"),
-        game.Workspace.MainLobby:FindFirstChild("NoEntry"),
-        game.Workspace.MainLobby:FindFirstChild("Plants"),
-        game.Workspace.MainLobby:FindFirstChild("Props"),
-        game.Workspace.MainLobby:FindFirstChild("Rocks"),
-        game.Workspace.MainLobby:FindFirstChild("Trees"),
-        game.Workspace.MainLobby:FindFirstChild("Banner"),
-        game.Workspace.MainLobby:FindFirstChild("ChallengeBanner"),
-        game.Workspace.MainLobby:FindFirstChild("Model"),
-        game.Workspace.MainLobby:FindFirstChild("No-Entry_Fence"),
-        game.Workspace.MainLobby:FindFirstChild("Prop1"),
-        game.Workspace.MainLobby:FindFirstChild("Thing")
+        lobby:FindFirstChild("Buildings"),
+        lobby:FindFirstChild("Circles"),
+        lobby:FindFirstChild("Effects"),
+        lobby:FindFirstChild("ExpensiveTrees"),
+        lobby:FindFirstChild("Fireflies"),
+        lobby:FindFirstChild("Folliage"),
+        lobby:FindFirstChild("Lights"),
+        lobby:FindFirstChild("NoEntry"),
+        lobby:FindFirstChild("Plants"),
+        lobby:FindFirstChild("Props"),
+        lobby:FindFirstChild("Rocks"),
+        lobby:FindFirstChild("Trees"),
+        lobby:FindFirstChild("Banner"),
+        lobby:FindFirstChild("ChallengeBanner"),
+        lobby:FindFirstChild("Floor_Raids"),
+        lobby:FindFirstChild("Neon Sign 1"),
+        lobby:FindFirstChild("Raid_Pillar"),
+        lobby:FindFirstChild("Space Ship Green"),
+        lobby:FindFirstChild("Space Ship Orange"),
+        lobby:FindFirstChild("Thing"),
+        lobby:FindFirstChild("Cylinder.072"),
+        lobby:FindFirstChild("Cylinder.021"),
     }
- 
+
+    local targetNames = {
+        ["Image Ad Unit 2"] = true,
+        ["No-Entry_Fence"] = true,  -- Added quotes to fix key
+        ["Model"] = true,
+        ["Doorway"] = true,
+        ["Prop1"] = true,
+        ["Sign_Capybara"] = true,
+        ["Small_wall"] = true
+    }
+    
+    if lobby then
+        for _, child in ipairs(lobby:GetChildren()) do
+            if targetNames[child.Name] then
+                table.insert(targets, child)
+            end
+        end
+    end
+    
+    -- DESTROY
     for _, target in pairs(targets) do
         if target then
             target:Destroy()
@@ -157,9 +181,8 @@ if game.Workspace:FindFirstChild("MainLobby") then
         end
     end
 else
-    print("MainLobby not found, skipping object removal")
+    print("Map not found")
 end
-
 
 -- DELETE MAP AND NESTED ITEMS
 -- DEMON SLAYER MAP DELETE
