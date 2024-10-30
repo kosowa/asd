@@ -340,7 +340,7 @@ button.ZIndex = 3  -- Set an even higher ZIndex to ensure it stays above everyth
 -- Watermark text
 local watermark = Instance.new("TextLabel", screenGui)
 watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "🟢this user loves to watch gay porn", true, 1
+watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "roblox crashing bug,FIXED 🟢", true, 1
 watermark.TextColor3 = Color3.new(1, 1, 1)
 watermark.ZIndex = 3  -- Set a high ZIndex to ensure it stays visible
 
