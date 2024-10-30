@@ -442,49 +442,41 @@ local function removeLaggyObjects()
     end
 end
 
--- Function to disable 3D rendering
-local RunService = game:GetService("RunService")
+-- Function to show blackscreen
 local Camera = game.Workspace.CurrentCamera
 local player = game.Players.LocalPlayer
- 
--- Function to disable 3D rendering and show black screen
-local function disableRendering()
+
+-- Function to show black screen
+local function showBlackScreen()
     if Camera then
-        -- Disable 3D rendering and show black screen
-        RunService:Set3dRenderingEnabled(false)
         blackFrame.Visible = true  -- Show black screen
-        print("3D rendering has been disabled and black screen is enabled.")
+        print("Black screen is enabled.")
     else
-        warn("Camera not found! 3D rendering was not disabled.")
+        warn("Camera not found! Black screen was not enabled.")
     end
 end
- 
--- Function to re-enable 3D rendering and hide black screen
-local function enableRendering()
+
+-- Function to hide black screen
+local function hideBlackScreen()
     if Camera then
-        -- Reset the camera to the default mode
-        Camera.CameraType = Enum.CameraType.Custom
- 
-        -- Re-enable 3D rendering and hide black screen
-        RunService:Set3dRenderingEnabled(true)
         blackFrame.Visible = false  -- Hide black screen
-        print("3D rendering has been re-enabled and black screen is disabled.")
+        print("Black screen is disabled.")
     else
-        warn("Camera not found! 3D rendering was not re-enabled.")
+        warn("Camera not found! Black screen was not disabled.")
     end
 end
- 
--- Toggle 3D rendering with button click
-local isRenderingDisabled = false
+
+-- Toggle black screen with button click
+local isBlackScreenEnabled = false
 button.MouseButton1Click:Connect(function()
-    isRenderingDisabled = not isRenderingDisabled
-    if isRenderingDisabled then
-        disableRendering()
+    isBlackScreenEnabled = not isBlackScreenEnabled
+    if isBlackScreenEnabled then
+        showBlackScreen()
     else
-        enableRendering()
+        hideBlackScreen()
     end
 end)
- 
--- Initial setup (disable 3D rendering automatically on script execution)
-disableRendering()  -- Automatically disable 3D rendering when the script is executed
+
+-- Initial setup (show black screen automatically on script execution)
+showBlackScreen()
 removeLaggyObjects()
