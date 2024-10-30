@@ -438,7 +438,6 @@ local function removeLaggyObjects()
         terrain.WaterTransparency = 0
         terrain.WaterWaveSize = 0
         terrain.WaterWaveSpeed = 0
-        terrain.Decoration = false
     end
 end
 
