@@ -467,7 +467,7 @@ local function hideBlackScreen()
 end
 
 -- Toggle black screen with button click
-local isBlackScreenEnabled = false
+local isBlackScreenEnabled = true
 button.MouseButton1Click:Connect(function()
     isBlackScreenEnabled = not isBlackScreenEnabled
     if isBlackScreenEnabled then
