@@ -142,7 +142,6 @@ if lobby then
         lobby:FindFirstChild("Rocks"),
         lobby:FindFirstChild("Trees"),
         lobby:FindFirstChild("Banner"),
-        lobby:FindFirstChild("ChallengeBanner"),
         lobby:FindFirstChild("Floor_Raids"),
         lobby:FindFirstChild("Neon Sign 1"),
         lobby:FindFirstChild("Raid_Pillar"),
