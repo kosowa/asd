@@ -402,21 +402,6 @@ local function removeLaggyObjects()
         end
     end
 
-    -- Remove textures from parts and change material to SmoothPlastic
-    for _, part in pairs(workspace:GetDescendants()) do
-        if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
-            part.Material = Enum.Material.SmoothPlastic
-
-            -- Remove SurfaceGuis, Decals, and Textures
-            for _, child in pairs(part:GetDescendants()) do
-                if child:IsA("Decal") or child:IsA("Texture") or child:IsA("SurfaceGui") then
-                    child:Destroy()
-                end
-            end
-        end
-    end
-    print("Laggy objects removed and textures disabled")
-    
     -- Adjust lighting settings for anti-lag
     local lighting = game:GetService("Lighting")
     lighting.GlobalShadows = false
@@ -432,6 +417,21 @@ local function removeLaggyObjects()
         terrain.WaterWaveSize = 0
         terrain.WaterWaveSpeed = 0
     end
+
+    -- Remove textures from parts and change material to SmoothPlastic
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
+            part.Material = Enum.Material.SmoothPlastic
+
+            -- Remove SurfaceGuis, Decals, and Textures
+            for _, child in pairs(part:GetDescendants()) do
+                if child:IsA("Decal") or child:IsA("Texture") or child:IsA("SurfaceGui") then
+                    child:Destroy()
+                end
+            end
+        end
+    end
+    print("Laggy objects removed and textures disabled")
 end
 
 --------------------------------------------------
