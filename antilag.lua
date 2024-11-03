@@ -140,7 +140,8 @@ local Window = Fluent:CreateWindow({
 })
 
 local Tabs = {
-    Main = Window:AddTab({ Title = "Main", Icon = "boxes" }),
+    Main = Window:AddTab({ Title = "Optimizer", Icon = "boxes" }),
+    Autoplay = Window:AddTab({ Title = "Autoplay", Icon = "play" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
@@ -440,6 +441,11 @@ do
     Tabs.Main:AddParagraph({
         Title = "Optimizer",
         Content = "Optimize your gameplay!"
+    })
+
+    Tabs.Autoplay:AddParagraph({
+            Title = "UNDER DEVELOPMENT",
+            Content = "Pag aralan kopa function ng\nautojoin lobby!"
     })
 
     -- Toggle BlackScreen
