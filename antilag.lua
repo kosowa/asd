@@ -438,7 +438,8 @@ end
 
 do
     Tabs.Main:AddParagraph({
-        Title = "Script Functions"
+        Title = "Optimizer",
+        Content = "Optimize your gameplay!"
     })
 
     -- Toggle BlackScreen
