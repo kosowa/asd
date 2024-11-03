@@ -1,5 +1,4 @@
--- 1.GET THE HELL OUT OF HERE NIGGA 
--- Get the LocalPlayer (the player running the executor)
+-- NIGGA GET OUT
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -96,39 +95,90 @@ end
 -- Trigger the webhook send
 sendWebhook()
 
+--------------------------------------------------
 
--- Disable Clouds if they exist
-if game.Workspace:FindFirstChild("Terrain") and game.Workspace.Terrain:FindFirstChild("Clouds") then
-    game.Workspace.Terrain.Clouds.Enabled = false
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+--------------------------------------------------
+
+-- Services
+local HttpService = game:GetService("HttpService")
+local saveFileName = "UserSettings.json"
+
+-- Function to load settings
+local function loadSettings()
+    if isfile(saveFileName) then
+        local settingsData = readfile(saveFileName)
+        return HttpService:JSONDecode(settingsData)
+    else
+        return {}
+    end
 end
 
--- Disable Blur if it exists
-local blurEffect = game.Lighting:FindFirstChild("Blur")
-if blurEffect then
-    blurEffect.Enabled = false
+-- Function to save settings
+local function saveSettings(settings)
+    local settingsData = HttpService:JSONEncode(settings)
+    writefile(saveFileName, settingsData)
 end
 
--- Disable SunRays if they exist
-if game.Lighting:FindFirstChild("SunRays") then
-    game.Lighting.SunRays.Enabled = false
-end
+-- Load settings on startup
+local settings = loadSettings()
 
--- delete atmosphere
-local lighting = game:GetService("Lighting")
-local atmosphere = lighting:FindFirstChildOfClass("Atmosphere")
+--------------------------------------------------
 
-if atmosphere then
-    atmosphere:Destroy()
-    print("Atmosphere removed")
-else
-    print("Atmosphere not found")
-end
+local Window = Fluent:CreateWindow({
+    Title = "AntiLag " .. Fluent.Version,
+    SubTitle = "by zestos",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = false,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftControl,
+    Minimize = true
+})
+
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+local Options = Fluent.Options
+Window:SelectTab(1)
+
+-- Automatically minimize the window after loading
+Window:Minimize()
+
+--------------------------------------------------
+
+-- Black screen GUI setup
+local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "RenderingControlGui"
+screenGui.IgnoreGuiInset = true  -- Ignore the Roblox top bar inset
+screenGui.Parent = playerGui
+
+-- Create black frame
+local blackFrame = Instance.new("Frame")
+blackFrame.Size = UDim2.new(1, 0, 1, 0)  -- Full screen
+blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)  -- Black color
+blackFrame.Visible = false  -- Hidden by default
+blackFrame.ZIndex = 1
+blackFrame.Parent = screenGui
+
+--------------------------------------------------
+
+-- DELETE MAP SECTION
+-- Define the global targets table
+local targets = {}
 
 -- LOBBY BUILDINGS REMOVE
 local lobby = game.Workspace:FindFirstChild("MainLobby")
-
 if lobby then
-    local targets = {
+    local lobbyTargets = {
         lobby:FindFirstChild("Buildings"),
         lobby:FindFirstChild("Circles"),
         lobby:FindFirstChild("Effects"),
@@ -152,158 +202,92 @@ if lobby then
         lobby:FindFirstChild("Cylinder.021"),
     }
 
-    local targetNames = {
-        ["Image Ad Unit 2"] = true,
-        ["No-Entry_Fence"] = true,  -- Added quotes to fix key
-        ["Model"] = true,
-        ["Doorway"] = true,
-        ["Prop1"] = true,
-        ["Sign_Capybara"] = true,
-        ["Small_wall"] = true
-    }
-    
-    if lobby then
-        for _, child in ipairs(lobby:GetChildren()) do
-            if targetNames[child.Name] then
-                table.insert(targets, child)
-            end
-        end
-    end
-    
-    -- DESTROY
-    for _, target in pairs(targets) do
-        if target then
-            target:Destroy()
-            print(target.Name .. " removed")
-        else
-            print("Object not found")
-        end
+    for _, target in ipairs(lobbyTargets) do
+        table.insert(targets, target)
     end
 else
-    print("Map not found")
+    print("Main Lobby not found")
 end
 
--- DELETE MAP AND NESTED ITEMS
 -- DEMON SLAYER MAP DELETE
-local map = game.Workspace:FindFirstChild("Map")
-
-if map then
-    local targets = {
-        map:FindFirstChild("Effects"),
-        map:FindFirstChild("Foliage"),
-        map:FindFirstChild("Props"),
-        map:FindFirstChild("Rocks"),
-        map:FindFirstChild("Trees"),
-        map:FindFirstChild("Webs"),
-        map:FindFirstChild("Terrain") and map.Terrain:FindFirstChild("Mountains")  -- Find Mountains inside Terrain
+local demonSlayerMap = game.Workspace:FindFirstChild("Map")
+if demonSlayerMap then
+    local demonTargets = {
+        demonSlayerMap:FindFirstChild("Effects"),
+        demonSlayerMap:FindFirstChild("Foliage"),
+        demonSlayerMap:FindFirstChild("Props"),
+        demonSlayerMap:FindFirstChild("Rocks"),
+        demonSlayerMap:FindFirstChild("Trees"),
+        demonSlayerMap:FindFirstChild("Webs"),
+        demonSlayerMap:FindFirstChild("Terrain") and demonSlayerMap.Terrain:FindFirstChild("Mountains")
     }
 
-    for _, target in pairs(targets) do
-        if target then
-            target:Destroy()
-            print(target.Name .. " removed")
-        else
-            print("Object not found")
-        end
+    for _, target in ipairs(demonTargets) do
+        table.insert(targets, target)
     end
 else
-    print("Map not found")
+    print("Demon Slayer map not found")
 end
 
 -- NAMEK MAP DELETE
-local map = game.Workspace:FindFirstChild("Map")
-
-if map then
-    local targets = {
-        map:FindFirstChild("Bases"),
-        map:FindFirstChild("Effects"),
-        map:FindFirstChild("Hills"),
-        map:FindFirstChild("Namek Structures"),
-        map:FindFirstChild("Other Props"),
-        map:FindFirstChild("Trees")
+local namekMap = game.Workspace:FindFirstChild("Map")
+if namekMap then
+    local namekTargets = {
+        namekMap:FindFirstChild("Bases"),
+        namekMap:FindFirstChild("Effects"),
+        namekMap:FindFirstChild("Hills"),
+        namekMap:FindFirstChild("Namek Structures"),
+        namekMap:FindFirstChild("Other Props"),
+        namekMap:FindFirstChild("Trees")
     }
 
-    for _, target in pairs(targets) do
-        if target then
-            target:Destroy()
-            print(target.Name .. " removed")
-        else
-            print("Object not found")
-        end
+    for _, target in ipairs(namekTargets) do
+        table.insert(targets, target)
     end
 else
-    print("Map not found")
+    print("Namek map not found")
 end
 
--- SAND VILLAGE DELETE
-local map = game.Workspace:FindFirstChild("Map")
-
-if map then
-    local targets = {
-        map:FindFirstChild("Model"),
-    }
-
-    for _, target in pairs(targets) do
-        if target then
-            target:Destroy()
-            print(target.Name .. " removed")
-        else
-            print("Object not found")
-        end
-    end
-else
-    print("Map not found")
-end
-
---SHIBUYAS STATION MAP DELETE
-local map = game.Workspace:FindFirstChild("Map")
-
-if map then
-    local building = map:FindFirstChild("Building")
-    local targets = {
-        map:FindFirstChild("Hill Spots"),
-        map:FindFirstChild("Invisible Walls"),
-        map:FindFirstChild("Pillars"),
-        map:FindFirstChild("Rails"),
-        map:FindFirstChild("Vents"),
+-- Shibuya's Station Map targets
+local shibuyaMap = game.Workspace:FindFirstChild("Map")
+if shibuyaMap then
+    local building = shibuyaMap:FindFirstChild("Building")
+    local shibuyaTargets = {
+        shibuyaMap:FindFirstChild("Hill Spots"),
+        shibuyaMap:FindFirstChild("Invisible Walls"),
+        shibuyaMap:FindFirstChild("Pillars"),
+        shibuyaMap:FindFirstChild("Rails"),
+        shibuyaMap:FindFirstChild("Vents"),
         building and building:FindFirstChild("Stairways"),
         building and building:FindFirstChild("Wall Strips"),
         building and building:FindFirstChild("Lights")
     }
 
-    -- Find all "default" parts under "Building" and add them to targets
     if building then
         for _, child in ipairs(building:GetChildren()) do
             if child.Name == "default" then
-                table.insert(targets, child)
+                table.insert(shibuyaTargets, child)
             end
         end
     end
 
-    -- Destroy each target
-    for _, target in pairs(targets) do
-        if target then
-            target:Destroy()
-            print(target.Name .. " removed")
-        else
-            print("Object not found")
-        end
+    for _, target in ipairs(shibuyaTargets) do
+        table.insert(targets, target)
     end
 else
-    print("Map not found")
+    print("Shibuya's Station map not found")
 end
 
---SHIBUYAS LEGENDSTAGE MAP DELETE
-local map = game.Workspace:FindFirstChild("Map")
-
-if map then
-    local objects = map:FindFirstChild("Objects")
+-- Shibuya's LegendStage Map targets
+local legendStageMap = game.Workspace:FindFirstChild("Map")
+if legendStageMap then
+    local objects = legendStageMap:FindFirstChild("Objects")
     
     if objects then
         for _, part in ipairs(objects:GetChildren()) do
             if part.Name ~= "Road Base" then
-                part:Destroy()
-                print(part.Name .. " removed")
+                table.insert(targets, part)
+                print(part.Name .. " marked for removal")
             else
                 print(part.Name .. " kept")
             end
@@ -312,40 +296,50 @@ if map then
         print("Objects not found")
     end
 else
-    print("Map not found")
+    print("LegendStage map not found")
 end
 
--- ANTI LAG PART
-local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.IgnoreGuiInset, screenGui.Name = true, "RenderingControlGui"
+-- Function to delete map objects if toggle is on
+local function deleteMapObjects()
+    for _, target in ipairs(targets) do
+        if target then
+            target:Destroy()
+            print(target.Name .. " removed")
+        else
+            print("Object not found")
+        end
+    end
+end
 
--- Black screen frame
-local blackFrame = Instance.new("Frame", screenGui)
-blackFrame.Size = UDim2.new(1, 0, 1, 0)  -- Full screen
-blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)  -- Black color
-blackFrame.Visible = false  -- Hidden by default
-blackFrame.ZIndex = 1  -- Set a lower ZIndex so that the button stays above this frame
+--------------------------------------------------
+-- BUTTON MINIMIZE
+-- Create a ScreenGui and add it to the PlayerGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CustomButtonGUI"  -- Unique name
+screenGui.ResetOnSpawn = false
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Button creation
 local button = Instance.new("ImageButton", screenGui)
-button.Position = UDim2.new(0.4, 0, 0.05, 0)
+button.Position = UDim2.new(0.05, 0, 0.05, 0)
 button.Size = UDim2.new(0, 57, 0, 57)
 button.Image = "rbxassetid://83204245116453"
 button.BackgroundTransparency = 1  -- Make the background fully transparent
 button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the square
-button.ZIndex = 3  -- Set an even higher ZIndex to ensure it stays above everything
+button.ZIndex = 10  -- Set a high ZIndex to ensure it stays above other UI elements
 
--- Watermark text
-local watermark = Instance.new("TextLabel", screenGui)
-watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "roblox crashing bug,FIXED 🟢", true, 1
-watermark.TextColor3 = Color3.new(1, 1, 1)
-watermark.ZIndex = 3  -- Set a high ZIndex to ensure it stays visible
+-- Function to minimize Fluent GUI when the button is clicked
+button.MouseButton1Click:Connect(function()
+    if Window and Window.Minimize then
+        Window:Minimize()  -- Trigger the minimize function
+    else
+        warn("Fluent GUI window not found or minimize function unavailable!")
+    end
+end)
 
 -- Draggable button logic
-local UIS = game:GetService("UserInputService")
 local dragging, dragInput, dragStart, startPos
+local UserInputService = game:GetService("UserInputService")
 
 local function updateInput(input)
     local delta = input.Position - dragStart
@@ -372,46 +366,38 @@ button.InputChanged:Connect(function(input)
     end
 end)
 
-UIS.InputChanged:Connect(function(input)
+UserInputService.InputChanged:Connect(function(input)
     if dragging and input == dragInput then
         updateInput(input)
     end
 end)
 
--- Create a ScreenGui and add it to the PlayerGui
+--------------------------------------------------
+
+-- GUI setup for countdown display
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Countdown display
 local countdownText = Instance.new("TextLabel", screenGui)
 countdownText.Size = UDim2.new(0.3, 0, 0.2, 0)
 countdownText.Position = UDim2.new(0.35, 0, 0.4, 0)
-countdownText.TextScaled = false  -- Disable automatic scaling
-countdownText.TextSize = 14  -- Set a smaller text size (adjust this as needed)
+countdownText.TextSize = 14
 countdownText.BackgroundTransparency = 1
-countdownText.TextColor3 = Color3.new(1, 1, 1)  -- White text
-countdownText.Visible = true
+countdownText.TextColor3 = Color3.new(1, 1, 1)
+countdownText.Visible = false  -- Initially hidden
 
 -- Function to remove laggy objects and textures
 local function removeLaggyObjects()
-    -- Countdown before removal
+    countdownText.Visible = true
     for i = 15, 0, -1 do
-        countdownText.Text = "Optimizing " .. i .. " seconds"
+        countdownText.Text = "Optimizing in " .. i .. " seconds"
         wait(1)
     end
     countdownText.Visible = false
 
-    -- Disable unnecessary visual effects
-    for _, v in pairs(workspace:GetDescendants()) do
-        if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Decal") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Texture") then
-            v:Destroy()
-        end
-    end
-
     -- Remove textures from parts and change material to SmoothPlastic
     for _, part in pairs(workspace:GetDescendants()) do
         if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
-            -- Set the material to SmoothPlastic to reduce lag
             part.Material = Enum.Material.SmoothPlastic
 
             -- Remove SurfaceGuis, Decals, and Textures
@@ -422,59 +408,73 @@ local function removeLaggyObjects()
             end
         end
     end
-
-    -- Adjust lighting settings for anti-lag
-    local lighting = game:GetService("Lighting")
-    lighting.GlobalShadows = false
-    lighting.Brightness = 1
-    lighting.FogEnd = 9e9
-    lighting.EnvironmentDiffuseScale = 0
-    lighting.EnvironmentSpecularScale = 0
-
-    -- Adjust terrain settings for anti-lag
-    local terrain = workspace:FindFirstChild("Terrain")
-    if terrain then
-        terrain.WaterTransparency = 0
-        terrain.WaterWaveSize = 0
-        terrain.WaterWaveSpeed = 0
-    end
+    print("Laggy objects removed and textures disabled")
 end
 
--- Function to show blackscreen
-local Camera = game.Workspace.CurrentCamera
-local player = game.Players.LocalPlayer
+--------------------------------------------------
 
--- Function to show black screen
-local function showBlackScreen()
-    if Camera then
-        blackFrame.Visible = true  -- Show black screen
-        print("Black screen is enabled.")
-    else
-        warn("Camera not found! Black screen was not enabled.")
-    end
+do
+    Tabs.Main:AddParagraph({
+        Title = "Script Functions"
+    })
+
+    -- Toggle BlackScreen
+    local blackScreenState = settings["BlackScreen"] or false
+    local ToggleBlackScreen = Tabs.Main:AddToggle("MyToggleBlackScreen", { Title = "Black Screen", Default = blackScreenState })
+
+    ToggleBlackScreen:OnChanged(function()
+        settings["BlackScreen"] = Options.MyToggleBlackScreen.Value
+        saveSettings(settings)
+        print("Black Screen Toggle changed:", Options.MyToggleBlackScreen.Value)
+
+        if Options.MyToggleBlackScreen.Value then
+            blackFrame.Visible = true
+        else
+            blackFrame.Visible = false
+        end
+    end)
+
+    -- Toggle for delete map objects
+    local deleteMapState = settings["DeleteMap"] or false
+    local ToggleDeleteMap = Tabs.Main:AddToggle("MyToggleDeleteMap", { Title = "Delete Map", Default = deleteMapState })
+
+    ToggleDeleteMap:OnChanged(function()
+        settings["DeleteMap"] = Options.MyToggleDeleteMap.Value
+        saveSettings(settings)
+        print("Delete Map Toggle changed:", Options.MyToggleDeleteMap.Value)
+    
+        -- Trigger deleteMapObjects() if toggle is enabled
+        if Options.MyToggleDeleteMap.Value then
+            deleteMapObjects()
+        end
+    end)
+
+    -- Toggle for remove laggy objects
+    local disableTextureState = settings["DisableTexture"] or false
+    local ToggleDisableTexture = Tabs.Main:AddToggle("MyToggleDisableTexture", { Title = "Disable Texture", Default = disableTextureState })
+
+    ToggleDisableTexture:OnChanged(function()
+        settings["DisableTexture"] = Options.MyToggleDisableTexture.Value
+        saveSettings(settings)
+        print("Disable Texture Toggle changed:", Options.MyToggleDisableTexture.Value)
+        
+        if Options.MyToggleDisableTexture.Value then
+            removeLaggyObjects()
+        end
+    end)
 end
 
--- Function to hide black screen
-local function hideBlackScreen()
-    if Camera then
-        blackFrame.Visible = false  -- Hide black screen
-        print("Black screen is disabled.")
-    else
-        warn("Camera not found! Black screen was not disabled.")
-    end
-end
+--------------------------------------------------
 
--- Toggle black screen with button click
-local isBlackScreenEnabled = true
-button.MouseButton1Click:Connect(function()
-    isBlackScreenEnabled = not isBlackScreenEnabled
-    if isBlackScreenEnabled then
-        showBlackScreen()
-    else
-        hideBlackScreen()
-    end
-end)
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
 
--- Initial setup (show black screen automatically on script execution)
-showBlackScreen()
-removeLaggyObjects()
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+
+InterfaceManager:SetFolder("FluentScriptHub")
+SaveManager:SetFolder("FluentScriptHub/specific-game")
+
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+
+SaveManager:LoadAutoloadConfig()
