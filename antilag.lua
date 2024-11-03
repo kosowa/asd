@@ -394,6 +394,13 @@ local function removeLaggyObjects()
         wait(1)
     end
     countdownText.Visible = false
+    
+    -- Disable unnecessary visual effects
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Decal") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Texture") then
+            v:Destroy()
+        end
+    end
 
     -- Remove textures from parts and change material to SmoothPlastic
     for _, part in pairs(workspace:GetDescendants()) do
@@ -409,6 +416,22 @@ local function removeLaggyObjects()
         end
     end
     print("Laggy objects removed and textures disabled")
+    
+    -- Adjust lighting settings for anti-lag
+    local lighting = game:GetService("Lighting")
+    lighting.GlobalShadows = false
+    lighting.Brightness = 1
+    lighting.FogEnd = 9e9
+    lighting.EnvironmentDiffuseScale = 0
+    lighting.EnvironmentSpecularScale = 0
+
+    -- Adjust terrain settings for anti-lag
+    local terrain = workspace:FindFirstChild("Terrain")
+    if terrain then
+        terrain.WaterTransparency = 0
+        terrain.WaterWaveSize = 0
+        terrain.WaterWaveSpeed = 0
+    end
 end
 
 --------------------------------------------------
