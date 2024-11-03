@@ -129,10 +129,10 @@ local settings = loadSettings()
 --------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "AntiLag " .. Fluent.Version,
+    Title = "AntiLag",
     SubTitle = "by zestos",
     TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
+    Size = UDim2.fromOffset(480, 400),
     Acrylic = false,
     Theme = "Darker",
     MinimizeKey = Enum.KeyCode.LeftControl,
