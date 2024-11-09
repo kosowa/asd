@@ -141,7 +141,7 @@ local Window = Fluent:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab({ Title = "Optimizer", Icon = "boxes" }),
-    Autoplay = Window:AddTab({ Title = "Autoplay", Icon = "play" }),
+    Autoplay = Window:AddTab({ Title = "Autoplay -Working-", Icon = "play" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
