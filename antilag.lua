@@ -508,6 +508,16 @@ end
 
 --------------------------------------------------
 
+-- Initialize settings with loaded values or defaults
+local selectedMode = settings["SelectedMode"] or "Story"
+local selectedMap = settings["SelectedMap"] or "Planet Namek"
+local selectedAct = settings["SelectedAct"] or "1"
+local selectDifficulty = settings["SelectDifficulty"] or "Normal"
+local autoJoinEnabled = settings["AutoJoin"] or false
+local autoStartEnabled = settings["AutoStart"] or false
+
+--------------------------------------------------
+
 do
     Tabs.Main:AddParagraph({
         Title = "Optimizer",
