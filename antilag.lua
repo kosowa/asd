@@ -153,13 +153,19 @@ Window:Minimize()
 
 -------------------------------------------------------------------------------------- 
 --AUTOJOIN PART
--- Variables to store selections
-local selectedMode = "Story"
-local selectedMap = "Planet Namek"
-local selectedAct = "1"
-local selectDifficulty = "Normal"
-local autoJoinEnabled = false
-local autoStartEnabled = false  -- Renamed to match the check
+-- Function to auto join map
+local function autoJoinMap()
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist,not triggering")
+        return  -- Exit if MainLobby does not exist
+    end
+
+    local args = {
+        [1] = "Enter",
+        [2] = workspace.MainLobby.Lobby.Stories.Lobby
+    }
+    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+end
 
 -- Map to Stage conversion table
 local mapToStage = {
@@ -170,74 +176,48 @@ local mapToStage = {
 }
 
 -- Function to select stage based on current selections
-local function selectStage()
+local function selectStage(mode, map, act, difficulty)
     if not workspace:FindFirstChild("MainLobby") then
-        print("MainLobby does not exist.")
+        print("MainLobby does not exist,not triggering")
         return  -- Exit if MainLobby does not exist
     end
+
+    -- Ensure we are passing updated values and fallback to defaults if necessary
+    mode = mode or selectedMode
+    map = map or selectedMap
+    act = act or selectedAct
+    difficulty = difficulty or selectDifficulty
     
-    local stage = mapToStage[selectedMap] or "Stage1"  -- Default to "Stage1" if map is not found
+    local stage = mapToStage[map] or "Stage1"
     local args = {
         [1] = "Confirm",
         [2] = {
-            [1] = selectedMode,
-            [2] = stage,        -- Use the converted stage identifier
-            [3] = selectedAct,
-            [4] = selectDifficulty,  -- Use selected difficulty
-            [5] = 7,                -- Adjust as needed
-            [6] = 0,                -- Adjust as needed
-            [7] = false             -- Adjust as needed
+            [1] = mode,
+            [2] = stage,
+            [3] = act,
+            [4] = difficulty,
+            [5] = 4,
+            [6] = 0,
+            [7] = false
         }
     }
-
-    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
-end
-
--- Function to auto join map
-local function autoJoinMap()
-    if not workspace:FindFirstChild("MainLobby") then
-        print("MainLobby does not exist.")
-        return  -- Exit if MainLobby does not exist
-    end
     
-    local args = {
-        [1] = "Enter",
-        [2] = workspace.MainLobby.Lobby.Stories.Lobby
-    }
+    -- Fire the event with all values filled
     game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
 end
 
 -- Auto Start Game Function
 local function autoStart()
     if not workspace:FindFirstChild("MainLobby") then
-        print("MainLobby does not exist.")
+        print("MainLobby does not exist,not triggering")
         return  -- Exit if MainLobby does not exist
     end
-    
+
     local args = {
         [1] = "Start",
         [2] = workspace.MainLobby.Lobby.Stories.Lobby
     }
     game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
-end
-
--- Function to auto join map if enabled
-local function autoJoinLoop()
-    if not workspace:FindFirstChild("MainLobby") then
-        print("MainLobby does not exist.")
-        return  -- Exit function if MainLobby is not found initially
-    end
-
-    while autoJoinEnabled do
-        autoJoinMap()      -- Enter map
-        wait(3)            -- Wait 3 seconds for entering the map
-        selectStage()      -- Confirm stage selection
-        wait(8)            -- Wait 8 seconds before possibly starting
-        if autoStartEnabled then
-            autoStart()
-            wait(10)
-        end
-    end
 end
 
 --------------------------------------------------------------------------------------
@@ -535,7 +515,7 @@ do
     })
 
     Tabs.Autoplay:AddParagraph({
-            Title = "BETA TESTING",
+            Title = "BETA TESTING (USE AT UR OWN RISK)",
             Content = "USE AT UR OWN RISK!"
     })
 
@@ -586,100 +566,117 @@ do
 
     -- AUTOPLAY PART
     -- Modes Select Dropdown
-    local selectedMode = settings["selectedMode"] or "Story"
-    local Dropdown = Tabs.Autoplay:AddDropdown("Modes Select", {
+    local DropdownMode = Tabs.Autoplay:AddDropdown("Modes Select", {
         Title = "Modes",
-        Values = {"Story", "LegendStage", "Raid"},
+        Values = {"Story", "Infinite", "LegendStage", "Raid"},
         Multi = false,
         Default = selectedMode,
     })
 
-    Dropdown:OnChanged(function(Value)
+    DropdownMode:OnChanged(function(Value)
         selectedMode = Value
-        settings["selectedMode"] = selectedMode
+        settings["SelectedMode"] = Value
         saveSettings(settings)
         if autoJoinEnabled then
-            selectStage()
+            selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)
         end
     end)
 
-    -- Maps Select Dropdown
-    local selectedMap = settings["selectedMap"] or "Planet Namek"
-    local Dropdown = Tabs.Autoplay:AddDropdown("Map Select", {
+    local DropdownMap = Tabs.Autoplay:AddDropdown("Map Select", {
         Title = "Maps",
         Values = {"Planet Namek", "Sand Village", "Double Dungeon", "Shibuya Station"},
         Multi = false,
         Default = selectedMap,
     })
 
-    Dropdown:OnChanged(function(Value)
+    DropdownMap:OnChanged(function(Value)
         selectedMap = Value
-        settings["selectedMap"] = selectedMap
+        settings["SelectedMap"] = Value
         saveSettings(settings)
         if autoJoinEnabled then
-            selectStage()
+            selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)
         end
     end)
 
-    -- Act Select Dropdown
-    local selectedAct = settings["selectedAct"] or "Infinite"
-    local Dropdown = Tabs.Autoplay:AddDropdown("Act Select", {
+    local DropdownAct = Tabs.Autoplay:AddDropdown("Act Select", {
         Title = "Act",
-        Values = {"Infinite", "Act 1", "Act 2", "Act 3", "Act 4", "Act 5", "Act 6"},
+        Values = {"Infinite", "Act1", "Act2", "Act3", "Act4", "Act5", "Act6"},
         Multi = false,
         Default = selectedAct,
     })
 
-    Dropdown:OnChanged(function(Value)
+    DropdownAct:OnChanged(function(Value)
         selectedAct = Value
-        settings["selectedAct"] = selectedAct
+        settings["SelectedAct"] = Value
         saveSettings(settings)
         if autoJoinEnabled then
-            selectStage()
+            selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)
         end
     end)
 
-    -- Difficulty Select Dropdown
-    local selectDifficulty = settings["selectDifficulty"] or "Normal"
-    local Dropdown = Tabs.Autoplay:AddDropdown("Difficulty Select", {
+    local DropdownDifficulty = Tabs.Autoplay:AddDropdown("Difficulty Select", {
         Title = "Difficulty",
         Values = {"Normal", "Nightmare"},
         Multi = false,
         Default = selectDifficulty,
     })
 
-    Dropdown:OnChanged(function(Value)
+    DropdownDifficulty:OnChanged(function(Value)
         selectDifficulty = Value
-        settings["selectDifficulty"] = selectDifficulty
+        settings["SelectDifficulty"] = Value
         saveSettings(settings)
         if autoJoinEnabled then
-            selectStage()
+            selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)
         end
     end)
 
-    -- Auto Join Toggle
-    local autoJoinEnabled = settings["autoJoinEnabled"] or false
-    local Toggle = Tabs.Autoplay:AddToggle("Auto Join", {Title = "Auto Join Map", Default = autoJoinEnabled})
-
-    Toggle:OnChanged(function(isEnabled)
-        autoJoinEnabled = isEnabled
-        settings["autoJoinEnabled"] = autoJoinEnabled
-        saveSettings(settings)
-        if autoJoinEnabled then
-            spawn(autoJoinLoop)  -- Start the auto join and select loop in a separate thread
-        end
-    end)
-
-    -- Auto Start Toggle
-    local autoStartEnabled = settings["autoStartEnabled"] or false
-    local Toggle = Tabs.Autoplay:AddToggle("Auto Start", {Title = "Auto Start Game", Default = autoStartEnabled})
-
-    Toggle:OnChanged(function(state)
-        autoStartEnabled = state
-        settings["autoStartEnabled"] = autoStartEnabled
-        saveSettings(settings)
-    end)
+    local ToggleAutoJoin = Tabs.Autoplay:AddToggle("Auto Join", {
+        Title = "Auto Join Map",
+        Default = autoJoinEnabled,
+    })
     
+    ToggleAutoJoin:OnChanged(function(isEnabled)
+        autoJoinEnabled = isEnabled
+        settings["AutoJoin"] = isEnabled
+        saveSettings(settings)
+
+        
+    
+        -- Run the autoJoinLoop directly if enabled
+        if autoJoinEnabled then
+            if not workspace:FindFirstChild("MainLobby") then
+                print("MainLobby does not exist.NOT JOINING")
+                return  -- Exit if MainLobby does not exist
+            end
+
+            while true do
+                autoJoinMap()      -- Enter map
+                wait(3)            -- Wait 3 seconds for entering the map
+                selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)  -- Pass updated values
+                wait(8)            -- Wait 8 seconds before possibly starting
+                if autoStartEnabled then
+                    autoStart()
+                    wait(10)
+                end
+                
+                -- Exit loop if autoJoinEnabled is toggled off
+                if not autoJoinEnabled then
+                    break
+                end
+            end
+        end
+    end)
+
+    local ToggleAutoStart = Tabs.Autoplay:AddToggle("Auto Start", {
+        Title = "Auto Start Game",
+        Default = autoStartEnabled,
+    })
+
+    ToggleAutoStart:OnChanged(function(isEnabled)
+        autoStartEnabled = isEnabled
+        settings["AutoStart"] = isEnabled
+        saveSettings(settings)
+    end)
 end
 
 --------------------------------------------------
