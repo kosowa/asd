@@ -535,7 +535,7 @@ do
     })
 
     Tabs.Autoplay:AddParagraph({
-            Title = "BETA TESTING (USE AT UR OWN RISK)",
+            Title = "BETA TESTING",
             Content = "USE AT UR OWN RISK!"
     })
 
