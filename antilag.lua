@@ -151,6 +151,97 @@ Window:SelectTab(1)
 -- Automatically minimize the window after loading
 Window:Minimize()
 
+-------------------------------------------------------------------------------------- 
+--AUTOJOIN PART
+-- Variables to store selections
+local selectedMode = "Story"
+local selectedMap = "Planet Namek"
+local selectedAct = "1"
+local selectDifficulty = "Normal"
+local autoJoinEnabled = false
+local autoStartEnabled = false  -- Renamed to match the check
+
+-- Map to Stage conversion table
+local mapToStage = {
+    ["Planet Namek"] = "Stage1",
+    ["Sand Village"] = "Stage2",
+    ["Double Dungeon"] = "Stage3",
+    ["Shibuya Station"] = "Stage4"
+}
+
+-- Function to select stage based on current selections
+local function selectStage()
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist.")
+        return  -- Exit if MainLobby does not exist
+    end
+    
+    local stage = mapToStage[selectedMap] or "Stage1"  -- Default to "Stage1" if map is not found
+    local args = {
+        [1] = "Confirm",
+        [2] = {
+            [1] = selectedMode,
+            [2] = stage,        -- Use the converted stage identifier
+            [3] = selectedAct,
+            [4] = selectDifficulty,  -- Use selected difficulty
+            [5] = 7,                -- Adjust as needed
+            [6] = 0,                -- Adjust as needed
+            [7] = false             -- Adjust as needed
+        }
+    }
+
+    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+end
+
+-- Function to auto join map
+local function autoJoinMap()
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist.")
+        return  -- Exit if MainLobby does not exist
+    end
+    
+    local args = {
+        [1] = "Enter",
+        [2] = workspace.MainLobby.Lobby.Stories.Lobby
+    }
+    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+end
+
+-- Auto Start Game Function
+local function autoStart()
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist.")
+        return  -- Exit if MainLobby does not exist
+    end
+    
+    local args = {
+        [1] = "Start",
+        [2] = workspace.MainLobby.Lobby.Stories.Lobby
+    }
+    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+end
+
+-- Function to auto join map if enabled
+local function autoJoinLoop()
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist.")
+        return  -- Exit function if MainLobby is not found initially
+    end
+
+    while autoJoinEnabled do
+        autoJoinMap()      -- Enter map
+        wait(3)            -- Wait 3 seconds for entering the map
+        selectStage()      -- Confirm stage selection
+        wait(8)            -- Wait 8 seconds before possibly starting
+        if autoStartEnabled then
+            autoStart()
+            wait(10)
+        end
+    end
+end
+
+--------------------------------------------------------------------------------------
+
 --------------------------------------------------
 
 -- Black screen GUI setup
@@ -444,8 +535,8 @@ do
     })
 
     Tabs.Autoplay:AddParagraph({
-            Title = "UNDER DEVELOPMENT",
-            Content = "Pag aralan kopa function ng\nautojoin lobby!"
+            Title = "BETA TESTING (USE AT UR OWN RISK)",
+            Content = "USE AT UR OWN RISK!"
     })
 
     -- Toggle BlackScreen
@@ -492,6 +583,103 @@ do
             removeLaggyObjects()
         end
     end)
+
+    -- AUTOPLAY PART
+    -- Modes Select Dropdown
+    local selectedMode = settings["selectedMode"] or "Story"
+    local Dropdown = Tabs.Autoplay:AddDropdown("Modes Select", {
+        Title = "Modes",
+        Values = {"Story", "LegendStage", "Raid"},
+        Multi = false,
+        Default = selectedMode,
+    })
+
+    Dropdown:OnChanged(function(Value)
+        selectedMode = Value
+        settings["selectedMode"] = selectedMode
+        saveSettings(settings)
+        if autoJoinEnabled then
+            selectStage()
+        end
+    end)
+
+    -- Maps Select Dropdown
+    local selectedMap = settings["selectedMap"] or "Planet Namek"
+    local Dropdown = Tabs.Autoplay:AddDropdown("Map Select", {
+        Title = "Maps",
+        Values = {"Planet Namek", "Sand Village", "Double Dungeon", "Shibuya Station"},
+        Multi = false,
+        Default = selectedMap,
+    })
+
+    Dropdown:OnChanged(function(Value)
+        selectedMap = Value
+        settings["selectedMap"] = selectedMap
+        saveSettings(settings)
+        if autoJoinEnabled then
+            selectStage()
+        end
+    end)
+
+    -- Act Select Dropdown
+    local selectedAct = settings["selectedAct"] or "Infinite"
+    local Dropdown = Tabs.Autoplay:AddDropdown("Act Select", {
+        Title = "Act",
+        Values = {"Infinite", "Act 1", "Act 2", "Act 3", "Act 4", "Act 5", "Act 6"},
+        Multi = false,
+        Default = selectedAct,
+    })
+
+    Dropdown:OnChanged(function(Value)
+        selectedAct = Value
+        settings["selectedAct"] = selectedAct
+        saveSettings(settings)
+        if autoJoinEnabled then
+            selectStage()
+        end
+    end)
+
+    -- Difficulty Select Dropdown
+    local selectDifficulty = settings["selectDifficulty"] or "Normal"
+    local Dropdown = Tabs.Autoplay:AddDropdown("Difficulty Select", {
+        Title = "Difficulty",
+        Values = {"Normal", "Nightmare"},
+        Multi = false,
+        Default = selectDifficulty,
+    })
+
+    Dropdown:OnChanged(function(Value)
+        selectDifficulty = Value
+        settings["selectDifficulty"] = selectDifficulty
+        saveSettings(settings)
+        if autoJoinEnabled then
+            selectStage()
+        end
+    end)
+
+    -- Auto Join Toggle
+    local autoJoinEnabled = settings["autoJoinEnabled"] or false
+    local Toggle = Tabs.Autoplay:AddToggle("Auto Join", {Title = "Auto Join Map", Default = autoJoinEnabled})
+
+    Toggle:OnChanged(function(isEnabled)
+        autoJoinEnabled = isEnabled
+        settings["autoJoinEnabled"] = autoJoinEnabled
+        saveSettings(settings)
+        if autoJoinEnabled then
+            spawn(autoJoinLoop)  -- Start the auto join and select loop in a separate thread
+        end
+    end)
+
+    -- Auto Start Toggle
+    local autoStartEnabled = settings["autoStartEnabled"] or false
+    local Toggle = Tabs.Autoplay:AddToggle("Auto Start", {Title = "Auto Start Game", Default = autoStartEnabled})
+
+    Toggle:OnChanged(function(state)
+        autoStartEnabled = state
+        settings["autoStartEnabled"] = autoStartEnabled
+        saveSettings(settings)
+    end)
+    
 end
 
 --------------------------------------------------
