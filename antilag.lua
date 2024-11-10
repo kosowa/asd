@@ -559,7 +559,7 @@ do
 
     Tabs.AutoChallenge:AddParagraph({
             Title = "BETA TESTING (USE AT UR OWN RISK)",
-            Content = "USE AT UR OWN RISK!"
+            Content = "buggy atm"
     })
 
     -- Toggle BlackScreen
