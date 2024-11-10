@@ -141,7 +141,8 @@ local Window = Fluent:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab({ Title = "Optimizer", Icon = "boxes" }),
-    Autoplay = Window:AddTab({ Title = "Autoplay -Working-", Icon = "play" }),
+    Autoplay = Window:AddTab({ Title = "Auto Play", Icon = "play" }),
+    AutoChallenge = Window:AddTab({ Title = "Auto Challenge", Icon = "swords" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 
@@ -525,6 +526,11 @@ do
     })
 
     Tabs.Autoplay:AddParagraph({
+            Title = "BETA TESTING (USE AT UR OWN RISK)",
+            Content = "USE AT UR OWN RISK!"
+    })
+
+    Tabs.AutoChallenge:AddParagraph({
             Title = "BETA TESTING (USE AT UR OWN RISK)",
             Content = "USE AT UR OWN RISK!"
     })
