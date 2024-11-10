@@ -152,7 +152,32 @@ Window:SelectTab(1)
 -- Automatically minimize the window after loading
 Window:Minimize()
 
--------------------------------------------------------------------------------------- 
+--------------------------------------------------------------------------------------
+
+-- AUTOJOIN CHALLENGE
+local function joinChallenge()
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist,not triggering")
+        return  -- Exit if MainLobby does not exist
+    end
+
+    local args = {
+        [1] = "Enter",
+        [2] = workspace.MainLobby.Lobby.Challenges.ChallengeLobby
+    }
+    
+    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+end
+
+local function startChallenge()
+    local args = {
+        [1] = "Start",
+        [2] = workspace.MainLobby.Lobby.Challenges.ChallengeLobby
+    }
+    
+    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+end
+
 --AUTOJOIN PART
 -- Function to auto join map
 local function autoJoinMap()
@@ -516,6 +541,8 @@ local selectedAct = settings["SelectedAct"] or "1"
 local selectDifficulty = settings["SelectDifficulty"] or "Normal"
 local autoJoinEnabled = settings["AutoJoin"] or false
 local autoStartEnabled = settings["AutoStart"] or false
+local autoChallengeEnabled = settings["AutoChallenge"] or false
+local autoStartChallengeEnabled = settings["AutoStartChallenge"] or false
 
 --------------------------------------------------
 
@@ -691,6 +718,48 @@ do
     ToggleAutoStart:OnChanged(function(isEnabled)
         autoStartEnabled = isEnabled
         settings["AutoStart"] = isEnabled
+        saveSettings(settings)
+    end)
+
+    local ToggleAutoChallenge = Tabs.AutoChallenge:AddToggle("Auto Challenge", {
+        Title = "Auto Join Challenge",
+        default = autoChallengeEnabled,
+    })
+
+    ToggleAutoChallenge:OnChanged(function(isEnabled)
+        autoChallengeEnabled = isEnabled
+        settings["AutoChallenge"] = isEnabled
+        saveSettings(settings)
+
+        if autoChallengeEnabled then
+            if not workspace:FindFirstChild("MainLobby") then
+                print("MainLobby does not exist.NOT JOINING")
+                return
+            end
+    
+            while true do
+                joinChallenge()
+                wait(8)
+                if autoStartChallengeEnabled then
+                    startChallenge()
+                    wait(8)
+                end
+                wait(8)               
+                if not autoChallengeEnabled then
+                    break
+                end
+            end
+        end
+    end)
+
+    local ToggleStartChallenge = Tabs.AutoChallenge:AddToggle("Auto Start Challenge", {
+        Title = "Auto Start Challenge",
+        default = autoChallengeEnabled,
+    })
+
+    ToggleAutoStartChallenge:OnChanged(function(isEnabled)
+        autoStartChallengeEnabled = isEnabled
+        settings["AutoStartChallenge"] = isEnabled
         saveSettings(settings)
     end)
 end
