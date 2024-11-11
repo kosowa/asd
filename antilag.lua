@@ -757,9 +757,6 @@ do
 
         if autoChallengeEnabled then
             runAutoChallengeLoop()
-        else
-            -- If auto challenge is turned off, check if auto join should start
-            monitorChallengeAndJoin()
         end
     end)
 
