@@ -101,32 +101,7 @@ local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
---------------------------------------------------
-
--- Services
-local HttpService = game:GetService("HttpService")
-local saveFileName = "UserSettings.json"
-
--- Function to load settings
-local function loadSettings()
-    if isfile(saveFileName) then
-        local settingsData = readfile(saveFileName)
-        return HttpService:JSONDecode(settingsData)
-    else
-        return {}
-    end
-end
-
--- Function to save settings
-local function saveSettings(settings)
-    local settingsData = HttpService:JSONEncode(settings)
-    writefile(saveFileName, settingsData)
-end
-
--- Load settings on startup
-local settings = loadSettings()
-
---------------------------------------------------
+------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
     Title = "AntiLag",
@@ -152,6 +127,31 @@ Window:SelectTab(1)
 Window:Minimize()
 
 --------------------------------------------------------------------------------------
+--AUTO LOAD SETTINGS
+-- Services
+local HttpService = game:GetService("HttpService")
+local saveFileName = "UserSettings.json"
+
+-- Function to load settings
+local function loadSettings()
+    if isfile(saveFileName) then
+        local settingsData = readfile(saveFileName)
+        return HttpService:JSONDecode(settingsData)
+    else
+        return {}
+    end
+end
+
+-- Function to save settings
+local function saveSettings(settings)
+    local settingsData = HttpService:JSONEncode(settings)
+    writefile(saveFileName, settingsData)
+end
+
+-- Load settings on startup
+local settings = loadSettings()
+
+--------------------------------------------------
 
 -- AUTOJOIN CHALLENGE
 local function joinChallenge()
