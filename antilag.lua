@@ -729,75 +729,75 @@ do
 end
 
 -- Function to run the auto challenge loop
-    function runAutoChallengeLoop()
-        -- Check for MainLobby
-        if not workspace:FindFirstChild("MainLobby") then
-            print("MainLobby does not exist. NOT JOINING")
-            return
+function runAutoChallengeLoop()
+    -- Check for MainLobby
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist. NOT JOINING")
+        return
+    end
+
+    -- Initialize repeat count
+    local repeatCount = 0
+
+    -- Run the auto challenge loop
+    while repeatCount < 3 do
+        joinChallenge()
+        wait(8)
+
+        if autoStartChallengeEnabled then
+            startChallenge()
         end
-    
-        -- Initialize repeat count
-        local repeatCount = 0
-    
-        -- Run the auto challenge loop
-        while repeatCount < 3 do
-            joinChallenge()
-            wait(8)
-    
-            if autoStartChallengeEnabled then
-                startChallenge()
-            end
-    
+
+        wait(10)
+        repeatCount = repeatCount + 1
+
+        -- Stop loop if autoChallenge is disabled
+        if not autoChallengeEnabled then
+            break
+        end
+    end
+
+    -- After challenge loop finishes, check if Auto Join should start
+    if autoJoinEnabled then
+        runAutoJoinLoop()
+    end
+end
+
+-- Function to run the auto join loop
+function runAutoJoinLoop()
+    -- Check for MainLobby
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist. NOT JOINING")
+        return
+    end
+
+    -- Run the auto join loop
+    while autoJoinEnabled do
+        autoJoinMap()  -- Enter map
+        wait(3)        -- Wait 3 seconds
+
+        selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)  -- Pass updated values
+        wait(8)        -- Wait 8 seconds
+
+        if autoStartEnabled then
+            autoStart()
             wait(10)
-            repeatCount = repeatCount + 1
-    
-            -- Stop loop if autoChallenge is disabled
-            if not autoChallengeEnabled then
-                break
-            end
         end
-    
-        -- After challenge loop finishes, check if Auto Join should start
-        if autoJoinEnabled then
-            runAutoJoinLoop()
+
+        -- Exit loop if autoJoinEnabled is toggled off
+        if not autoJoinEnabled then
+            break
         end
     end
-    
-    -- Function to run the auto join loop
-    function runAutoJoinLoop()
-        -- Check for MainLobby
-        if not workspace:FindFirstChild("MainLobby") then
-            print("MainLobby does not exist. NOT JOINING")
-            return
-        end
-    
-        -- Run the auto join loop
-        while autoJoinEnabled do
-            autoJoinMap()  -- Enter map
-            wait(3)        -- Wait 3 seconds
-    
-            selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)  -- Pass updated values
-            wait(8)        -- Wait 8 seconds
-    
-            if autoStartEnabled then
-                autoStart()
-                wait(10)
-            end
-    
-            -- Exit loop if autoJoinEnabled is toggled off
-            if not autoJoinEnabled then
-                break
-            end
-        end
+end
+
+-- Monitoring function to manage challenge and join loops
+function monitorChallengeAndJoin()
+    -- If auto challenge is disabled and auto join is enabled, run the auto join loop
+    if not autoChallengeEnabled and autoJoinEnabled then
+        runAutoJoinLoop()
     end
-    
-    -- Monitoring function to manage challenge and join loops
-    function monitorChallengeAndJoin()
-        -- If auto challenge is disabled and auto join is enabled, run the auto join loop
-        if not autoChallengeEnabled and autoJoinEnabled then
-            runAutoJoinLoop()
-        end
-    end
+end
 
 --------------------------------------------------
 
