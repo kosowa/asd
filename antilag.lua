@@ -722,7 +722,7 @@ do
 
     local ToggleAutoChallenge = Tabs.AutoChallenge:AddToggle("Auto Challenge", {
         Title = "Auto Join Challenge",
-        default = autoChallengeEnabled,
+        Default = autoChallengeEnabled,
     })
 
     ToggleAutoChallenge:OnChanged(function(isEnabled)
@@ -753,7 +753,7 @@ do
 
     local ToggleStartChallenge = Tabs.AutoChallenge:AddToggle("Auto Start Challenge", {
         Title = "Auto Start Challenge",
-        default = autoChallengeEnabled,
+        Default = autoChallengeEnabled,
     })
 
     ToggleAutoStartChallenge:OnChanged(function(isEnabled)
