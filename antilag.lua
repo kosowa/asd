@@ -672,6 +672,65 @@ do
         end
     end)
 
+    -- Autojoin Toggles
+    local ToggleAutoChallenge = Tabs.AutoChallenge:AddToggle("Auto Challenge", {
+        Title = "Auto Join Challenge",
+        Default = autoChallengeEnabled,
+    })
+    
+    ToggleAutoChallenge:OnChanged(function(isEnabled)
+        autoChallengeEnabled = isEnabled
+        settings["AutoChallenge"] = isEnabled
+        saveSettings(settings)
+    
+        if autoChallengeEnabled then
+            -- Check for MainLobby
+            if not workspace:FindFirstChild("MainLobby") then
+                print("MainLobby does not exist. NOT JOINING")
+                return
+            end
+    
+            -- Initialize repeat count
+            local repeatCount = 0
+    
+            -- Run the auto challenge loop
+            while repeatCount < 3 do
+                joinChallenge()
+                wait(8)
+    
+                if autoStartChallengeEnabled then
+                    startChallenge()
+                end
+    
+                wait(10)
+                repeatCount = repeatCount + 1
+    
+                -- Stop loop if autoChallenge is disabled
+                if not autoChallengeEnabled then
+                    break
+                end
+            end
+    
+            -- Check if auto join is enabled after challenge loop finishes
+            if autoJoinEnabled then
+                runAutoJoinLoop()
+            end
+        end
+    end)
+    
+    -- Auto Start Challenge Toggle
+    local ToggleStartChallenge = Tabs.AutoChallenge:AddToggle("Auto Start Challenge", {
+        Title = "Auto Start Challenge",
+        Default = autoStartChallengeEnabled,
+    })
+    
+    ToggleStartChallenge:OnChanged(function(isEnabled)
+        autoStartChallengeEnabled = isEnabled
+        settings["AutoStartChallenge"] = isEnabled
+        saveSettings(settings)
+    end)
+    
+    -- Define the auto join toggle and loop
     local ToggleAutoJoin = Tabs.Autoplay:AddToggle("Auto Join", {
         Title = "Auto Join Map",
         Default = autoJoinEnabled,
@@ -681,26 +740,32 @@ do
         autoJoinEnabled = isEnabled
         settings["AutoJoin"] = isEnabled
         saveSettings(settings)
-
-        
     
-        -- Run the autoJoinLoop directly if enabled
-        if autoJoinEnabled then
+        -- If auto join is enabled and auto challenge is disabled, start the auto join loop
+        if autoJoinEnabled and not autoChallengeEnabled then
+            runAutoJoinLoop()
+        end
+    
+        function runAutoJoinLoop()
+            -- Check for MainLobby
             if not workspace:FindFirstChild("MainLobby") then
-                print("MainLobby does not exist.NOT JOINING")
-                return  -- Exit if MainLobby does not exist
+                print("MainLobby does not exist. NOT JOINING")
+                return
             end
-
-            while true do
-                autoJoinMap()      -- Enter map
-                wait(3)            -- Wait 3 seconds for entering the map
+        
+            -- Run the auto join loop
+            while autoJoinEnabled do
+                autoJoinMap()  -- Enter map
+                wait(3)        -- Wait 3 seconds
+        
                 selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)  -- Pass updated values
-                wait(8)            -- Wait 8 seconds before possibly starting
+                wait(8)        -- Wait 8 seconds
+        
                 if autoStartEnabled then
                     autoStart()
                     wait(10)
                 end
-                
+        
                 -- Exit loop if autoJoinEnabled is toggled off
                 if not autoJoinEnabled then
                     break
@@ -708,57 +773,16 @@ do
             end
         end
     end)
-
-    local ToggleAutoStart = Tabs.Autoplay:AddToggle("Auto Start", {
+    
+    -- Auto Start Game Toggle
+    local ToggleAutoStart = Tabs.Autoplay:AddToggle("Auto Start Game", {
         Title = "Auto Start Game",
         Default = autoStartEnabled,
     })
-
+    
     ToggleAutoStart:OnChanged(function(isEnabled)
         autoStartEnabled = isEnabled
         settings["AutoStart"] = isEnabled
-        saveSettings(settings)
-    end)
-
-    local ToggleAutoChallenge = Tabs.AutoChallenge:AddToggle("Auto Challenge", {
-        Title = "Auto Join Challenge",
-        Default = autoChallengeEnabled,
-    })
-
-    ToggleAutoChallenge:OnChanged(function(isEnabled)
-        autoChallengeEnabled = isEnabled
-        settings["AutoChallenge"] = isEnabled
-        saveSettings(settings)
-
-        if autoChallengeEnabled then
-            if not workspace:FindFirstChild("MainLobby") then
-                print("MainLobby does not exist.NOT JOINING")
-                return
-            end
-    
-            while true do
-                joinChallenge()
-                wait(8)
-                if autoStartChallengeEnabled then
-                    startChallenge()
-                    wait(8)
-                end
-                wait(8)               
-                if not autoChallengeEnabled then
-                    break
-                end
-            end
-        end
-    end)
-
-    local ToggleStartChallenge = Tabs.AutoChallenge:AddToggle("Auto Start Challenge", {
-        Title = "Auto Start Challenge",
-        Default = autoStartChallengeEnabled,
-    })
-
-    ToggleAutoStartChallenge:OnChanged(function(isEnabled)
-        autoStartChallengeEnabled = isEnabled
-        settings["AutoStartChallenge"] = isEnabled
         saveSettings(settings)
     end)
 end
