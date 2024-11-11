@@ -677,6 +677,7 @@ do
     -- Autojoin Toggles
     local ToggleAutoChallenge = Tabs.AutoChallenge:AddToggle("Auto Challenge", {
         Title = "Auto Join Challenge",
+        Content = "Rejoin to work!",
         Default = autoChallengeEnabled,
     })
 
