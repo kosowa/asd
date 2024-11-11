@@ -684,10 +684,6 @@ do
         autoChallengeEnabled = isEnabled
         settings["AutoChallenge"] = isEnabled
         saveSettings(settings)
-    
-        if autoChallengeEnabled then
-            runAutoChallengeLoop()
-        end
 
         function runAutoChallengeLoop()
             -- Check for MainLobby
@@ -716,6 +712,10 @@ do
                     break
                 end
             end
+                
+        if autoChallengeEnabled then
+            runAutoChallengeLoop()
+        end
     
             -- After challenge loop finishes, check if Auto Join should start
             if autoJoinEnabled then
