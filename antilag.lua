@@ -753,7 +753,7 @@ do
 
     local ToggleStartChallenge = Tabs.AutoChallenge:AddToggle("Auto Start Challenge", {
         Title = "Auto Start Challenge",
-        Default = autoChallengeEnabled,
+        Default = autoStartChallengeEnabled,
     })
 
     ToggleAutoStartChallenge:OnChanged(function(isEnabled)
