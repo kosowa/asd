@@ -549,18 +549,18 @@ local autoStartChallengeEnabled = settings["AutoStartChallenge"] or false
 --------------------------------------------------
 do
     Tabs.Main:AddParagraph({
-        Title = "Optimizer",
+        Title = "GAME OPTIMIZER",
         Content = "Optimize your gameplay!"
     })
 
     Tabs.Autoplay:AddParagraph({
             Title = "BETA TESTING (USE AT UR OWN RISK)",
-            Content = "USE AT UR OWN RISK!"
+            Content = "WORKING!"
     })
 
     Tabs.AutoChallenge:AddParagraph({
             Title = "BETA TESTING (USE AT UR OWN RISK)",
-            Content = "buggy atm"
+            Content = "WORKING!"
     })
 
     -- Toggle BlackScreen
@@ -676,8 +676,7 @@ do
 
     -- Autojoin Toggles
     local ToggleAutoChallenge = Tabs.AutoChallenge:AddToggle("Auto Challenge", {
-        Title = "Auto Join Challenge",
-        Content = "Rejoin to work!",
+        Title = "Auto Challenge (rejoin to work)",
         Default = autoChallengeEnabled,
     })
 
