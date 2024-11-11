@@ -685,6 +685,12 @@ do
         settings["AutoChallenge"] = isEnabled
         saveSettings(settings)
 
+        if autoChallengeEnabled then
+            wait(3)
+            runAutoChallengeLoop()
+            print("Joining Challenge")
+        end
+
         function runAutoChallengeLoop()
             -- Check for MainLobby
             if not workspace:FindFirstChild("MainLobby") then
@@ -712,10 +718,6 @@ do
                     break
                 end
             end
-                
-        if autoChallengeEnabled then
-            runAutoChallengeLoop()
-        end
     
             -- After challenge loop finishes, check if Auto Join should start
             if autoJoinEnabled then
