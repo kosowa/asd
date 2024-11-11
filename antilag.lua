@@ -132,11 +132,10 @@ local Window = Fluent:CreateWindow({
     Title = "AntiLag",
     SubTitle = "by zestos",
     TabWidth = 160,
-    Size = UDim2.fromOffset(480, 400),
-    Acrylic = false,
+    Size = UDim2.fromOffset(480, 350),
+    Acrylic = true,
     Theme = "Darker",
     MinimizeKey = Enum.KeyCode.LeftControl,
-    Minimize = true
 })
 
 local Tabs = {
@@ -776,5 +775,3 @@ InterfaceManager:SetFolder("FluentScriptHub")
 SaveManager:SetFolder("FluentScriptHub/specific-game")
 
 InterfaceManager:BuildInterfaceSection(Tabs.Settings)
-
-SaveManager:LoadAutoloadConfig()
