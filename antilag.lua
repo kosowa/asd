@@ -679,6 +679,13 @@ do
         Title = "Auto Join Challenge",
         Default = autoChallengeEnabled,
     })
+
+    -- Toggle for Auto Challenge
+    ToggleAutoChallenge:OnChanged(function(isEnabled)
+        autoChallengeEnabled = isEnabled
+        settings["AutoChallenge"] = isEnabled
+        saveSettings(settings)
+    end)
     
     -- Function to check and start auto challenge loop based on the setting
     function checkAndStartAutoChallenge()
@@ -751,17 +758,6 @@ do
             end
         end
     end
-    
-    -- Toggle for Auto Challenge
-    ToggleAutoChallenge:OnChanged(function(isEnabled)
-        autoChallengeEnabled = isEnabled
-        settings["AutoChallenge"] = isEnabled
-        saveSettings(settings)
-    
-        if autoChallengeEnabled then
-            runAutoChallengeLoop()
-        end
-    end)
     
     -- Call the function to check and start the loop if the game loads with the setting enabled
     checkAndStartAutoChallenge()
