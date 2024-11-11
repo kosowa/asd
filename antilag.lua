@@ -595,14 +595,6 @@ function runAutoJoinLoop()
     end
 end
 
--- Monitoring function to manage challenge and join loops
-function monitorChallengeAndJoin()
-    -- If auto challenge is disabled and auto join is enabled, run the auto join loop
-    if not autoChallengeEnabled and autoJoinEnabled then
-        runAutoJoinLoop()
-    end
-end
-
 --------------------------------------------------
 
 -- Initialize settings with loaded values or defaults
@@ -772,7 +764,7 @@ do
         saveSettings(settings)
     end)
 
-    -- Auto Join Toggle
+    -- Auto Join Map Toggle
     local ToggleAutoJoin = Tabs.Autoplay:AddToggle("Auto Join", {
         Title = "Auto Join Map",
         Default = autoJoinEnabled,
@@ -783,6 +775,13 @@ do
         settings["AutoJoin"] = isEnabled
         saveSettings(settings)
 
+        -- Monitoring function to manage challenge and join loops
+        function monitorChallengeAndJoin()
+            -- If auto challenge is disabled and auto join is enabled, run the auto join loop
+            if not autoChallengeEnabled and autoJoinEnabled then
+                runAutoJoinLoop()
+            end
+        end
         -- Run the auto join loop directly if auto challenge is not active
         monitorChallengeAndJoin()
     end)
