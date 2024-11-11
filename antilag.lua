@@ -726,7 +726,9 @@ do
         settings["AutoStart"] = isEnabled
         saveSettings(settings)
     end)
-    -- Function to run the auto challenge loop
+end
+
+-- Function to run the auto challenge loop
     function runAutoChallengeLoop()
         -- Check for MainLobby
         if not workspace:FindFirstChild("MainLobby") then
@@ -796,7 +798,6 @@ do
             runAutoJoinLoop()
         end
     end
-end
 
 --------------------------------------------------
 
