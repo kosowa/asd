@@ -418,7 +418,8 @@ screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Button creation
 local button = Instance.new("ImageButton", screenGui)
-button.Position = UDim2.new(0.05, 0, 0.05, 0)
+button.Position = UDim2.new(0.5, 0, 0, 10)
+button.AnchorPoint = Vector2.new(0.5, 0)
 button.Size = UDim2.new(0, 57, 0, 57)
 button.Image = "rbxassetid://83204245116453"
 button.BackgroundTransparency = 1  -- Make the background fully transparent
