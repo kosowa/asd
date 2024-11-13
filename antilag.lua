@@ -418,7 +418,7 @@ screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
 -- Button creation
 local button = Instance.new("ImageButton", screenGui)
-button.Position = UDim2.new(0.5, 0, 0, -10)  -- Adjusted to move it to the top
+button.Position = UDim2.new(265, 0, 0, -46)  -- Adjusted to move it to the top
 button.AnchorPoint = Vector2.new(0.5, 0)
 button.Size = UDim2.new(0.12, 0, 0.12, 0)  -- Scaled size to adjust based on screen size
 button.Image = "rbxassetid://83204245116453"
