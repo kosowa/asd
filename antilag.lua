@@ -263,36 +263,69 @@ screenGui.Parent = playerGui
 local blackFrame = Instance.new("Frame")
 blackFrame.Size = UDim2.new(1, 0, 1, 0)  -- Full screen
 blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)  -- Black color
-blackFrame.Visible = false  -- Set to true to make it visible by default
+blackFrame.Visible = false  -- Hidden by default
 blackFrame.ZIndex = 1
 blackFrame.Parent = screenGui
 
--- Create text label for displaying Gems and Gold
-local textLabel = Instance.new("TextLabel")
-textLabel.Size = UDim2.new(0.5, 0, 0.1, 0)  -- Adjust size as needed
-textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)  -- Center of the screen
-textLabel.AnchorPoint = Vector2.new(0.5, 0.5)  -- Center alignment
-textLabel.BackgroundTransparency = 1  -- No background
-textLabel.TextColor3 = Color3.new(1, 1, 1)  -- White color
-textLabel.Font = Enum.Font.SourceSansBold
-textLabel.TextSize = 48  -- Text size
-textLabel.ZIndex = 2
-textLabel.Parent = blackFrame
+-- Vertical layout to arrange items
+local layout = Instance.new("UIListLayout")
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.VerticalAlignment = Enum.VerticalAlignment.Center
+layout.Padding = UDim.new(0, 10)  -- Space between rows
+layout.Parent = blackFrame
 
--- Function to update text label with Gems and Gold values
+-- Function to create a row with an image and a label
+local function createRow(imageId, text)
+    local row = Instance.new("Frame")
+    row.Size = UDim2.new(0.5, 0, 0, 50)
+    row.BackgroundTransparency = 1
+    row.Parent = blackFrame
+
+    local rowLayout = Instance.new("UIListLayout")
+    rowLayout.FillDirection = Enum.FillDirection.Horizontal
+    rowLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    rowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    rowLayout.Padding = UDim.new(0, 10)  -- Space between image and text
+    rowLayout.Parent = row
+
+    local image = Instance.new("ImageLabel")
+    image.Size = UDim2.new(0, 50, 0, 50)
+    image.BackgroundTransparency = 1
+    image.Image = "rbxassetid://" .. imageId
+    image.Parent = row
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 150, 0, 50)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.new(1, 1, 1)  -- White color
+    label.Font = Enum.Font.SourceSansBold
+    label.TextSize = 24
+    label.Text = text
+    label.Parent = row
+
+    return label
+end
+
+-- Create rows for Gems, Gold, and Rerolls
+local gemsLabel = createRow("95858760477365", "GEMS: 0")
+local goldLabel = createRow("75136334344816", "GOLD: 0")
+local rerollsLabel = createRow("122851858665013", "REROLLS: 0")
+
+-- Function to update text labels with Gems, Gold, and Rerolls values
 local function updateText()
     local gems = player:GetAttribute("Gems") or 0
     local gold = player:GetAttribute("Gold") or 0
-	local rerolls = player:GetAttribute("TraitRerolls") or 0
-	local level = player:GetAttribute("Level") or 0
-    textLabel.Text = "GEMS: " .. gems .. "\nGOLD: " .. gold .. "\nREROLLS: " .. rerolls .. "\nLEVEL: " .. level
+    local rerolls = player:GetAttribute("TraitRerolls") or 0
+
+    gemsLabel.Text = tostring(gems)
+    goldLabel.Text = tostring(gold)
+    rerollsLabel.Text = tostring(rerolls)
 end
 
--- Update the text when Gems or Gold attributes change
+-- Update the text when Gems, Gold, or Rerolls attributes change
 player:GetAttributeChangedSignal("Gems"):Connect(updateText)
 player:GetAttributeChangedSignal("Gold"):Connect(updateText)
 player:GetAttributeChangedSignal("TraitRerolls"):Connect(updateText)
-player:GetAttributeChangedSignal("Level"):Connect(updateText)
 
 --------------------------------------------------
 
