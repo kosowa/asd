@@ -254,7 +254,7 @@ local player = game.Players.LocalPlayer
 
 -- Create ScreenGui in CoreGui
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "BLACKSCREEN"
+screenGui.Name = "zBLACKSCREEN"
 screenGui.IgnoreGuiInset = true  -- Ignore the Roblox top bar inset
 screenGui.Parent = game:GetService("CoreGui")  -- Parent to CoreGui for higher layering
 
