@@ -601,6 +601,7 @@ do
 
         if Options.MyToggleBlackScreen.Value then
             blackFrame.Visible = true
+            updateText()
         else
             blackFrame.Visible = false
         end
