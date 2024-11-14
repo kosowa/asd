@@ -291,6 +291,8 @@ end
 -- Update the text when Gems or Gold attributes change
 player:GetAttributeChangedSignal("Gems"):Connect(updateText)
 player:GetAttributeChangedSignal("Gold"):Connect(updateText)
+player:GetAttributeChangedSignal("TraitRerolls"):Connect(updateText)
+player:GetAttributeChangedSignal("Level"):Connect(updateText)
 
 --------------------------------------------------
 
