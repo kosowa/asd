@@ -251,20 +251,18 @@ end
 
 -- Black screen GUI setup
 local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
 
--- Create ScreenGui
+-- Create ScreenGui in CoreGui
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "RenderingControlGui"
+screenGui.Name = "BLACKSCREEN"
 screenGui.IgnoreGuiInset = true  -- Ignore the Roblox top bar inset
-screenGui.Parent = playerGui
+screenGui.Parent = game:GetService("CoreGui")  -- Parent to CoreGui for higher layering
 
 -- Create black frame
 local blackFrame = Instance.new("Frame")
 blackFrame.Size = UDim2.new(1, 0, 1, 0)  -- Full screen
 blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)  -- Black color
-blackFrame.Visible = false  -- Hidden by default
-blackFrame.ZIndex = 1
+blackFrame.Visible = false  -- Start hidden
 blackFrame.Parent = screenGui
 
 -- Vertical layout to arrange items
