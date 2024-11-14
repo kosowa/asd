@@ -250,7 +250,8 @@ end
 --------------------------------------------------
 
 -- Black screen GUI setup
-local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
 
 -- Create ScreenGui
 local screenGui = Instance.new("ScreenGui")
@@ -262,9 +263,34 @@ screenGui.Parent = playerGui
 local blackFrame = Instance.new("Frame")
 blackFrame.Size = UDim2.new(1, 0, 1, 0)  -- Full screen
 blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)  -- Black color
-blackFrame.Visible = false  -- Hidden by default
+blackFrame.Visible = false  -- Set to true to make it visible by default
 blackFrame.ZIndex = 1
 blackFrame.Parent = screenGui
+
+-- Create text label for displaying Gems and Gold
+local textLabel = Instance.new("TextLabel")
+textLabel.Size = UDim2.new(0.5, 0, 0.1, 0)  -- Adjust size as needed
+textLabel.Position = UDim2.new(0.5, 0, 0.5, 0)  -- Center of the screen
+textLabel.AnchorPoint = Vector2.new(0.5, 0.5)  -- Center alignment
+textLabel.BackgroundTransparency = 1  -- No background
+textLabel.TextColor3 = Color3.new(1, 1, 1)  -- White color
+textLabel.Font = Enum.Font.SourceSansBold
+textLabel.TextSize = 48  -- Text size
+textLabel.ZIndex = 2
+textLabel.Parent = blackFrame
+
+-- Function to update text label with Gems and Gold values
+local function updateText()
+    local gems = player:GetAttribute("Gems") or 0
+    local gold = player:GetAttribute("Gold") or 0
+	local rerolls = player:GetAttribute("TraitRerolls") or 0
+	local level = player:GetAttribute("Level") or 0
+    textLabel.Text = "GEMS: " .. gems .. "\nGOLD: " .. gold .. "\nREROLLS: " .. rerolls .. "\nLEVEL: " .. level
+end
+
+-- Update the text when Gems or Gold attributes change
+player:GetAttributeChangedSignal("Gems"):Connect(updateText)
+player:GetAttributeChangedSignal("Gold"):Connect(updateText)
 
 --------------------------------------------------
 
