@@ -469,21 +469,21 @@ end
 
 --------------------------------------------------
 -- BUTTON MINIMIZE
--- Create a ScreenGui and add it to the PlayerGui
+-- Create a ScreenGui and add it to CoreGui
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "CustomButtonGUI"  -- Unique name
 screenGui.ResetOnSpawn = false
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+screenGui.Parent = game:GetService("CoreGui")  -- Parent to CoreGui for higher layering
 
 -- Button creation
-local button = Instance.new("ImageButton", screenGui)
-button.Position = UDim2.new(0.05, 0, 0.05, 0)  -- Adjusted to move it to the top
-button.AnchorPoint = Vector2.new(0.5, 0)
-button.Size = UDim2.new(0.13, 0, 0.13, 0)  -- Scaled size to adjust based on screen size
-button.Image = "rbxassetid://83204245116453"
+local button = Instance.new("ImageButton")
+button.Position = UDim2.new(0.05, 0, 0.05, 0)
+button.Size = UDim2.new(0, 57, 0, 57)
+button.Image = "rbxassetid://83204245116453"  -- Set your image asset ID here
 button.BackgroundTransparency = 1  -- Make the background fully transparent
 button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the square
 button.ZIndex = 10  -- Set a high ZIndex to ensure it stays above other UI elements
+button.Parent = screenGui
 
 -- Function to minimize Fluent GUI when the button is clicked
 button.MouseButton1Click:Connect(function()
