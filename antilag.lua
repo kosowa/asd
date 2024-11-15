@@ -627,34 +627,35 @@ do
     -- Toggle BlackScreen
     local blackScreenState = settings["BlackScreen"] or false
     local ToggleBlackScreen = Tabs.Main:AddToggle("MyToggleBlackScreen", { Title = "Black Screen", Default = blackScreenState })
-
+    
     ToggleBlackScreen:OnChanged(function()
         settings["BlackScreen"] = Options.MyToggleBlackScreen.Value
         saveSettings(settings)
         print("Black Screen Toggle changed:", Options.MyToggleBlackScreen.Value)
-
+    
         if Options.MyToggleBlackScreen.Value then
             blackFrame.Visible = true
             updateText()
-            
-            if ToggleDisableRender then
+    
+            if settings["DisableRender"] then
                 game:GetService("RunService"):Set3dRenderingEnabled(false)
-                print("3d Rendering Has been Disabled")
+                print("3D Rendering has been disabled")
             end
         else
             blackFrame.Visible = false
             game:GetService("RunService"):Set3dRenderingEnabled(true)
+            print("3D Rendering has been enabled")
         end
     end)
-
-    -- Toggle disable rendering
+    
+    -- Toggle Disable Rendering
     local DisableRenderState = settings["DisableRender"] or false
     local ToggleDisableRender = Tabs.Main:AddToggle("MyToggleDisableRender", { Title = "Disable Render", Default = DisableRenderState })
-
+    
     ToggleDisableRender:OnChanged(function(isEnabled)
-        DisableRenderState = isEnabled
         settings["DisableRender"] = isEnabled
         saveSettings(settings)
+        print("Disable Render Toggle changed:", isEnabled)
     end)
 
     -- Toggle for remove laggy objects
