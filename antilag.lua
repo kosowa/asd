@@ -636,8 +636,37 @@ do
         if Options.MyToggleBlackScreen.Value then
             blackFrame.Visible = true
             updateText()
+            
+            if ToggleDisableRender then
+                game:GetService("RunService"):Set3dRenderingEnabled(false)
+            end
         else
             blackFrame.Visible = false
+            game:GetService("RunService"):Set3dRenderingEnabled(true)
+        end
+    end)
+
+    -- Toggle disable rendering
+    local DisableRenderState = settings["DisableRender"] or false
+    local ToggleDisableRender = Tabs.Main:AddToggle("MyToggleDisableRender", { Title = "Disable Render", Default = DisableRenderState })
+
+    ToggleDisableRender:OnChanged(function(isEnabled)
+        DisableRenderState = isEnabled
+        settings["DisableRender"] = isEnabled
+        saveSettings(settings)
+    end)
+
+    -- Toggle for remove laggy objects
+    local disableTextureState = settings["DisableTexture"] or false
+    local ToggleDisableTexture = Tabs.Main:AddToggle("MyToggleDisableTexture", { Title = "Disable Texture", Default = disableTextureState })
+
+    ToggleDisableTexture:OnChanged(function()
+        settings["DisableTexture"] = Options.MyToggleDisableTexture.Value
+        saveSettings(settings)
+        print("Disable Texture Toggle changed:", Options.MyToggleDisableTexture.Value)
+        
+        if Options.MyToggleDisableTexture.Value then
+            removeLaggyObjects()
         end
     end)
 
@@ -653,20 +682,6 @@ do
         -- Trigger deleteMapObjects() if toggle is enabled
         if Options.MyToggleDeleteMap.Value then
             deleteMapObjects()
-        end
-    end)
-
-    -- Toggle for remove laggy objects
-    local disableTextureState = settings["DisableTexture"] or false
-    local ToggleDisableTexture = Tabs.Main:AddToggle("MyToggleDisableTexture", { Title = "Disable Texture", Default = disableTextureState })
-
-    ToggleDisableTexture:OnChanged(function()
-        settings["DisableTexture"] = Options.MyToggleDisableTexture.Value
-        saveSettings(settings)
-        print("Disable Texture Toggle changed:", Options.MyToggleDisableTexture.Value)
-        
-        if Options.MyToggleDisableTexture.Value then
-            removeLaggyObjects()
         end
     end)
 
