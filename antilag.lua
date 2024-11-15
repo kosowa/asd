@@ -1,4 +1,4 @@
--- NIGGA GET OUT
+-- v1
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -115,6 +115,7 @@ local Window = Fluent:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab({ Title = "Optimizer", Icon = "boxes" }),
+    BossRush = Window:AddTab({ Title = "BossRush", Icon = "calendar" }),
     Autoplay = Window:AddTab({ Title = "Auto Play", Icon = "play" }),
     AutoChallenge = Window:AddTab({ Title = "Auto Challenge", Icon = "swords" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
@@ -152,7 +153,97 @@ end
 local settings = loadSettings()
 
 --------------------------------------------------
+--Open Boss rush event
+local player = game.Players.LocalPlayer
 
+local function teleportToGojo()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+       local humanoidRootPart = player.Character.HumanoidRootPart
+       local targetPosition = Vector3.new(-294, 39, 617)
+       humanoidRootPart.CFrame = CFrame.new(targetPosition)
+    end
+end
+
+local GuiService = game:GetService("GuiService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local playerGui = player:WaitForChild("PlayerGui")
+
+local function pressEnter()
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+    wait(0.1)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+end
+
+local function BossRush()
+    teleportToGojo()
+    wait(1)
+    
+    local clickGojo = playerGui:FindFirstChild("Gujo")
+    local holder, button
+
+    for i = 1, 5 do
+        clickGojo = playerGui:FindFirstChild("Gujo")
+        if clickGojo then
+            holder = clickGojo:FindFirstChild("Holder")
+            if holder then
+                button = holder:FindFirstChild("Button")
+                if button then
+                    GuiService.SelectedObject = button
+                    if GuiService.SelectedObject == button then
+                        break
+                    end
+                end
+            end
+        end
+        wait(0.5)
+    end
+    
+    if GuiService.SelectedObject == button then
+        wait(0.5)
+        pressEnter()
+    end
+end
+
+
+
+--select boss
+local function sukuna()
+	local player = game:GetService("Players").LocalPlayer
+	local sukuna = player.PlayerGui.BossRush.SwitchButtons.SukonoEvent:FindFirstChild("Button")
+	
+	if sukuna then
+		GuiService.AutoSelectGuiEnabled = true
+        GuiService.SelectedObject = sukuna
+		wait(1)
+        pressEnter()
+	end
+end
+
+local function igris()
+    local player = game:GetService("Players").LocalPlayer
+    local igris = player.PlayerGui.BossRush.SwitchButtons.IgrosEvent:FindFirstChild("Button")
+    
+    if igris then
+        GuiService.AutoSelectGuiEnabled = true
+        GuiService.SelectedObject = igris
+        wait(1)
+        pressEnter()
+    end
+end
+
+local function clickStartButton()
+    local player = game:GetService("Players").LocalPlayer
+    local igris = player.PlayerGui.BossRush.SwitchButtons:FindFirstChild("IgrosEvent")
+    local buttonStart = player.PlayerGui.BossRush.Holder.StageInfo.Buttons.Start:FindFirstChild("Button")
+
+    if buttonStart then
+        GuiService.AutoSelectGuiEnabled = true
+        GuiService.SelectedObject = buttonStart
+		wait(1)
+        pressEnter()
+    end
+end
+----------------------------------------------------------------------------
 -- AUTOJOIN CHALLENGE
 local function joinChallenge()
     if not workspace:FindFirstChild("MainLobby") then
@@ -606,12 +697,19 @@ local autoJoinEnabled = settings["AutoJoin"] or false
 local autoStartEnabled = settings["AutoStart"] or false
 local autoChallengeEnabled = settings["AutoChallenge"] or false
 local autoStartChallengeEnabled = settings["AutoStartChallenge"] or false
+local selectedBoss = settings["SelectedBoss"] or "IGRIS"
+local autoBossRush = settings["AutoBossRush"] or false
 
 --------------------------------------------------
 do
     Tabs.Main:AddParagraph({
         Title = "GAME OPTIMIZER",
         Content = "Optimize your gameplay!"
+    })
+
+    Tabs.BossRush:AddParagraph({
+            Title = "100% SAFE",
+            Content = "WORKING!"
     })
 
     Tabs.Autoplay:AddParagraph({
@@ -627,35 +725,34 @@ do
     -- Toggle BlackScreen
     local blackScreenState = settings["BlackScreen"] or false
     local ToggleBlackScreen = Tabs.Main:AddToggle("MyToggleBlackScreen", { Title = "Black Screen", Default = blackScreenState })
-    
+
     ToggleBlackScreen:OnChanged(function()
         settings["BlackScreen"] = Options.MyToggleBlackScreen.Value
         saveSettings(settings)
         print("Black Screen Toggle changed:", Options.MyToggleBlackScreen.Value)
-    
+
         if Options.MyToggleBlackScreen.Value then
             blackFrame.Visible = true
             updateText()
-    
-            if settings["DisableRender"] then
+
+            if ToggleDisableRender then
                 game:GetService("RunService"):Set3dRenderingEnabled(false)
-                print("3D Rendering has been disabled")
+                print("3d Rendering Has been Disabled")
             end
         else
             blackFrame.Visible = false
             game:GetService("RunService"):Set3dRenderingEnabled(true)
-            print("3D Rendering has been enabled")
         end
     end)
-    
-    -- Toggle Disable Rendering
+
+    -- Toggle disable rendering
     local DisableRenderState = settings["DisableRender"] or false
-    local ToggleDisableRender = Tabs.Main:AddToggle("MyToggleDisableRender", { Title = "Disable Render | Turn OFF if u'r crashing", Default = DisableRenderState })
-    
+    local ToggleDisableRender = Tabs.Main:AddToggle("MyToggleDisableRender", { Title = "Disable Render", Default = DisableRenderState })
+
     ToggleDisableRender:OnChanged(function(isEnabled)
+        DisableRenderState = isEnabled
         settings["DisableRender"] = isEnabled
         saveSettings(settings)
-        print("Disable Render Toggle changed:", isEnabled)
     end)
 
     -- Toggle for remove laggy objects
@@ -885,6 +982,47 @@ do
         autoStartEnabled = isEnabled
         settings["AutoStart"] = isEnabled
         saveSettings(settings)
+    end)
+
+    local DropdownBoss = Tabs.BossRush:AddDropdown("Select Boss", {
+        Title = "Boss",
+        Values = {"IGRIS", "SUKUNA",},
+        Multi = false,
+        Default = selectedBoss,
+    })
+
+    DropdownBoss:OnChanged(function(Value)
+        selectedBoss = Value
+        settings["SelectedBoss"] = Value
+        saveSettings(settings)
+
+    end)
+
+    local ToggleBossRush = Tabs.BossRush:AddToggle("Auto Join Boss Rush", {
+        Title = "Auto Boss Rush",
+        Default = autoBossRush,
+    })
+
+    ToggleBossRush:OnChanged(function(isEnabled)
+        autoBossRush = isEnabled
+        settings["AutoBossRush"] = isEnabled
+        saveSettings(settings)
+        if not workspace:FindFirstChild("MainLobby") then
+            print("MainLobby does not exist. NOT JOINING")
+            return
+        end
+        
+        if autoBossRush then
+            BossRush()
+            wait(1)
+            if selectedBoss == "SUKUNA" then
+                sukuna()
+            elseif selectedBoss == "IGRIS" then
+                igris()
+            end
+            wait(1)
+            clickStartButton()
+        end
     end)
 end
 
