@@ -639,6 +639,7 @@ do
             
             if ToggleDisableRender then
                 game:GetService("RunService"):Set3dRenderingEnabled(false)
+                print("3d Rendering Has been Disabled")
             end
         else
             blackFrame.Visible = false
