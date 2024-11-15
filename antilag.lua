@@ -650,7 +650,7 @@ do
     
     -- Toggle Disable Rendering
     local DisableRenderState = settings["DisableRender"] or false
-    local ToggleDisableRender = Tabs.Main:AddToggle("MyToggleDisableRender", { Title = "Disable Render (Turn OFF if u'r crashing", Default = DisableRenderState })
+    local ToggleDisableRender = Tabs.Main:AddToggle("MyToggleDisableRender", { Title = "Disable Render | Turn OFF if u'r crashing", Default = DisableRenderState })
     
     ToggleDisableRender:OnChanged(function(isEnabled)
         settings["DisableRender"] = isEnabled
