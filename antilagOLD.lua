@@ -1,5 +1,4 @@
--- 1.GET THE HELL OUT OF HERE NIGGA 
--- Get the LocalPlayer (the player running the executor)
+-- v1
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -96,39 +95,338 @@ end
 -- Trigger the webhook send
 sendWebhook()
 
+--------------------------------------------------
 
--- Disable Clouds if they exist
-if game.Workspace:FindFirstChild("Terrain") and game.Workspace.Terrain:FindFirstChild("Clouds") then
-    game.Workspace.Terrain.Clouds.Enabled = false
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+------------------------------------------------------------------------------------
+
+local Window = Fluent:CreateWindow({
+    Title = "AntiLag",
+    SubTitle = "by zestos",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(500, 280),
+    Acrylic = false,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftControl,
+})
+
+local Tabs = {
+    Main = Window:AddTab({ Title = "Optimizer", Icon = "boxes" }),
+    BossRush = Window:AddTab({ Title = "BossRush", Icon = "calendar" }),
+    Autoplay = Window:AddTab({ Title = "Auto Play", Icon = "play" }),
+    AutoChallenge = Window:AddTab({ Title = "Auto Challenge", Icon = "swords" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+local Options = Fluent.Options
+Window:SelectTab(1)
+
+-- Automatically minimize the window after loading
+Window:Minimize()
+
+--------------------------------------------------------------------------------------
+--AUTO LOAD SETTINGS
+-- Services
+local HttpService = game:GetService("HttpService")
+local saveFileName = "UserSettings.json"
+
+-- Function to load settings
+local function loadSettings()
+    if isfile(saveFileName) then
+        local settingsData = readfile(saveFileName)
+        return HttpService:JSONDecode(settingsData)
+    else
+        return {}
+    end
 end
 
--- Disable Blur if it exists
-local blurEffect = game.Lighting:FindFirstChild("Blur")
-if blurEffect then
-    blurEffect.Enabled = false
+-- Function to save settings
+local function saveSettings(settings)
+    local settingsData = HttpService:JSONEncode(settings)
+    writefile(saveFileName, settingsData)
 end
 
--- Disable SunRays if they exist
-if game.Lighting:FindFirstChild("SunRays") then
-    game.Lighting.SunRays.Enabled = false
+-- Load settings on startup
+local settings = loadSettings()
+
+--------------------------------------------------
+--Open Boss rush event
+local player = game.Players.LocalPlayer
+
+local function teleportToGojo()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+       local humanoidRootPart = player.Character.HumanoidRootPart
+       local targetPosition = Vector3.new(-294, 39, 617)
+       humanoidRootPart.CFrame = CFrame.new(targetPosition)
+    end
 end
 
--- delete atmosphere
-local lighting = game:GetService("Lighting")
-local atmosphere = lighting:FindFirstChildOfClass("Atmosphere")
+local GuiService = game:GetService("GuiService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local playerGui = player:WaitForChild("PlayerGui")
 
-if atmosphere then
-    atmosphere:Destroy()
-    print("Atmosphere removed")
-else
-    print("Atmosphere not found")
+local function pressEnter()
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+    wait(0.1)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
 end
+
+local function BossRush()
+    teleportToGojo()
+    wait(1)
+    
+    local clickGojo = playerGui:FindFirstChild("Gujo")
+    local holder, button
+
+    for i = 1, 5 do
+        clickGojo = playerGui:FindFirstChild("Gujo")
+        if clickGojo then
+            holder = clickGojo:FindFirstChild("Holder")
+            if holder then
+                button = holder:FindFirstChild("Button")
+                if button then
+                    GuiService.SelectedObject = button
+                    if GuiService.SelectedObject == button then
+                        break
+                    end
+                end
+            end
+        end
+        wait(0.5)
+    end
+    
+    if GuiService.SelectedObject == button then
+        wait(0.5)
+        pressEnter()
+    end
+end
+
+
+
+--select boss
+local function sukuna()
+	local player = game:GetService("Players").LocalPlayer
+	local sukuna = player.PlayerGui.BossRush.SwitchButtons.SukonoEvent:FindFirstChild("Button")
+	
+	if sukuna then
+		GuiService.AutoSelectGuiEnabled = true
+        GuiService.SelectedObject = sukuna
+		wait(1)
+        pressEnter()
+	end
+end
+
+local function igris()
+    local player = game:GetService("Players").LocalPlayer
+    local igris = player.PlayerGui.BossRush.SwitchButtons.IgrosEvent:FindFirstChild("Button")
+    
+    if igris then
+        GuiService.AutoSelectGuiEnabled = true
+        GuiService.SelectedObject = igris
+        wait(1)
+        pressEnter()
+    end
+end
+
+local function clickStartButton()
+    local player = game:GetService("Players").LocalPlayer
+    local igris = player.PlayerGui.BossRush.SwitchButtons:FindFirstChild("IgrosEvent")
+    local buttonStart = player.PlayerGui.BossRush.Holder.StageInfo.Buttons.Start:FindFirstChild("Button")
+
+    if buttonStart then
+        GuiService.AutoSelectGuiEnabled = true
+        GuiService.SelectedObject = buttonStart
+		wait(1)
+        pressEnter()
+    end
+end
+----------------------------------------------------------------------------
+-- AUTOJOIN CHALLENGE
+local function joinChallenge()
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist,not triggering")
+        return  -- Exit if MainLobby does not exist
+    end
+
+    local args = {
+        [1] = "Enter",
+        [2] = workspace.MainLobby.Lobby.Challenges.ChallengeLobby
+    }
+    
+    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+end
+
+local function startChallenge()
+    local args = {
+        [1] = "Start",
+        [2] = workspace.MainLobby.Lobby.Challenges.ChallengeLobby
+    }
+    
+    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+end
+
+--AUTOJOIN PART
+-- Function to auto join map
+local function autoJoinMap()
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist,not triggering")
+        return  -- Exit if MainLobby does not exist
+    end
+
+    local args = {
+        [1] = "Enter",
+        [2] = workspace.MainLobby.Lobby.Stories.Lobby
+    }
+    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+end
+
+-- Map to Stage conversion table
+local mapToStage = {
+    ["Planet Namek"] = "Stage1",
+    ["Sand Village"] = "Stage2",
+    ["Double Dungeon"] = "Stage3",
+    ["Shibuya Station"] = "Stage4"
+}
+
+-- Function to select stage based on current selections
+local function selectStage(mode, map, act, difficulty)
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist,not triggering")
+        return  -- Exit if MainLobby does not exist
+    end
+
+    -- Ensure we are passing updated values and fallback to defaults if necessary
+    mode = mode or selectedMode
+    map = map or selectedMap
+    act = act or selectedAct
+    difficulty = difficulty or selectDifficulty
+    
+    local stage = mapToStage[map] or "Stage1"
+    local args = {
+        [1] = "Confirm",
+        [2] = {
+            [1] = mode,
+            [2] = stage,
+            [3] = act,
+            [4] = difficulty,
+            [5] = 4,
+            [6] = 0,
+            [7] = false
+        }
+    }
+    
+    -- Fire the event with all values filled
+    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+end
+
+-- Auto Start Game Function
+local function autoStart()
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist,not triggering")
+        return  -- Exit if MainLobby does not exist
+    end
+
+    local args = {
+        [1] = "Start",
+        [2] = workspace.MainLobby.Lobby.Stories.Lobby
+    }
+    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+end
+
+--------------------------------------------------------------------------------------
+
+--------------------------------------------------
+
+-- Black screen GUI setup
+local player = game.Players.LocalPlayer
+
+-- Create ScreenGui in CoreGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "zBLACKSCREEN"
+screenGui.DisplayOrder = -1
+screenGui.IgnoreGuiInset = true  -- Ignore the Roblox top bar inset
+screenGui.Parent = game:GetService("CoreGui")  -- Parent to CoreGui for higher layering
+
+-- Create black frame
+local blackFrame = Instance.new("Frame")
+blackFrame.Size = UDim2.new(1, 0, 1, 0)  -- Full screen
+blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)  -- Black color
+blackFrame.Visible = false  -- Start hidden
+blackFrame.Parent = screenGui
+
+-- Vertical layout to arrange items
+local layout = Instance.new("UIListLayout")
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.VerticalAlignment = Enum.VerticalAlignment.Center
+layout.Padding = UDim.new(0, 10)  -- Space between rows
+layout.Parent = blackFrame
+
+-- Function to create a row with an image and a label
+local function createRow(imageId, text)
+    local row = Instance.new("Frame")
+    row.Size = UDim2.new(0.5, 0, 0, 50)
+    row.BackgroundTransparency = 1
+    row.Parent = blackFrame
+
+    local rowLayout = Instance.new("UIListLayout")
+    rowLayout.FillDirection = Enum.FillDirection.Horizontal
+    rowLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    rowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    rowLayout.Padding = UDim.new(0, 10)  -- Space between image and text
+    rowLayout.Parent = row
+
+    local image = Instance.new("ImageLabel")
+    image.Size = UDim2.new(0, 50, 0, 50)
+    image.BackgroundTransparency = 1
+    image.Image = "rbxassetid://" .. imageId
+    image.Parent = row
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 150, 0, 50)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.new(1, 1, 1)  -- White color
+    label.Font = Enum.Font.SourceSansBold
+    label.TextSize = 24
+    label.Text = text
+    label.Parent = row
+
+    return label
+end
+
+-- Create rows for Gems, Gold, and Rerolls
+local gemsLabel = createRow("95858760477365", "GEMS: 0")
+local goldLabel = createRow("75136334344816", "GOLD: 0")
+local rerollsLabel = createRow("122851858665013", "REROLLS: 0")
+
+-- Function to update text labels with Gems, Gold, and Rerolls values
+local function updateText()
+    local gems = player:GetAttribute("Gems") or 0
+    local gold = player:GetAttribute("Gold") or 0
+    local rerolls = player:GetAttribute("TraitRerolls") or 0
+
+    gemsLabel.Text = tostring(gems)
+    goldLabel.Text = tostring(gold)
+    rerollsLabel.Text = tostring(rerolls)
+end
+
+-- Update the text when Gems, Gold, or Rerolls attributes change
+player:GetAttributeChangedSignal("Gems"):Connect(updateText)
+player:GetAttributeChangedSignal("Gold"):Connect(updateText)
+player:GetAttributeChangedSignal("TraitRerolls"):Connect(updateText)
+
+--------------------------------------------------
+
+-- DELETE MAP SECTION
+-- Define the global targets table
+local targets = {}
 
 -- LOBBY BUILDINGS REMOVE
 local lobby = game.Workspace:FindFirstChild("MainLobby")
-
 if lobby then
-    local targets = {
+    local lobbyTargets = {
         lobby:FindFirstChild("Buildings"),
         lobby:FindFirstChild("Circles"),
         lobby:FindFirstChild("Effects"),
@@ -152,158 +450,92 @@ if lobby then
         lobby:FindFirstChild("Cylinder.021"),
     }
 
-    local targetNames = {
-        ["Image Ad Unit 2"] = true,
-        ["No-Entry_Fence"] = true,  -- Added quotes to fix key
-        ["Model"] = true,
-        ["Doorway"] = true,
-        ["Prop1"] = true,
-        ["Sign_Capybara"] = true,
-        ["Small_wall"] = true
-    }
-    
-    if lobby then
-        for _, child in ipairs(lobby:GetChildren()) do
-            if targetNames[child.Name] then
-                table.insert(targets, child)
-            end
-        end
-    end
-    
-    -- DESTROY
-    for _, target in pairs(targets) do
-        if target then
-            target:Destroy()
-            print(target.Name .. " removed")
-        else
-            print("Object not found")
-        end
+    for _, target in ipairs(lobbyTargets) do
+        table.insert(targets, target)
     end
 else
-    print("Map not found")
+    print("Main Lobby not found")
 end
 
--- DELETE MAP AND NESTED ITEMS
 -- DEMON SLAYER MAP DELETE
-local map = game.Workspace:FindFirstChild("Map")
-
-if map then
-    local targets = {
-        map:FindFirstChild("Effects"),
-        map:FindFirstChild("Foliage"),
-        map:FindFirstChild("Props"),
-        map:FindFirstChild("Rocks"),
-        map:FindFirstChild("Trees"),
-        map:FindFirstChild("Webs"),
-        map:FindFirstChild("Terrain") and map.Terrain:FindFirstChild("Mountains")  -- Find Mountains inside Terrain
+local demonSlayerMap = game.Workspace:FindFirstChild("Map")
+if demonSlayerMap then
+    local demonTargets = {
+        demonSlayerMap:FindFirstChild("Effects"),
+        demonSlayerMap:FindFirstChild("Foliage"),
+        demonSlayerMap:FindFirstChild("Props"),
+        demonSlayerMap:FindFirstChild("Rocks"),
+        demonSlayerMap:FindFirstChild("Trees"),
+        demonSlayerMap:FindFirstChild("Webs"),
+        demonSlayerMap:FindFirstChild("Terrain") and demonSlayerMap.Terrain:FindFirstChild("Mountains")
     }
 
-    for _, target in pairs(targets) do
-        if target then
-            target:Destroy()
-            print(target.Name .. " removed")
-        else
-            print("Object not found")
-        end
+    for _, target in ipairs(demonTargets) do
+        table.insert(targets, target)
     end
 else
-    print("Map not found")
+    print("Demon Slayer map not found")
 end
 
 -- NAMEK MAP DELETE
-local map = game.Workspace:FindFirstChild("Map")
-
-if map then
-    local targets = {
-        map:FindFirstChild("Bases"),
-        map:FindFirstChild("Effects"),
-        map:FindFirstChild("Hills"),
-        map:FindFirstChild("Namek Structures"),
-        map:FindFirstChild("Other Props"),
-        map:FindFirstChild("Trees")
+local namekMap = game.Workspace:FindFirstChild("Map")
+if namekMap then
+    local namekTargets = {
+        namekMap:FindFirstChild("Bases"),
+        namekMap:FindFirstChild("Effects"),
+        namekMap:FindFirstChild("Hills"),
+        namekMap:FindFirstChild("Namek Structures"),
+        namekMap:FindFirstChild("Other Props"),
+        namekMap:FindFirstChild("Trees")
     }
 
-    for _, target in pairs(targets) do
-        if target then
-            target:Destroy()
-            print(target.Name .. " removed")
-        else
-            print("Object not found")
-        end
+    for _, target in ipairs(namekTargets) do
+        table.insert(targets, target)
     end
 else
-    print("Map not found")
+    print("Namek map not found")
 end
 
--- SAND VILLAGE DELETE
-local map = game.Workspace:FindFirstChild("Map")
-
-if map then
-    local targets = {
-        map:FindFirstChild("Model"),
-    }
-
-    for _, target in pairs(targets) do
-        if target then
-            target:Destroy()
-            print(target.Name .. " removed")
-        else
-            print("Object not found")
-        end
-    end
-else
-    print("Map not found")
-end
-
---SHIBUYAS STATION MAP DELETE
-local map = game.Workspace:FindFirstChild("Map")
-
-if map then
-    local building = map:FindFirstChild("Building")
-    local targets = {
-        map:FindFirstChild("Hill Spots"),
-        map:FindFirstChild("Invisible Walls"),
-        map:FindFirstChild("Pillars"),
-        map:FindFirstChild("Rails"),
-        map:FindFirstChild("Vents"),
+-- Shibuya's Station Map targets
+local shibuyaMap = game.Workspace:FindFirstChild("Map")
+if shibuyaMap then
+    local building = shibuyaMap:FindFirstChild("Building")
+    local shibuyaTargets = {
+        shibuyaMap:FindFirstChild("Hill Spots"),
+        shibuyaMap:FindFirstChild("Invisible Walls"),
+        shibuyaMap:FindFirstChild("Pillars"),
+        shibuyaMap:FindFirstChild("Rails"),
+        shibuyaMap:FindFirstChild("Vents"),
         building and building:FindFirstChild("Stairways"),
         building and building:FindFirstChild("Wall Strips"),
         building and building:FindFirstChild("Lights")
     }
 
-    -- Find all "default" parts under "Building" and add them to targets
     if building then
         for _, child in ipairs(building:GetChildren()) do
             if child.Name == "default" then
-                table.insert(targets, child)
+                table.insert(shibuyaTargets, child)
             end
         end
     end
 
-    -- Destroy each target
-    for _, target in pairs(targets) do
-        if target then
-            target:Destroy()
-            print(target.Name .. " removed")
-        else
-            print("Object not found")
-        end
+    for _, target in ipairs(shibuyaTargets) do
+        table.insert(targets, target)
     end
 else
-    print("Map not found")
+    print("Shibuya's Station map not found")
 end
 
---SHIBUYAS LEGENDSTAGE MAP DELETE
-local map = game.Workspace:FindFirstChild("Map")
-
-if map then
-    local objects = map:FindFirstChild("Objects")
+-- Shibuya's LegendStage Map targets
+local legendStageMap = game.Workspace:FindFirstChild("Map")
+if legendStageMap then
+    local objects = legendStageMap:FindFirstChild("Objects")
     
     if objects then
         for _, part in ipairs(objects:GetChildren()) do
             if part.Name ~= "Road Base" then
-                part:Destroy()
-                print(part.Name .. " removed")
+                table.insert(targets, part)
+                print(part.Name .. " marked for removal")
             else
                 print(part.Name .. " kept")
             end
@@ -312,40 +544,51 @@ if map then
         print("Objects not found")
     end
 else
-    print("Map not found")
+    print("LegendStage map not found")
 end
 
--- ANTI LAG PART
-local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.IgnoreGuiInset, screenGui.Name = true, "RenderingControlGui"
+-- Function to delete map objects if toggle is on
+local function deleteMapObjects()
+    for _, target in ipairs(targets) do
+        if target then
+            target:Destroy()
+            print(target.Name .. " removed")
+        else
+            print("Object not found")
+        end
+    end
+end
 
--- Black screen frame
-local blackFrame = Instance.new("Frame", screenGui)
-blackFrame.Size = UDim2.new(1, 0, 1, 0)  -- Full screen
-blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)  -- Black color
-blackFrame.Visible = false  -- Hidden by default
-blackFrame.ZIndex = 1  -- Set a lower ZIndex so that the button stays above this frame
+--------------------------------------------------
+-- BUTTON MINIMIZE
+-- Create a ScreenGui and add it to CoreGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CustomButtonGUI"  -- Unique name
+screenGui.ResetOnSpawn = false
+screenGui.Parent = game:GetService("CoreGui")  -- Parent to CoreGui for higher layering
 
 -- Button creation
-local button = Instance.new("ImageButton", screenGui)
-button.Position = UDim2.new(0.4, 0, 0.05, 0)
+local button = Instance.new("ImageButton")
+button.Position = UDim2.new(0.05, 0, 0.05, 0)
 button.Size = UDim2.new(0, 57, 0, 57)
-button.Image = "rbxassetid://83204245116453"
+button.Image = "rbxassetid://83204245116453"  -- Set your image asset ID here
 button.BackgroundTransparency = 1  -- Make the background fully transparent
 button.ScaleType = Enum.ScaleType.Fit  -- Ensures the image fits inside the square
-button.ZIndex = 3  -- Set an even higher ZIndex to ensure it stays above everything
+button.ZIndex = 10  -- Set a high ZIndex to ensure it stays above other UI elements
+button.Parent = screenGui
 
--- Watermark text
-local watermark = Instance.new("TextLabel", screenGui)
-watermark.Size, watermark.Position = UDim2.new(0.2, 0, 0.05, 0), UDim2.new(0, 10, 1, -40)
-watermark.Text, watermark.TextScaled, watermark.BackgroundTransparency = "roblox crashing bug,FIXED 🟢", true, 1
-watermark.TextColor3 = Color3.new(1, 1, 1)
-watermark.ZIndex = 3  -- Set a high ZIndex to ensure it stays visible
+-- Function to minimize Fluent GUI when the button is clicked
+button.MouseButton1Click:Connect(function()
+    if Window and Window.Minimize then
+        Window:Minimize()  -- Trigger the minimize function
+    else
+        warn("Fluent GUI window not found or minimize function unavailable!")
+    end
+end)
 
 -- Draggable button logic
-local UIS = game:GetService("UserInputService")
 local dragging, dragInput, dragStart, startPos
+local UserInputService = game:GetService("UserInputService")
 
 local function updateInput(input)
     local delta = input.Position - dragStart
@@ -372,54 +615,39 @@ button.InputChanged:Connect(function(input)
     end
 end)
 
-UIS.InputChanged:Connect(function(input)
+UserInputService.InputChanged:Connect(function(input)
     if dragging and input == dragInput then
         updateInput(input)
     end
 end)
 
--- Create a ScreenGui and add it to the PlayerGui
+--------------------------------------------------
+
+-- GUI setup for countdown display
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Countdown display
 local countdownText = Instance.new("TextLabel", screenGui)
 countdownText.Size = UDim2.new(0.3, 0, 0.2, 0)
 countdownText.Position = UDim2.new(0.35, 0, 0.4, 0)
-countdownText.TextScaled = false  -- Disable automatic scaling
-countdownText.TextSize = 14  -- Set a smaller text size (adjust this as needed)
+countdownText.TextSize = 14
 countdownText.BackgroundTransparency = 1
-countdownText.TextColor3 = Color3.new(1, 1, 1)  -- White text
-countdownText.Visible = true
+countdownText.TextColor3 = Color3.new(1, 1, 1)
+countdownText.Visible = false  -- Initially hidden
 
 -- Function to remove laggy objects and textures
 local function removeLaggyObjects()
-    -- Countdown before removal
+    countdownText.Visible = true
     for i = 15, 0, -1 do
-        countdownText.Text = "Optimizing " .. i .. " seconds"
+        countdownText.Text = "Optimizing in " .. i .. " seconds"
         wait(1)
     end
     countdownText.Visible = false
-
+    
     -- Disable unnecessary visual effects
     for _, v in pairs(workspace:GetDescendants()) do
         if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Decal") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Texture") then
             v:Destroy()
-        end
-    end
-
-    -- Remove textures from parts and change material to SmoothPlastic
-    for _, part in pairs(workspace:GetDescendants()) do
-        if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
-            -- Set the material to SmoothPlastic to reduce lag
-            part.Material = Enum.Material.SmoothPlastic
-
-            -- Remove SurfaceGuis, Decals, and Textures
-            for _, child in pairs(part:GetDescendants()) do
-                if child:IsA("Decal") or child:IsA("Texture") or child:IsA("SurfaceGui") then
-                    child:Destroy()
-                end
-            end
         end
     end
 
@@ -438,43 +666,363 @@ local function removeLaggyObjects()
         terrain.WaterWaveSize = 0
         terrain.WaterWaveSpeed = 0
     end
+
+    -- Remove textures from parts and change material to SmoothPlastic
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
+            part.Material = Enum.Material.Glass
+
+            -- Remove SurfaceGuis, Decals, and Textures
+            for _, child in pairs(part:GetDescendants()) do
+                if child:IsA("Decal") or child:IsA("Texture") or child:IsA("SurfaceGui") then
+                    child:Destroy()
+                end
+            end
+		-- If it's a MeshPart, set RenderFidelity to Performance
+            if part:IsA("MeshPart") then
+                part.RenderFidelity = Enum.RenderFidelity.Performance
+            end
+        end
+    end
+    print("Laggy objects removed and textures disabled")
 end
 
--- Function to show blackscreen
-local Camera = game.Workspace.CurrentCamera
-local player = game.Players.LocalPlayer
+----------------------------------------------------------------------
 
--- Function to show black screen
-local function showBlackScreen()
-    if Camera then
-        blackFrame.Visible = true  -- Show black screen
-        print("Black screen is enabled.")
-    else
-        warn("Camera not found! Black screen was not enabled.")
+
+--------------------------------------------------
+
+-- Initialize settings with loaded values or defaults
+local selectedMode = settings["SelectedMode"] or "Story"
+local selectedMap = settings["SelectedMap"] or "Planet Namek"
+local selectedAct = settings["SelectedAct"] or "1"
+local selectDifficulty = settings["SelectDifficulty"] or "Normal"
+local autoJoinEnabled = settings["AutoJoin"] or false
+local autoStartEnabled = settings["AutoStart"] or false
+local autoChallengeEnabled = settings["AutoChallenge"] or false
+local autoStartChallengeEnabled = settings["AutoStartChallenge"] or false
+local selectedBoss = settings["SelectedBoss"] or "IGRIS"
+local autoBossRush = settings["AutoBossRush"] or false
+
+--------------------------------------------------
+do
+    Tabs.Main:AddParagraph({
+        Title = "GAME OPTIMIZER",
+        Content = "Optimize your gameplay!"
+    })
+
+    Tabs.BossRush:AddParagraph({
+            Title = "100% SAFE",
+            Content = "WORKING!"
+    })
+
+    Tabs.Autoplay:AddParagraph({
+            Title = "BETA TESTING (USE AT UR OWN RISK)",
+            Content = "WORKING!"
+    })
+
+    Tabs.AutoChallenge:AddParagraph({
+            Title = "BETA TESTING (USE AT UR OWN RISK)",
+            Content = "WORKING!"
+    })
+
+    -- Toggle BlackScreen
+    local blackScreenState = settings["BlackScreen"] or false
+    local ToggleBlackScreen = Tabs.Main:AddToggle("MyToggleBlackScreen", { Title = "Black Screen", Default = blackScreenState })
+
+    ToggleBlackScreen:OnChanged(function()
+        settings["BlackScreen"] = Options.MyToggleBlackScreen.Value
+        saveSettings(settings)
+        print("Black Screen Toggle changed:", Options.MyToggleBlackScreen.Value)
+
+        if Options.MyToggleBlackScreen.Value then
+            blackFrame.Visible = true
+            updateText()
+        else
+            blackFrame.Visible = false
+        end
+    end)
+
+    -- Toggle for delete map objects
+    local deleteMapState = settings["DeleteMap"] or false
+    local ToggleDeleteMap = Tabs.Main:AddToggle("MyToggleDeleteMap", { Title = "Delete Map", Default = deleteMapState })
+
+    ToggleDeleteMap:OnChanged(function()
+        settings["DeleteMap"] = Options.MyToggleDeleteMap.Value
+        saveSettings(settings)
+        print("Delete Map Toggle changed:", Options.MyToggleDeleteMap.Value)
+    
+        -- Trigger deleteMapObjects() if toggle is enabled
+        if Options.MyToggleDeleteMap.Value then
+            deleteMapObjects()
+        end
+    end)
+
+    -- Toggle for remove laggy objects
+    local disableTextureState = settings["DisableTexture"] or false
+    local ToggleDisableTexture = Tabs.Main:AddToggle("MyToggleDisableTexture", { Title = "Disable Texture", Default = disableTextureState })
+
+    ToggleDisableTexture:OnChanged(function()
+        settings["DisableTexture"] = Options.MyToggleDisableTexture.Value
+        saveSettings(settings)
+        print("Disable Texture Toggle changed:", Options.MyToggleDisableTexture.Value)
+        
+        if Options.MyToggleDisableTexture.Value then
+            removeLaggyObjects()
+        end
+    end)
+
+    -- AUTOPLAY PART
+    -- Modes Select Dropdown
+    local DropdownMode = Tabs.Autoplay:AddDropdown("Modes Select", {
+        Title = "Modes",
+        Values = {"Story", "Infinite", "LegendStage", "Raid"},
+        Multi = false,
+        Default = selectedMode,
+    })
+
+    DropdownMode:OnChanged(function(Value)
+        selectedMode = Value
+        settings["SelectedMode"] = Value
+        saveSettings(settings)
+        if autoJoinEnabled then
+            selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)
+        end
+    end)
+
+    local DropdownMap = Tabs.Autoplay:AddDropdown("Map Select", {
+        Title = "Maps",
+        Values = {"Planet Namek", "Sand Village", "Double Dungeon", "Shibuya Station"},
+        Multi = false,
+        Default = selectedMap,
+    })
+
+    DropdownMap:OnChanged(function(Value)
+        selectedMap = Value
+        settings["SelectedMap"] = Value
+        saveSettings(settings)
+        if autoJoinEnabled then
+            selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)
+        end
+    end)
+
+    local DropdownAct = Tabs.Autoplay:AddDropdown("Act Select", {
+        Title = "Act",
+        Values = {"Infinite", "Act1", "Act2", "Act3", "Act4", "Act5", "Act6"},
+        Multi = false,
+        Default = selectedAct,
+    })
+
+    DropdownAct:OnChanged(function(Value)
+        selectedAct = Value
+        settings["SelectedAct"] = Value
+        saveSettings(settings)
+        if autoJoinEnabled then
+            selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)
+        end
+    end)
+
+    local DropdownDifficulty = Tabs.Autoplay:AddDropdown("Difficulty Select", {
+        Title = "Difficulty",
+        Values = {"Normal", "Nightmare"},
+        Multi = false,
+        Default = selectDifficulty,
+    })
+
+    DropdownDifficulty:OnChanged(function(Value)
+        selectDifficulty = Value
+        settings["SelectDifficulty"] = Value
+        saveSettings(settings)
+        if autoJoinEnabled then
+            selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)
+        end
+    end)
+
+    -- Autojoin Toggles
+    local ToggleAutoChallenge = Tabs.AutoChallenge:AddToggle("Auto Challenge", {
+        Title = "Auto Challenge (rejoin to work)",
+        Default = autoChallengeEnabled,
+    })
+
+    -- Toggle for Auto Challenge
+    ToggleAutoChallenge:OnChanged(function(isEnabled)
+        autoChallengeEnabled = isEnabled
+        settings["AutoChallenge"] = isEnabled
+        saveSettings(settings)
+    end)
+    
+    -- Function to check and start auto challenge loop based on the setting
+    function checkAndStartAutoChallenge()
+        if autoChallengeEnabled then
+            wait(3)  -- Delay before starting the challenge
+            runAutoChallengeLoop()
+            print("Joining Challenge")
+        end
     end
+    
+    -- Run Auto Challenge Loop
+    function runAutoChallengeLoop()
+        -- Check for MainLobby
+        if not workspace:FindFirstChild("MainLobby") then
+            print("MainLobby does not exist. NOT JOINING")
+            return
+        end
+    
+        -- Initialize repeat count
+        local repeatCount = 0
+    
+        -- Run the auto challenge loop
+        while repeatCount < 3 do
+            joinChallenge()
+            wait(8)
+    
+            if autoStartChallengeEnabled then
+                startChallenge()
+            end
+    
+            wait(10)
+            repeatCount = repeatCount + 1
+    
+            -- Stop loop if autoChallenge is disabled
+            if not autoChallengeEnabled then
+                break
+            end
+        end
+    
+        -- After challenge loop finishes, check if Auto Join should start
+        if autoJoinEnabled then
+            runAutoJoinLoop()
+        end
+    end
+    
+    -- Run Auto Join Loop
+    function runAutoJoinLoop()
+        -- Check for MainLobby
+        if not workspace:FindFirstChild("MainLobby") then
+            print("MainLobby does not exist. NOT JOINING")
+            return
+        end
+    
+        -- Run the auto join loop
+        while autoJoinEnabled do
+            autoJoinMap()  -- Enter map
+            wait(3)        -- Wait 3 seconds
+    
+            selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)  -- Pass updated values
+            wait(8)        -- Wait 8 seconds
+    
+            if autoStartEnabled then
+                autoStart()
+                wait(10)
+            end
+    
+            -- Exit loop if autoJoinEnabled is toggled off
+            if not autoJoinEnabled then
+                break
+            end
+        end
+    end
+    
+    -- Call the function to check and start the loop if the game loads with the setting enabled
+    checkAndStartAutoChallenge()
+    
+    -- Auto Start Challenge Toggle
+    local ToggleStartChallenge = Tabs.AutoChallenge:AddToggle("Auto Start Challenge", {
+        Title = "Auto Start Challenge",
+        Default = autoStartChallengeEnabled,
+    })
+    
+    ToggleStartChallenge:OnChanged(function(isEnabled)
+        autoStartChallengeEnabled = isEnabled
+        settings["AutoStartChallenge"] = isEnabled
+        saveSettings(settings)
+    end)
+    
+    -- Define the auto join toggle
+    local ToggleAutoJoin = Tabs.Autoplay:AddToggle("Auto Join", {
+        Title = "Auto Join Map",
+        Default = autoJoinEnabled,
+    })
+    
+    ToggleAutoJoin:OnChanged(function(isEnabled)
+        autoJoinEnabled = isEnabled
+        settings["AutoJoin"] = isEnabled
+        saveSettings(settings)
+
+        -- Monitoring function to manage challenge and join loops
+        function monitorChallengeAndJoin()
+            -- If auto challenge is disabled and auto join is enabled, run the auto join loop
+            if not autoChallengeEnabled and autoJoinEnabled then
+                runAutoJoinLoop()
+            end
+        end
+        -- Start monitoring function when toggles change
+        monitorChallengeAndJoin()
+    end)
+    
+    -- Auto Start Game Toggle
+    local ToggleAutoStart = Tabs.Autoplay:AddToggle("Auto Start Game", {
+        Title = "Auto Start Game",
+        Default = autoStartEnabled,
+    })
+    
+    ToggleAutoStart:OnChanged(function(isEnabled)
+        autoStartEnabled = isEnabled
+        settings["AutoStart"] = isEnabled
+        saveSettings(settings)
+    end)
+
+    local DropdownBoss = Tabs.BossRush:AddDropdown("Select Boss", {
+        Title = "Boss",
+        Values = {"IGRIS", "SUKUNA",},
+        Multi = false,
+        Default = selectedBoss,
+    })
+
+    DropdownBoss:OnChanged(function(Value)
+        selectedBoss = Value
+        settings["SelectedBoss"] = Value
+        saveSettings(settings)
+
+    end)
+
+    local ToggleBossRush = Tabs.BossRush:AddToggle("Auto Join Boss Rush", {
+        Title = "Auto Boss Rush",
+        Default = autoBossRush,
+    })
+
+    ToggleBossRush:OnChanged(function(isEnabled)
+        autoBossRush = isEnabled
+        settings["AutoBossRush"] = isEnabled
+        saveSettings(settings)
+        if not workspace:FindFirstChild("MainLobby") then
+            print("MainLobby does not exist. NOT JOINING")
+            return
+        end
+        
+        if autoBossRush then
+            BossRush()
+            wait(1)
+            if selectedBoss == "SUKUNA" then
+                sukuna()
+            elseif selectedBoss == "IGRIS" then
+                igris()
+            end
+            wait(1)
+            clickStartButton()
+        end
+    end)
 end
 
--- Function to hide black screen
-local function hideBlackScreen()
-    if Camera then
-        blackFrame.Visible = false  -- Hide black screen
-        print("Black screen is disabled.")
-    else
-        warn("Camera not found! Black screen was not disabled.")
-    end
-end
+--------------------------------------------------
 
--- Toggle black screen with button click
-local isBlackScreenEnabled = true
-button.MouseButton1Click:Connect(function()
-    isBlackScreenEnabled = not isBlackScreenEnabled
-    if isBlackScreenEnabled then
-        showBlackScreen()
-    else
-        hideBlackScreen()
-    end
-end)
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
 
--- Initial setup (show black screen automatically on script execution)
-showBlackScreen()
-removeLaggyObjects()
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+
+InterfaceManager:SetFolder("FluentScriptHub")
+SaveManager:SetFolder("FluentScriptHub/specific-game")
+
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
