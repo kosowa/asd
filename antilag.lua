@@ -1,4 +1,4 @@
--- v1
+-- v2
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -96,7 +96,6 @@ end
 sendWebhook()
 
 --------------------------------------------------
-
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
@@ -115,7 +114,7 @@ local Window = Fluent:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab({ Title = "Optimizer", Icon = "boxes" }),
-    BossRush = Window:AddTab({ Title = "BossRush", Icon = "calendar" }),
+    BossRush = Window:AddTab({ Title = "Boss Rush", Icon = "calendar" }),
     Autoplay = Window:AddTab({ Title = "Auto Play", Icon = "play" }),
     AutoChallenge = Window:AddTab({ Title = "Auto Challenge", Icon = "swords" }),
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
@@ -158,9 +157,9 @@ local player = game.Players.LocalPlayer
 
 local function teleportToGojo()
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-       local humanoidRootPart = player.Character.HumanoidRootPart
-       local targetPosition = Vector3.new(-294, 39, 617)
-       humanoidRootPart.CFrame = CFrame.new(targetPosition)
+    local humanoidRootPart = player.Character.HumanoidRootPart
+    local targetPosition = Vector3.new(-294, 39, 617)
+    humanoidRootPart.CFrame = CFrame.new(targetPosition)
     end
 end
 
@@ -208,15 +207,15 @@ end
 
 --select boss
 local function sukuna()
-	local player = game:GetService("Players").LocalPlayer
-	local sukuna = player.PlayerGui.BossRush.SwitchButtons.SukonoEvent:FindFirstChild("Button")
-	
-	if sukuna then
-		GuiService.AutoSelectGuiEnabled = true
+    local player = game:GetService("Players").LocalPlayer
+    local sukuna = player.PlayerGui.BossRush.SwitchButtons.SukonoEvent:FindFirstChild("Button")
+    
+    if sukuna then
+        GuiService.AutoSelectGuiEnabled = true
         GuiService.SelectedObject = sukuna
-		wait(1)
+        wait(1)
         pressEnter()
-	end
+    end
 end
 
 local function igris()
@@ -239,33 +238,87 @@ local function clickStartButton()
     if buttonStart then
         GuiService.AutoSelectGuiEnabled = true
         GuiService.SelectedObject = buttonStart
-		wait(1)
+        wait(1)
         pressEnter()
     end
 end
-----------------------------------------------------------------------------
--- AUTOJOIN CHALLENGE
-local function joinChallenge()
-    if not workspace:FindFirstChild("MainLobby") then
-        print("MainLobby does not exist,not triggering")
-        return  -- Exit if MainLobby does not exist
-    end
 
-    local args = {
-        [1] = "Enter",
-        [2] = workspace.MainLobby.Lobby.Challenges.ChallengeLobby
-    }
-    
-    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+--AUTO START GAME FUNCTION
+local detectionEnabled = false
+
+local function startGame()
+    if not detectionEnabled then return end
+
+    local player = game:GetService("Players").LocalPlayer
+    local GuiService = game:GetService("GuiService")
+
+    local button = player:WaitForChild("PlayerGui")
+        :WaitForChild("MiniLobbyInterface")
+        :WaitForChild("Holder")
+        :WaitForChild("Buttons")
+        :WaitForChild("Start")
+        :WaitForChild("Button")
+
+    if button then
+        GuiService.AutoSelectGuiEnabled = true
+        GuiService.SelectedObject = button
+        wait(0.1)
+        pressEnter()
+    end
 end
 
-local function startChallenge()
-    local args = {
-        [1] = "Start",
-        [2] = workspace.MainLobby.Lobby.Challenges.ChallengeLobby
-    }
-    
-    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
+local function onChildAdded(child)
+    if detectionEnabled and child.Name == "MiniLobbyInterface" then
+        startGame()
+    end
+end
+
+local function enableStart()
+    detectionEnabled = true
+    print("auto start enabled")
+    local playerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+
+    if playerGui:FindFirstChild("MiniLobbyInterface") then
+        startGame()
+    end
+end
+
+local function disableStart()
+    detectionEnabled = false
+    print("auto start disabled")
+end
+
+local playerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+playerGui.ChildAdded:Connect(onChildAdded)
+
+----------------------------------------------------------------------------
+-- AUTOJOIN CHALLENGE
+local player = game.Players.LocalPlayer
+
+local function teleportToDaily()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local humanoidRootPart = player.Character.HumanoidRootPart
+        local targetPosition = Vector3.new(-258, 42, 683)
+        humanoidRootPart.CFrame = CFrame.new(targetPosition)
+    end
+end
+local function teleportToChallenge()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local humanoidRootPart = player.Character.HumanoidRootPart
+        local targetPosition = Vector3.new(-236, 42, 683)
+        humanoidRootPart.CFrame = CFrame.new(targetPosition)
+    end
+end
+
+local function tpToChallenge()
+    if not workspace:FindFirstChild("MainLobby") then
+        print("MainLobby does not exist. NOT JOINING CHALLENGE")
+        return
+    end
+
+    teleportToDaily()
+    wait(1)
+    teleportToChallenge()
 end
 
 --AUTOJOIN PART
@@ -321,21 +374,6 @@ local function selectStage(mode, map, act, difficulty)
     -- Fire the event with all values filled
     game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
 end
-
--- Auto Start Game Function
-local function autoStart()
-    if not workspace:FindFirstChild("MainLobby") then
-        print("MainLobby does not exist,not triggering")
-        return  -- Exit if MainLobby does not exist
-    end
-
-    local args = {
-        [1] = "Start",
-        [2] = workspace.MainLobby.Lobby.Stories.Lobby
-    }
-    game:GetService("ReplicatedStorage").Networking.LobbyEvent:FireServer(unpack(args))
-end
-
 --------------------------------------------------------------------------------------
 
 --------------------------------------------------
@@ -678,7 +716,7 @@ local function removeLaggyObjects()
                     child:Destroy()
                 end
             end
-		-- If it's a MeshPart, set RenderFidelity to Performance
+        -- If it's a MeshPart, set RenderFidelity to Performance
             if part:IsA("MeshPart") then
                 part.RenderFidelity = Enum.RenderFidelity.Performance
             end
@@ -698,9 +736,7 @@ local selectedMap = settings["SelectedMap"] or "Planet Namek"
 local selectedAct = settings["SelectedAct"] or "1"
 local selectDifficulty = settings["SelectDifficulty"] or "Normal"
 local autoJoinEnabled = settings["AutoJoin"] or false
-local autoStartEnabled = settings["AutoStart"] or false
 local autoChallengeEnabled = settings["AutoChallenge"] or false
-local autoStartChallengeEnabled = settings["AutoStartChallenge"] or false
 local selectedBoss = settings["SelectedBoss"] or "IGRIS"
 local autoBossRush = settings["AutoBossRush"] or false
 
@@ -712,18 +748,18 @@ do
     })
 
     Tabs.BossRush:AddParagraph({
-            Title = "100% SAFE",
+            Title = "JOIN BOSS EVENT",
             Content = "WORKING!"
     })
 
     Tabs.Autoplay:AddParagraph({
-            Title = "BETA TESTING (USE AT UR OWN RISK)",
+            Title = "BETA TESTING",
             Content = "WORKING!"
     })
 
     Tabs.AutoChallenge:AddParagraph({
-            Title = "BETA TESTING (USE AT UR OWN RISK)",
-            Content = "WORKING!"
+            Title = "BETA TESTING",
+            Content = "ENABLE AUTO JOIN MAP IN AUTO PLAY FIRST!"
     })
 
     -- Toggle BlackScreen
@@ -773,6 +809,33 @@ do
     end)
 
     -- AUTOPLAY PART
+    local AutoStartState = settings["AutoStart"] or false
+    local ToggleAutoStart = Tabs.Autoplay:AddToggle("Auto Start Game", {
+        Title = "Auto Start Game",
+        Default = AutoStartState,
+    })
+    
+    ToggleAutoStart:OnChanged(function(isEnabled)
+        AutoStartState = isEnabled
+        settings["AutoStart"] = isEnabled
+    
+        -- Save the settings (ensure this works correctly)
+        if saveSettings then
+            saveSettings(settings)
+        end
+    
+        -- Enable or disable the auto-start feature
+        if AutoStartState then
+            if enableStart then
+                enableStart()
+            end
+        else
+            if disableStart then
+                disableStart()
+            end
+        end
+    end)
+    
     -- Modes Select Dropdown
     local DropdownMode = Tabs.Autoplay:AddDropdown("Modes Select", {
         Title = "Modes",
@@ -838,140 +901,83 @@ do
         end
     end)
 
-    -- Autojoin Toggles
+    -- Auto Challenge Toggle
     local ToggleAutoChallenge = Tabs.AutoChallenge:AddToggle("Auto Challenge", {
-        Title = "Auto Challenge (rejoin to work)",
+        Title = "Auto Challenge",
         Default = autoChallengeEnabled,
     })
 
-    -- Toggle for Auto Challenge
     ToggleAutoChallenge:OnChanged(function(isEnabled)
         autoChallengeEnabled = isEnabled
         settings["AutoChallenge"] = isEnabled
         saveSettings(settings)
     end)
-    
-    -- Function to check and start auto challenge loop based on the setting
-    function checkAndStartAutoChallenge()
+
+    -- Function to handle Auto Challenge
+    function runAutoChallenge(onComplete)
         if autoChallengeEnabled then
-            wait(3)  -- Delay before starting the challenge
-            runAutoChallengeLoop()
-            print("Joining Challenge")
-        end
-    end
-    
-    -- Run Auto Challenge Loop
-    function runAutoChallengeLoop()
-        -- Check for MainLobby
-        if not workspace:FindFirstChild("MainLobby") then
-            print("MainLobby does not exist. NOT JOINING")
-            return
-        end
-    
-        -- Initialize repeat count
-        local repeatCount = 0
-    
-        -- Run the auto challenge loop
-        while repeatCount < 3 do
-            joinChallenge()
-            wait(8)
-    
-            if autoStartChallengeEnabled then
-                startChallenge()
-            end
-    
-            wait(10)
-            repeatCount = repeatCount + 1
-    
-            -- Stop loop if autoChallenge is disabled
-            if not autoChallengeEnabled then
-                break
+            local repeatCount = 0
+            while repeatCount < 3 do
+                tpToChallenge()
+                wait(3)
+                repeatCount = repeatCount + 1
+
+                if not autoChallengeEnabled then
+                    break
+                end
             end
         end
-    
-        -- After challenge loop finishes, check if Auto Join should start
-        if autoJoinEnabled then
-            runAutoJoinLoop()
+
+        -- Callback to notify completion
+        if onComplete then
+            onComplete()
         end
     end
-    
-    -- Run Auto Join Loop
+
+    -- Function to run Auto Join Loop
     function runAutoJoinLoop()
         -- Check for MainLobby
         if not workspace:FindFirstChild("MainLobby") then
             print("MainLobby does not exist. NOT JOINING")
             return
         end
-    
-        -- Run the auto join loop
+
+        -- Run the Auto Join loop
         while autoJoinEnabled do
-            autoJoinMap()  -- Enter map
-            wait(3)        -- Wait 3 seconds
-    
-            selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty)  -- Pass updated values
-            wait(8)        -- Wait 8 seconds
-    
-            if autoStartEnabled then
-                autoStart()
-                wait(10)
-            end
-    
-            -- Exit loop if autoJoinEnabled is toggled off
+            autoJoinMap()
+            wait(3)
+
+            selectStage(selectedMode, selectedMap, selectedAct, selectDifficulty) -- Pass updated values
+            wait(8)
+
             if not autoJoinEnabled then
                 break
             end
         end
     end
-    
-    -- Call the function to check and start the loop if the game loads with the setting enabled
-    checkAndStartAutoChallenge()
-    
-    -- Auto Start Challenge Toggle
-    local ToggleStartChallenge = Tabs.AutoChallenge:AddToggle("Auto Start Challenge", {
-        Title = "Auto Start Challenge",
-        Default = autoStartChallengeEnabled,
-    })
-    
-    ToggleStartChallenge:OnChanged(function(isEnabled)
-        autoStartChallengeEnabled = isEnabled
-        settings["AutoStartChallenge"] = isEnabled
-        saveSettings(settings)
-    end)
-    
-    -- Define the auto join toggle
+
+    -- Auto Join Toggle
     local ToggleAutoJoin = Tabs.Autoplay:AddToggle("Auto Join", {
         Title = "Auto Join Map",
         Default = autoJoinEnabled,
     })
-    
+
     ToggleAutoJoin:OnChanged(function(isEnabled)
         autoJoinEnabled = isEnabled
         settings["AutoJoin"] = isEnabled
         saveSettings(settings)
 
-        -- Monitoring function to manage challenge and join loops
-        function monitorChallengeAndJoin()
-            -- If auto challenge is disabled and auto join is enabled, run the auto join loop
-            if not autoChallengeEnabled and autoJoinEnabled then
-                runAutoJoinLoop()
-            end
+        if autoJoinEnabled then
+            -- First run Auto Challenge if enabled, then proceed to Auto Join
+            runAutoChallenge(function()
+                if autoJoinEnabled then
+                    runAutoJoinLoop()
+                end
+            end)
         end
-        -- Start monitoring function when toggles change
-        monitorChallengeAndJoin()
-    end)
-    
-    -- Auto Start Game Toggle
-    local ToggleAutoStart = Tabs.Autoplay:AddToggle("Auto Start Game", {
-        Title = "Auto Start Game",
-        Default = autoStartEnabled,
-    })
-    
-    ToggleAutoStart:OnChanged(function(isEnabled)
-        autoStartEnabled = isEnabled
-        settings["AutoStart"] = isEnabled
-        saveSettings(settings)
     end)
 
+    
     local DropdownBoss = Tabs.BossRush:AddDropdown("Select Boss", {
         Title = "Boss",
         Values = {"IGRIS", "SUKUNA",},
