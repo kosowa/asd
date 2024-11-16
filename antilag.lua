@@ -743,20 +743,6 @@ do
         end
     end)
 
-    -- Toggle for remove laggy objects
-    local disableTextureState = settings["DisableTexture"] or false
-    local ToggleDisableTexture = Tabs.Main:AddToggle("MyToggleDisableTexture", { Title = "Disable Texture", Default = disableTextureState })
-
-    ToggleDisableTexture:OnChanged(function()
-        settings["DisableTexture"] = Options.MyToggleDisableTexture.Value
-        saveSettings(settings)
-        print("Disable Texture Toggle changed:", Options.MyToggleDisableTexture.Value)
-        
-        if Options.MyToggleDisableTexture.Value then
-            removeLaggyObjects()
-        end
-    end)
-
     -- Toggle for delete map objects
     local deleteMapState = settings["DeleteMap"] or false
     local ToggleDeleteMap = Tabs.Main:AddToggle("MyToggleDeleteMap", { Title = "Delete Map", Default = deleteMapState })
@@ -769,6 +755,20 @@ do
         -- Trigger deleteMapObjects() if toggle is enabled
         if Options.MyToggleDeleteMap.Value then
             deleteMapObjects()
+        end
+    end)
+
+    -- Toggle for remove laggy objects
+    local disableTextureState = settings["DisableTexture"] or false
+    local ToggleDisableTexture = Tabs.Main:AddToggle("MyToggleDisableTexture", { Title = "Disable Texture", Default = disableTextureState })
+
+    ToggleDisableTexture:OnChanged(function()
+        settings["DisableTexture"] = Options.MyToggleDisableTexture.Value
+        saveSettings(settings)
+        print("Disable Texture Toggle changed:", Options.MyToggleDisableTexture.Value)
+        
+        if Options.MyToggleDisableTexture.Value then
+            removeLaggyObjects()
         end
     end)
 
