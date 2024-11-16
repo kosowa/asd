@@ -670,7 +670,7 @@ local function removeLaggyObjects()
     -- Remove textures from parts and change material to SmoothPlastic
     for _, part in pairs(workspace:GetDescendants()) do
         if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
-            part.Material = Enum.Material.SmoothPlastic
+            part.Material = Enum.Material.Glass
 
             -- Remove SurfaceGuis, Decals, and Textures
             for _, child in pairs(part:GetDescendants()) do
