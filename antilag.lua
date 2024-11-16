@@ -678,6 +678,10 @@ local function removeLaggyObjects()
                     child:Destroy()
                 end
             end
+		-- If it's a MeshPart, set RenderFidelity to Performance
+            if part:IsA("MeshPart") then
+                part.RenderFidelity = Enum.RenderFidelity.Performance
+            end
         end
     end
     print("Laggy objects removed and textures disabled")
