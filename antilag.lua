@@ -811,7 +811,7 @@ do
     -- AUTOPLAY PART
     local AutoStartState = settings["AutoStart"] or false
     local ToggleAutoStart = Tabs.Autoplay:AddToggle("Auto Start Game", {
-        Title = "Auto Start Game",
+        Title = "Auto Start Lobbies",
         Default = AutoStartState,
     })
     
@@ -839,7 +839,7 @@ do
     -- Modes Select Dropdown
     local DropdownMode = Tabs.Autoplay:AddDropdown("Modes Select", {
         Title = "Modes",
-        Values = {"Story", "Infinite", "LegendStage", "Raid"},
+        Values = {"Story", "LegendStage", "Raid"},
         Multi = false,
         Default = selectedMode,
     })
