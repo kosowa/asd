@@ -317,7 +317,7 @@ local function tpToChallenge()
     end
 
     teleportToDaily()
-    wait(1)
+    wait(0.7)
     teleportToChallenge()
 end
 
