@@ -1,4 +1,4 @@
--- v3_HIDE ENEMIES UPD
+-- v3 test
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -158,6 +158,11 @@ local Entities = workspace:FindFirstChild("Entities")
 local autoHideEnabled = false
 
 local function hideModels()
+    if not workspace:FindFirstChild("Entities") then
+        print("NO ENTITIES")
+        return
+    end
+
     if not autoHideEnabled then
         autoHideEnabled = true
         print("Auto-hide enabled.")
@@ -185,6 +190,11 @@ local function hideModels()
 end
 
 local function showModels()
+    if not workspace:FindFirstChild("Entities") then
+        print("NO ENTITIES")
+        return
+    end
+    
     if autoHideEnabled then
         autoHideEnabled = false
         print("Auto-hide disabled.")
