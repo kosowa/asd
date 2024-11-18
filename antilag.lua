@@ -1,4 +1,4 @@
--- v3 test
+-- v3 HIDE ENEMIES TEST 1
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -194,7 +194,7 @@ local function showModels()
         print("NO ENTITIES")
         return
     end
-    
+
     if autoHideEnabled then
         autoHideEnabled = false
         print("Auto-hide disabled.")
@@ -846,25 +846,6 @@ do
         end
     end)
 
-    -- Toggle HideEnemies
-    local hideEnemiesState = settings["HideEnemies"] or false
-    local ToggleHideEnemies = Tabs.Main:AddToggle("MyToggleHideEnemies", { Title = "Hide Enemies", Default = hideEnemiesState })
-
-    ToggleHideEnemies:OnChanged(function(isEnabled)
-        hideEnemiesState = isEnabled
-        settings["HideEnemies"] = isEnabled
-
-        if hideEnemiesState then
-            if not workspace:FindFirstChild("Entities") then
-                print("NO ENTITIES")
-                return
-            end
-            hideModels()
-        else
-            showModels()
-        end
-    end)
-
     -- Toggle for delete map objects
     local deleteMapState = settings["DeleteMap"] or false
     local ToggleDeleteMap = Tabs.Main:AddToggle("MyToggleDeleteMap", { Title = "Delete Map", Default = deleteMapState })
@@ -1102,6 +1083,25 @@ do
             end
             wait(1)
             clickStartButton()
+        end
+    end)
+
+    -- Toggle HideEnemies
+    local hideEnemiesState = settings["HideEnemies"] or false
+    local ToggleHideEnemies = Tabs.Main:AddToggle("MyToggleHideEnemies", { Title = "Hide Enemies", Default = hideEnemiesState })
+
+    ToggleHideEnemies:OnChanged(function(isEnabled)
+        hideEnemiesState = isEnabled
+        settings["HideEnemies"] = isEnabled
+
+        if hideEnemiesState then
+            if not workspace:FindFirstChild("Entities") then
+                print("NO ENTITIES")
+                return
+            end
+            hideModels()
+        else
+            showModels()
         end
     end)
 end
