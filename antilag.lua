@@ -1,4 +1,4 @@
--- v3 HIDE ENEMIES TEST 1
+-- v3 HIDE ENEMIES TEST 2
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -169,7 +169,6 @@ local function hideModels()
         while autoHideEnabled do
             for _, entity in pairs(Entities:GetChildren()) do
                 if entity:IsA("Model") then
-                    print("Hiding model:", entity.Name)
 
                     for _, descendant in pairs(entity:GetDescendants()) do
                         if descendant:IsA("BasePart") then
@@ -202,7 +201,6 @@ local function showModels()
 
     for _, entity in pairs(Entities:GetChildren()) do
         if entity:IsA("Model") then
-            print("Showing model:", entity.Name)
 
             for _, descendant in pairs(entity:GetDescendants()) do
                 if descendant:IsA("BasePart") then
