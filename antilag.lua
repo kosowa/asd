@@ -1,4 +1,4 @@
--- v2
+-- v3_HIDE ENEMIES UPD
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -151,7 +151,64 @@ end
 -- Load settings on startup
 local settings = loadSettings()
 
---------------------------------------------------
+-------------------------------------------------------------------------
+
+--HIDE ENEMIES
+local Entities = workspace:FindFirstChild("Entities")
+local autoHideEnabled = false
+
+local function hideModels()
+    if not autoHideEnabled then
+        autoHideEnabled = true
+        print("Auto-hide enabled.")
+        while autoHideEnabled do
+            for _, entity in pairs(Entities:GetChildren()) do
+                if entity:IsA("Model") then
+                    print("Hiding model:", entity.Name)
+
+                    for _, descendant in pairs(entity:GetDescendants()) do
+                        if descendant:IsA("BasePart") then
+                            descendant.Transparency = 1
+                            descendant.CanCollide = false
+                        end
+
+                        if descendant:IsA("BillboardGui") or descendant:IsA("SurfaceGui") then
+                            descendant.Enabled = false
+                        end
+                    end
+                end
+            end
+            wait(1)
+        end
+        print("Auto-hide loop stopped.")
+    end
+end
+
+local function showModels()
+    if autoHideEnabled then
+        autoHideEnabled = false
+        print("Auto-hide disabled.")
+    end
+
+    for _, entity in pairs(Entities:GetChildren()) do
+        if entity:IsA("Model") then
+            print("Showing model:", entity.Name)
+
+            for _, descendant in pairs(entity:GetDescendants()) do
+                if descendant:IsA("BasePart") then
+                    descendant.Transparency = 0
+                    descendant.CanCollide = true
+                end
+
+                if descendant:IsA("BillboardGui") or descendant:IsA("SurfaceGui") then
+                    descendant.Enabled = true
+                end
+            end
+        end
+    end
+end
+
+-------------------------------------------------------------------------
 --Open Boss rush event
 local player = game.Players.LocalPlayer
 
@@ -776,6 +833,25 @@ do
             updateText()
         else
             blackFrame.Visible = false
+        end
+    end)
+
+    -- Toggle HideEnemies
+    local hideEnemiesState = settings["HideEnemies"] or false
+    local ToggleHideEnemies = Tabs.Main:AddToggle("MyToggleHideEnemies", { Title = "Hide Enemies", Default = hideEnemiesState })
+
+    ToggleHideEnemies:OnChanged(function(isEnabled)
+        hideEnemiesState = isEnabled
+        settings["HideEnemies"] = isEnabled
+
+        if hideEnemiesState then
+            if not workspace:FindFirstChild("Entities") then
+                print("NO ENTITIES")
+                return
+            end
+            hideModels()
+        else
+            showModels()
         end
     end)
 
