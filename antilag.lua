@@ -836,17 +836,17 @@ do
 
     Tabs.BossRush:AddParagraph({
             Title = "JOIN BOSS EVENT",
-            Content = "WORKING!"
+            Content = "Working!"
     })
 
     Tabs.Autoplay:AddParagraph({
-            Title = "BETA TESTING",
-            Content = "WORKING!"
+            Title = "AUTO JOIN GAME MAPS",
+            Content = "Working!"
     })
 
     Tabs.AutoChallenge:AddParagraph({
-            Title = "BETA TESTING",
-            Content = "ENABLE AUTO JOIN MAP IN AUTO PLAY FIRST!"
+            Title = "AUTO JOIN CHALLENGES",
+            Content = "Enable Auto Join Map in Auto Play!"
     })
 
     -- Toggle BlackScreen
