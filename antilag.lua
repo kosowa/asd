@@ -1,4 +1,4 @@
--- v4 LOADS ALL TOGGLES & DROPDOWN | DELETE ENTIRE MAP
+-- v4 LOADS ALL TOGGLES & DROPDOWN | DELETE ENTIRE MAP 2
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -172,8 +172,6 @@ local function deleteEntireMap()
 		end
 	end
 end
-
-deleteEntireMap()
 
 ---------------------------------------------------------------------------
 
@@ -861,8 +859,8 @@ do
 
     -- Toggle Delete Entire Map
     local deleteEntireMapState = settings["DeleteEntireMap"] or false
-    local ToggleDeleteEntireMap = Tab.Main:AddToggle("ToggleDeleteEntireMap", {
-        Tittle = "Delete Entire Map",
+    local ToggleDeleteEntireMap = Tabs.Main:AddToggle("MyToggleDeleteEntireMap", {
+        Title = "Delete Entire Map",
         Default = deleteEntireMapState
     })
 
@@ -958,11 +956,12 @@ do
     ToggleDeleteEntireMap:OnChanged(function(isEnabled)
         deleteEntireMapState = isEnabled
         settings["DeleteEntireMap"] = isEnabled
+        saveSettings(settings)
 
         if deleteEntireMapState then
             deleteEntireMap()
         end
-    )
+    end)
 
     -- Toggle Delete Map
     ToggleDeleteMap:OnChanged(function()
