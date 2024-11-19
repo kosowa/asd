@@ -205,7 +205,7 @@ local function showModels()
             for _, descendant in pairs(entity:GetDescendants()) do
                 if descendant:IsA("BasePart") then
                     descendant.Transparency = 0
-                    descendant.CanCollide = true
+                    descendant.CanCollide = false
                 end
 
                 if descendant:IsA("BillboardGui") or descendant:IsA("SurfaceGui") then
