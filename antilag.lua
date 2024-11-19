@@ -103,8 +103,8 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "AntiLag",
-    SubTitle = "by zestos",
+    Title = "ANTILAG",
+    SubTitle = "V2 (script fixed)",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 280),
     Acrylic = false,
