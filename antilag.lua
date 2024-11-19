@@ -1,4 +1,4 @@
--- v4 LOADS ALL TOGGLES & DROPDOWN 1
+-- v4 LOADS ALL TOGGLES & DROPDOWN 3
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -153,6 +153,30 @@ local settings = loadSettings()
 
 -------------------------------------------------------------------------
 
+-- Delete Entire Map
+local function deleteEntireMap()
+    if not workspace:FindFirstChild("Map") then
+        print("NO MAP DETECTED")
+        return
+    end
+
+	local map = workspace:FindFirstChild("Map")
+	if map then
+		for _, child in ipairs(map:GetChildren()) do
+			if child:IsA("BasePart") and child.Name == "SpawnLocation" then
+				child.CanCollide = true
+				child.Transparency = 0
+			else
+				child:Destroy()
+			end
+		end
+	end
+end
+
+deleteEntireMap()
+
+---------------------------------------------------------------------------
+
 --HIDE ENEMIES
 local Entities = workspace:FindFirstChild("Entities")
 local autoHideEnabled = false
@@ -205,7 +229,7 @@ local function showModels()
             for _, descendant in pairs(entity:GetDescendants()) do
                 if descendant:IsA("BasePart") then
                     descendant.Transparency = 0
-                    descendant.CanCollide = false
+                    descendant.CanCollide = true
                 end
 
                 if descendant:IsA("BillboardGui") or descendant:IsA("SurfaceGui") then
@@ -831,9 +855,20 @@ do
     local blackScreenState = settings["BlackScreen"] or false
     local ToggleBlackScreen = Tabs.Main:AddToggle("MyToggleBlackScreen", { Title = "Black Screen", Default = blackScreenState })
 
+    -- Toggle HideEnemies
+    local hideEnemiesState = settings["HideEnemies"] or false
+    local ToggleHideEnemies = Tabs.Main:AddToggle("MyToggleHideEnemies", { Title = "Hide Enemies", Default = hideEnemiesState })
+
+    -- Toggle Delete Entire Map
+    local deleteEntireMapState = settings["DeleteEntireMap"] or false
+    local ToggleDeleteEntireMap = Tab.Main:AddToggle("ToggleDeleteEntireMap" {
+        Tittle = "Delete Entire Map",
+        Default = deleteEntireMapState
+    })
+
     -- Toggle for delete map objects
     local deleteMapState = settings["DeleteMap"] or false
-    local ToggleDeleteMap = Tabs.Main:AddToggle("MyToggleDeleteMap", { Title = "Delete Map", Default = deleteMapState })
+    local ToggleDeleteMap = Tabs.Main:AddToggle("MyToggleDeleteMap", { Title = "Clean Map", Default = deleteMapState })
 
     -- Toggle for remove laggy objects
     local disableTextureState = settings["DisableTexture"] or false
@@ -904,11 +939,7 @@ do
         Default = autoBossRush,
     })
 
-    -- Toggle HideEnemies
-    local hideEnemiesState = settings["HideEnemies"] or false
-    local ToggleHideEnemies = Tabs.Main:AddToggle("MyToggleHideEnemies", { Title = "Hide Enemies", Default = hideEnemiesState })
-
-    ------------------------------
+    ----------------------------------------------------------------------------------------------------------------------
     -- Toggle BlackScreen
     ToggleBlackScreen:OnChanged(function()
         settings["BlackScreen"] = Options.MyToggleBlackScreen.Value
@@ -922,6 +953,16 @@ do
             blackFrame.Visible = false
         end
     end)
+
+    -- Toggle Delete Entire Map
+    ToggleDeleteEntireMap:OnChanged(function(isEnabled)
+        deleteEntireMapState = isEnabled
+        settings["DeleteEntireMap"] = isEnabled
+
+        if deleteEntireMapState then
+            deleteEntireMap()
+        end
+    )
 
     -- Toggle Delete Map
     ToggleDeleteMap:OnChanged(function()
