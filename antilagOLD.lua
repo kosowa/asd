@@ -1,4 +1,4 @@
--- v2
+-- v4 LOADS ALL TOGGLES & DROPDOWN 1
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -151,7 +151,72 @@ end
 -- Load settings on startup
 local settings = loadSettings()
 
---------------------------------------------------
+-------------------------------------------------------------------------
+
+--HIDE ENEMIES
+local Entities = workspace:FindFirstChild("Entities")
+local autoHideEnabled = false
+
+local function hideModels()
+    if not workspace:FindFirstChild("Entities") then
+        print("NO ENTITIES")
+        return
+    end
+
+    if not autoHideEnabled then
+        autoHideEnabled = true
+        print("Auto-hide enabled.")
+        while autoHideEnabled do
+            for _, entity in pairs(Entities:GetChildren()) do
+                if entity:IsA("Model") then
+
+                    for _, descendant in pairs(entity:GetDescendants()) do
+                        if descendant:IsA("BasePart") then
+                            descendant.Transparency = 1
+                            descendant.CanCollide = false
+                        end
+
+                        if descendant:IsA("BillboardGui") or descendant:IsA("SurfaceGui") then
+                            descendant.Enabled = false
+                        end
+                    end
+                end
+            end
+            wait(1)
+        end
+        print("Auto-hide loop stopped.")
+    end
+end
+
+local function showModels()
+    if not workspace:FindFirstChild("Entities") then
+        print("NO ENTITIES")
+        return
+    end
+
+    if autoHideEnabled then
+        autoHideEnabled = false
+        print("Auto-hide disabled.")
+    end
+
+    for _, entity in pairs(Entities:GetChildren()) do
+        if entity:IsA("Model") then
+
+            for _, descendant in pairs(entity:GetDescendants()) do
+                if descendant:IsA("BasePart") then
+                    descendant.Transparency = 0
+                    descendant.CanCollide = false
+                end
+
+                if descendant:IsA("BillboardGui") or descendant:IsA("SurfaceGui") then
+                    descendant.Enabled = true
+                end
+            end
+        end
+    end
+end
+
+-------------------------------------------------------------------------
 --Open Boss rush event
 local player = game.Players.LocalPlayer
 
@@ -766,6 +831,85 @@ do
     local blackScreenState = settings["BlackScreen"] or false
     local ToggleBlackScreen = Tabs.Main:AddToggle("MyToggleBlackScreen", { Title = "Black Screen", Default = blackScreenState })
 
+    -- Toggle for delete map objects
+    local deleteMapState = settings["DeleteMap"] or false
+    local ToggleDeleteMap = Tabs.Main:AddToggle("MyToggleDeleteMap", { Title = "Delete Map", Default = deleteMapState })
+
+    -- Toggle for remove laggy objects
+    local disableTextureState = settings["DisableTexture"] or false
+    local ToggleDisableTexture = Tabs.Main:AddToggle("MyToggleDisableTexture", { Title = "Disable Texture", Default = disableTextureState })
+
+    -- Toggle Autoplay
+    local AutoStartState = settings["AutoStart"] or false
+    local ToggleAutoStart = Tabs.Autoplay:AddToggle("Auto Start Game", {
+        Title = "Auto Start Lobbies",
+        Default = AutoStartState,
+    })
+    
+    -- Modes Select Dropdown
+    local DropdownMode = Tabs.Autoplay:AddDropdown("Modes Select", {
+        Title = "Modes",
+        Values = {"Story", "LegendStage", "Raid"},
+        Multi = false,
+        Default = selectedMode,
+    })
+
+    -- Map Select Dropdown
+    local DropdownMap = Tabs.Autoplay:AddDropdown("Map Select", {
+        Title = "Maps",
+        Values = {"Planet Namek", "Sand Village", "Double Dungeon", "Shibuya Station"},
+        Multi = false,
+        Default = selectedMap,
+    })
+
+    -- Act Select Dropdown
+    local DropdownAct = Tabs.Autoplay:AddDropdown("Act Select", {
+        Title = "Act",
+        Values = {"Infinite", "Act1", "Act2", "Act3", "Act4", "Act5", "Act6"},
+        Multi = false,
+        Default = selectedAct,
+    })
+
+    -- Difficulty Select Dropdown
+    local DropdownDifficulty = Tabs.Autoplay:AddDropdown("Difficulty Select", {
+        Title = "Difficulty",
+        Values = {"Normal", "Nightmare"},
+        Multi = false,
+        Default = selectDifficulty,
+    })
+
+    -- Auto Challenge Toggle
+    local ToggleAutoChallenge = Tabs.AutoChallenge:AddToggle("Auto Challenge", {
+        Title = "Auto Challenge",
+        Default = autoChallengeEnabled,
+    })
+
+    -- Auto Join Toggle
+    local ToggleAutoJoin = Tabs.Autoplay:AddToggle("Auto Join", {
+        Title = "Auto Join Map",
+        Default = autoJoinEnabled,
+    })
+
+    -- Bossrush Select Dropdown
+    local DropdownBoss = Tabs.BossRush:AddDropdown("Select Boss", {
+        Title = "Boss",
+        Values = {"IGRIS", "SUKUNA",},
+        Multi = false,
+        Default = selectedBoss,
+    })
+
+    -- Auto Bossrush Toggle
+    local ToggleBossRush = Tabs.BossRush:AddToggle("Auto Join Boss Rush", {
+        Title = "Auto Boss Rush",
+        Default = autoBossRush,
+    })
+
+    -- Toggle HideEnemies
+    local hideEnemiesState = settings["HideEnemies"] or false
+    local ToggleHideEnemies = Tabs.Main:AddToggle("MyToggleHideEnemies", { Title = "Hide Enemies", Default = hideEnemiesState })
+
+    ------------------------------
+    -- Toggle BlackScreen
     ToggleBlackScreen:OnChanged(function()
         settings["BlackScreen"] = Options.MyToggleBlackScreen.Value
         saveSettings(settings)
@@ -779,25 +923,19 @@ do
         end
     end)
 
-    -- Toggle for delete map objects
-    local deleteMapState = settings["DeleteMap"] or false
-    local ToggleDeleteMap = Tabs.Main:AddToggle("MyToggleDeleteMap", { Title = "Delete Map", Default = deleteMapState })
-
+    -- Toggle Delete Map
     ToggleDeleteMap:OnChanged(function()
         settings["DeleteMap"] = Options.MyToggleDeleteMap.Value
         saveSettings(settings)
         print("Delete Map Toggle changed:", Options.MyToggleDeleteMap.Value)
-    
+
         -- Trigger deleteMapObjects() if toggle is enabled
         if Options.MyToggleDeleteMap.Value then
             deleteMapObjects()
         end
     end)
 
-    -- Toggle for remove laggy objects
-    local disableTextureState = settings["DisableTexture"] or false
-    local ToggleDisableTexture = Tabs.Main:AddToggle("MyToggleDisableTexture", { Title = "Disable Texture", Default = disableTextureState })
-
+    -- Toggle Disable Textures
     ToggleDisableTexture:OnChanged(function()
         settings["DisableTexture"] = Options.MyToggleDisableTexture.Value
         saveSettings(settings)
@@ -808,22 +946,16 @@ do
         end
     end)
 
-    -- AUTOPLAY PART
-    local AutoStartState = settings["AutoStart"] or false
-    local ToggleAutoStart = Tabs.Autoplay:AddToggle("Auto Start Game", {
-        Title = "Auto Start Lobbies",
-        Default = AutoStartState,
-    })
-    
+    -- Toggle Autoplay
     ToggleAutoStart:OnChanged(function(isEnabled)
         AutoStartState = isEnabled
         settings["AutoStart"] = isEnabled
-    
+
         -- Save the settings (ensure this works correctly)
         if saveSettings then
             saveSettings(settings)
         end
-    
+
         -- Enable or disable the auto-start feature
         if AutoStartState then
             if enableStart then
@@ -835,15 +967,8 @@ do
             end
         end
     end)
-    
-    -- Modes Select Dropdown
-    local DropdownMode = Tabs.Autoplay:AddDropdown("Modes Select", {
-        Title = "Modes",
-        Values = {"Story", "LegendStage", "Raid"},
-        Multi = false,
-        Default = selectedMode,
-    })
 
+    -- Mode Select Dropdown
     DropdownMode:OnChanged(function(Value)
         selectedMode = Value
         settings["SelectedMode"] = Value
@@ -853,13 +978,7 @@ do
         end
     end)
 
-    local DropdownMap = Tabs.Autoplay:AddDropdown("Map Select", {
-        Title = "Maps",
-        Values = {"Planet Namek", "Sand Village", "Double Dungeon", "Shibuya Station"},
-        Multi = false,
-        Default = selectedMap,
-    })
-
+    -- Map Select Dropdown
     DropdownMap:OnChanged(function(Value)
         selectedMap = Value
         settings["SelectedMap"] = Value
@@ -869,13 +988,7 @@ do
         end
     end)
 
-    local DropdownAct = Tabs.Autoplay:AddDropdown("Act Select", {
-        Title = "Act",
-        Values = {"Infinite", "Act1", "Act2", "Act3", "Act4", "Act5", "Act6"},
-        Multi = false,
-        Default = selectedAct,
-    })
-
+    -- Act Select Dropdown
     DropdownAct:OnChanged(function(Value)
         selectedAct = Value
         settings["SelectedAct"] = Value
@@ -885,13 +998,7 @@ do
         end
     end)
 
-    local DropdownDifficulty = Tabs.Autoplay:AddDropdown("Difficulty Select", {
-        Title = "Difficulty",
-        Values = {"Normal", "Nightmare"},
-        Multi = false,
-        Default = selectDifficulty,
-    })
-
+    -- Difficulty Select Dropdown
     DropdownDifficulty:OnChanged(function(Value)
         selectDifficulty = Value
         settings["SelectDifficulty"] = Value
@@ -902,17 +1009,11 @@ do
     end)
 
     -- Auto Challenge Toggle
-    local ToggleAutoChallenge = Tabs.AutoChallenge:AddToggle("Auto Challenge", {
-        Title = "Auto Challenge",
-        Default = autoChallengeEnabled,
-    })
-
     ToggleAutoChallenge:OnChanged(function(isEnabled)
         autoChallengeEnabled = isEnabled
         settings["AutoChallenge"] = isEnabled
         saveSettings(settings)
     end)
-
     -- Function to handle Auto Challenge
     function runAutoChallenge(onComplete)
         if autoChallengeEnabled then
@@ -957,11 +1058,6 @@ do
     end
 
     -- Auto Join Toggle
-    local ToggleAutoJoin = Tabs.Autoplay:AddToggle("Auto Join", {
-        Title = "Auto Join Map",
-        Default = autoJoinEnabled,
-    })
-
     ToggleAutoJoin:OnChanged(function(isEnabled)
         autoJoinEnabled = isEnabled
         settings["AutoJoin"] = isEnabled
@@ -977,26 +1073,14 @@ do
         end
     end)
 
-    
-    local DropdownBoss = Tabs.BossRush:AddDropdown("Select Boss", {
-        Title = "Boss",
-        Values = {"IGRIS", "SUKUNA",},
-        Multi = false,
-        Default = selectedBoss,
-    })
-
+    -- Bossrush Select Dropdown
     DropdownBoss:OnChanged(function(Value)
         selectedBoss = Value
         settings["SelectedBoss"] = Value
         saveSettings(settings)
-
     end)
 
-    local ToggleBossRush = Tabs.BossRush:AddToggle("Auto Join Boss Rush", {
-        Title = "Auto Boss Rush",
-        Default = autoBossRush,
-    })
-
+    -- Auto Bossrush Toggle
     ToggleBossRush:OnChanged(function(isEnabled)
         autoBossRush = isEnabled
         settings["AutoBossRush"] = isEnabled
@@ -1018,9 +1102,27 @@ do
             clickStartButton()
         end
     end)
+
+    -- Toggle HideEnemies
+    ToggleHideEnemies:OnChanged(function(isEnabled)
+        hideEnemiesState = isEnabled
+        settings["HideEnemies"] = isEnabled
+
+        if hideEnemiesState then
+            if not workspace:FindFirstChild("Entities") then
+                print("NO ENTITIES")
+                return
+            end
+            hideModels()
+        else
+            showModels()
+        end
+    end)
 end
 
---------------------------------------------------
+------------------------------------------------------------------------
+
+------------------------------------------------------------------------
 
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
