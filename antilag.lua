@@ -1,4 +1,4 @@
--- v5 TALISMAN REGION
+-- v5 TALISMAN REGION2
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -169,6 +169,7 @@ local function deleteEntireMap()
         for _, child in ipairs(talismanRegions:GetChildren()) do
             if table.find(keepParts, child.Name) and child:IsA("BasePart") then
                 child.CanCollide = true
+                child.Transparency = 0
             end
         end
     end
