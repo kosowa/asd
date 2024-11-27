@@ -1,4 +1,4 @@
--- v4 LOADS ALL TOGGLES & DROPDOWN | DELETE ENTIRE MAP 2
+-- v5 WISP
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -103,8 +103,8 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANTILAG",
-    SubTitle = "V2 (script fixed)",
+    Title = "ANTILAG V2",
+    SubTitle = "by zestos",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 280),
     Acrylic = false,
@@ -521,26 +521,30 @@ local function createRow(imageId, text)
     return label
 end
 
--- Create rows for Gems, Gold, and Rerolls
+-- Create rows for Gems, Gold, Rerolls, and SpiritWisp
 local gemsLabel = createRow("95858760477365", "GEMS: 0")
 local goldLabel = createRow("75136334344816", "GOLD: 0")
 local rerollsLabel = createRow("122851858665013", "REROLLS: 0")
+local spiritWispLabel = createRow("105624461273688", "WISP: 0")
 
--- Function to update text labels with Gems, Gold, and Rerolls values
+-- Function to update text labels with Gems, Gold, Rerolls, and SpiritWisp values
 local function updateText()
     local gems = player:GetAttribute("Gems") or 0
     local gold = player:GetAttribute("Gold") or 0
     local rerolls = player:GetAttribute("TraitRerolls") or 0
+    local spiritWisp = player:GetAttribute("SpiritWisp") or 0
 
-    gemsLabel.Text = tostring(gems)
-    goldLabel.Text = tostring(gold)
-    rerollsLabel.Text = tostring(rerolls)
+    gemsLabel.Text = "GEMS: " .. tostring(gems)
+    goldLabel.Text = "GOLD: " .. tostring(gold)
+    rerollsLabel.Text = "REROLLS: " .. tostring(rerolls)
+    spiritWispLabel.Text = "WISP: " .. tostring(spiritWisp)
 end
 
--- Update the text when Gems, Gold, or Rerolls attributes change
+-- Update the text when Gems, Gold, Rerolls, or SpiritWisp attributes change
 player:GetAttributeChangedSignal("Gems"):Connect(updateText)
 player:GetAttributeChangedSignal("Gold"):Connect(updateText)
 player:GetAttributeChangedSignal("TraitRerolls"):Connect(updateText)
+player:GetAttributeChangedSignal("SpiritWisp"):Connect(updateText)
 
 --------------------------------------------------
 
