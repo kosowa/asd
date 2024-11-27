@@ -1,4 +1,4 @@
--- v5 WISP
+-- v5 TALISMAN REGION
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -153,24 +153,36 @@ local settings = loadSettings()
 
 -------------------------------------------------------------------------
 
--- Delete Entire Map
+-- DELETE ENTIRE MAP
 local function deleteEntireMap()
     if not workspace:FindFirstChild("Map") then
         print("NO MAP DETECTED")
         return
     end
 
-	local map = workspace:FindFirstChild("Map")
-	if map then
-		for _, child in ipairs(map:GetChildren()) do
-			if child:IsA("BasePart") and child.Name == "SpawnLocation" then
-				child.CanCollide = true
-				child.Transparency = 0
-			else
-				child:Destroy()
-			end
-		end
-	end
+    local map = workspace:FindFirstChild("Map")
+    local talismanRegions = map:FindFirstChild("TalismanRegions")
+    local keepParts = {"Box", "Floor", "Grass", "Open", "Shack", "Shade", "Shrine"}
+
+    if talismanRegions then
+        -- Ensure the specified parts under TalismanRegions are set to CanCollide = true
+        for _, child in ipairs(talismanRegions:GetChildren()) do
+            if table.find(keepParts, child.Name) and child:IsA("BasePart") then
+                child.CanCollide = true
+            end
+        end
+    end
+
+    if map then
+        for _, child in ipairs(map:GetChildren()) do
+            if child:IsA("BasePart") and child.Name == "SpawnLocation" then
+                child.CanCollide = true
+                child.Transparency = 0
+            elseif child ~= talismanRegions then
+                child:Destroy()
+            end
+        end
+    end
 end
 
 ---------------------------------------------------------------------------
