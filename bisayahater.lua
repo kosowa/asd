@@ -1,4 +1,100 @@
---- x2
+--- x3
+local player = game.Players.LocalPlayer
+local playerName = player.Name
+
+-- Webhook
+local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
+
+-- Variable to keep track of how many times the script has been executed
+local executionCount = 0
+
+-- Function to encode data in JSON
+local function jsonEncode(data)
+    return game:GetService("HttpService"):JSONEncode(data)
+end
+
+-- Function to get Roblox avatar thumbnail from new API
+local function getAvatarUrl(userId)
+    -- Roblox Avatar API endpoint with the correct user ID
+    local avatarApiUrl = "https://www.roblox.com/avatar-thumbnails?params=[{userId:" .. userId .. "}]"
+    
+    -- Make a request to get the avatar URL
+    local httpService = game:GetService("HttpService")
+    local success, response = pcall(function()
+        return httpService:GetAsync(avatarApiUrl)
+    end)
+    
+    if success then
+        print("API Response: " .. response)  -- Print the response for debugging
+        local data = httpService:JSONDecode(response)
+        
+        -- Check if the data structure is as expected and get thumbnailUrl
+        if data and data[1] and data[1].thumbnailUrl then
+            return data[1].thumbnailUrl -- Return the avatar thumbnailUrl
+        else
+            print("No avatar thumbnail found or data structure is unexpected.") -- Debug message
+            return nil -- Return nil if no avatar is found
+        end
+    else
+        warn("Failed to fetch avatar URL: " .. tostring(response))
+        return nil
+    end
+end
+
+-- Function to send the webhook request (for executor)
+local function sendWebhook()
+    -- Increment the execution count
+    executionCount = executionCount + 1
+
+    -- Fetch the player's profile picture using Roblox Avatar API
+    local userId = player.UserId
+    local avatarUrl = getAvatarUrl(userId)
+
+    -- Ensure the avatar URL is valid, if not use a default image
+    if not avatarUrl then
+        avatarUrl = "https://cdn.discordapp.com/attachments/1187818042873368696/1269680756121141319/Screenshot_20240722-205650.jpg?ex=66fb6e99&is=66fa1d19&hm=53f31cd191d92672febc48e78e46da006b445c32b1b04c63b52a47d980958e78&" -- Default placeholder image
+    end
+
+    -- Data to be sent in the webhook embed (JSON format)
+    local data = {
+        ["embeds"] = {{
+            ["title"] = "Script Execution",
+            ["description"] = "Script executed by: **" .. playerName .. "**\nExecution count: **" .. executionCount .. "**",
+            ["color"] = 10181046, -- Purple color in decimal format (hex: #9932CC)
+            ["thumbnail"] = {
+                ["url"] = avatarUrl -- Directly assign the player's avatar imageUrl as the thumbnail
+            },
+            ["footer"] = {
+                ["text"] = "Execution Info",
+                ["icon_url"] = avatarUrl
+            },
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ") -- Timestamp in UTC format
+        }}
+    }
+
+    local jsonData = jsonEncode(data)
+
+    -- Use the executor's HTTP request function to send the webhook
+    local response = request({
+        Url = webhookURL,
+        Method = "POST",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = jsonData
+    })
+
+    -- Check if the request failed and print the response if any
+    if response.StatusCode ~= 200 then
+        warn("Webhook failed to send. Status code: " .. response.StatusCode .. "\nResponse: " .. response.Body)
+    else
+        print("Webhook sent successfully!")
+    end
+end
+
+-- Trigger the webhook send
+sendWebhook()
+
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
