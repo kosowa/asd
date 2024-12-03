@@ -1,3 +1,4 @@
+--- x1
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
@@ -248,7 +249,7 @@ do
                 wait(1)
             end
             wait(1)
-            for i = 1, 100 do
+            for i = 1, 1000 do
                 upgradeItadori()
                 wait(2)
             end
