@@ -1,4 +1,4 @@
--- nigga
+-- nigga1
 --[[
     SimpleSpy v2.2 SOURCE
 
@@ -240,7 +240,7 @@ Simple.BackgroundTransparency = 1
 Simple.Position = UDim2.new(0, 5, 0, 0)
 Simple.Size = UDim2.new(0, 57, 0, 18)
 Simple.Font = Enum.Font.SourceSansBold
-Simple.Text = "SimpleSpy For Mobile"
+Simple.Text = "ATHAN KUMAKAEN NG ASO"
 Simple.TextColor3 = Color3.new(0, 0, 1)
 Simple.TextSize = 14
 Simple.TextXAlignment = Enum.TextXAlignment.Left
