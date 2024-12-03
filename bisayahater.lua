@@ -316,7 +316,7 @@ end)
 do
     Tabs.Main:AddParagraph({
         Title = "AUTOPLAY",
-        Content = "1 tap auto play"
+        Content = "1 tap auto play inf marine ford"
     })
 
     
