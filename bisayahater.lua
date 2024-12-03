@@ -1,4 +1,4 @@
---- x3
+--- x4
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -333,6 +333,7 @@ do
         saveSettings(settings)
 
         if autoplayState then
+            wait(5)
             joinLobby()
             wait(1)
             joinMap()
