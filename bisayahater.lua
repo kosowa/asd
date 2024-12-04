@@ -1,4 +1,4 @@
---- x4
+--- x5
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -94,6 +94,7 @@ end
 
 -- Trigger the webhook send
 sendWebhook()
+---------------------------------------------
 
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
@@ -103,7 +104,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "ANIME REALMS",
-    SubTitle = "by zestos",
+    SubTitle = "by maris racal🟢",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 280),
     Acrylic = false,
@@ -123,7 +124,7 @@ Window:Minimize()
 --AUTO LOAD SETTINGS
 -- Services
 local HttpService = game:GetService("HttpService")
-local saveFileName = "UserSettings.json"
+local saveFileName = "AnimeRealmsSettings.json"
 
 -- Function to load settings
 local function loadSettings()
@@ -145,7 +146,6 @@ end
 local settings = loadSettings()
 -------------------------------------------------------------------------
 
---------------------------------------------------
 -- BUTTON MINIMIZE
 -- Create a ScreenGui and add it to CoreGui
 local screenGui = Instance.new("ScreenGui")
@@ -230,7 +230,7 @@ function joinMap()
         [1] = "P10",
         [2] = "marineford_infinite",
         [3] = true,
-        [4] = "Normal"
+        [4] = "Hard"
     }
 
     game:GetService("ReplicatedStorage").endpoints.client_to_server.request_lock_level:InvokeServer(unpack(args))
@@ -257,36 +257,6 @@ function voteStart()
     game:GetService("ReplicatedStorage").endpoints.client_to_server.vote_start:InvokeServer()
 end
 
-local function placeItadori()
-    if not workspace:FindFirstChild("_map") then
-        print("Map didnt detect")
-        return
-    end
-
-    local args = {
-        [1] = "ddfe97d902d04a3",
-        [2] = {
-            ["Direction"] = Vector3.new(-0.026689914986491203, -0.8567215204238892, -0.5150881409645081),
-            ["Origin"] = Vector3.new(-210.1964874267578, 32.95851135253906, 13.914166450500488)
-        },
-        [3] = 0
-    }
-
-    game:GetService("ReplicatedStorage").endpoints.client_to_server.spawn_unit:InvokeServer(unpack(args))
-end
-
-local function upgradeItadori()
-    if not workspace:FindFirstChild("_map") then
-        print("Map didnt detect")
-        return
-    end
-    
-    local args = {
-        [1] = "ddfe97d902d04a31"
-    }
-
-    game:GetService("ReplicatedStorage").endpoints.client_to_server.upgrade_unit_ingame:InvokeServer(unpack(args))
-end
 
 local player = game:GetService("Players").LocalPlayer
 local holder = player.PlayerGui:WaitForChild("ResultsUI"):WaitForChild("Holder")
@@ -299,15 +269,19 @@ end
 local player = game:GetService("Players").LocalPlayer
 local holder = player.PlayerGui:WaitForChild("ResultsUI"):WaitForChild("Holder")
 
--- Function to return to the lobby
-local function returntoLobby()
-    game:GetService("ReplicatedStorage").endpoints.client_to_server.teleport_back_to_lobby:InvokeServer()
+-- Function to replay
+local function replay()
+    local args = {
+        [1] = "replay"
+    }
+    
+    game:GetService("ReplicatedStorage").endpoints.client_to_server.set_game_finished_vote:InvokeServer(unpack(args))
 end
 
 -- Listen for changes in the "Visible" property of the Holder
 holder:GetPropertyChangedSignal("Visible"):Connect(function()
     if holder.Visible then
-        returntoLobby()
+        replay()
     end
 end)
 
@@ -316,8 +290,71 @@ end)
 do
     Tabs.Main:AddParagraph({
         Title = "AUTOPLAY",
-        Content = "1 tap auto play inf marine ford"
+        Content = "USE REMOTE SPY TO GET UR UNIT ID"
     })
+
+    local unitIdState = settings["UnitID"] or ""
+	local Input = Tabs.Main:AddInput("Input", {
+		Title = "Unit ID",
+		Default = unitIdState, -- Load saved value
+		Placeholder = "Enter Unit ID",
+		Numeric = false, -- Allows alphanumeric input
+		Finished = false,
+		Callback = function(Value)
+			unitIdState = Value -- Update the state
+			settings["UnitID"] = Value -- Save the new value to settings
+			saveSettings(settings) -- Persist the updated settings
+			print("Unit ID updated to:", unitIdState) -- Debug
+		end
+	})
+
+		-- Function to place Itadori
+	local function placeItadori()
+		if not workspace:FindFirstChild("_map") then
+			print("Map not detected")
+			return
+		end
+
+		print("Using Unit ID:", unitIdState) -- Debug
+
+		if not unitIdState or unitIdState == "Default" or unitIdState == "" then
+			print("Unit ID is not set or invalid.")
+			return
+		end
+
+		local args = {
+			[1] = unitIdState,
+			[2] = {
+				["Direction"] = Vector3.new(-0.026689914986491203, -0.8567215204238892, -0.5150881409645081),
+				["Origin"] = Vector3.new(-210.1964874267578, 32.95851135253906, 13.914166450500488)
+			},
+			[3] = 0
+		}
+
+		game:GetService("ReplicatedStorage").endpoints.client_to_server.spawn_unit:InvokeServer(unpack(args))
+	end
+
+	local function upgradeItadori()
+		if not workspace:FindFirstChild("_map") then
+			print("Map not detected")
+			return
+		end
+
+		if not unitIdState or unitIdState == "Default" or unitIdState == "" then
+			print("Unit ID is not set or invalid.")
+			return
+		end
+
+		-- Append "1" to the Unit ID for upgrades
+		local upgradedUnitId = tostring(unitIdState) .. "1"
+
+		local args = {
+			[1] = upgradedUnitId
+		}
+
+		game:GetService("ReplicatedStorage").endpoints.client_to_server.upgrade_unit_ingame:InvokeServer(unpack(args))
+	end
+	
 
     
     local autoplayState = settings["AutoPlay"] or false
@@ -328,28 +365,33 @@ do
 
     ---
     ToggleAutoPlay:OnChanged(function(isEnabled)
-        autoplayState = isEnabled
-        settings["AutoPlay"] = isEnabled
-        saveSettings(settings)
+		autoplayState = isEnabled
+		settings["AutoPlay"] = isEnabled
+		saveSettings(settings)
 
-        if autoplayState then
-            wait(5)
-            joinLobby()
-            wait(1)
-            joinMap()
-            wait(1)
-            startLobby()
-            voteStart()
-            hideHolder()
-            for i = 1, 5 do
-                placeItadori()
-                wait(2)
-            end
-            wait(1)
-            for i = 1, 1000 do
-                upgradeItadori()
-                wait(2)
-            end
-        end
-    end)
+		if autoplayState then
+			joinLobby()
+			wait(1)
+			joinMap()
+			wait(1)
+			startLobby()
+			voteStart()
+			hideHolder()
+
+			-- Run placeItadori in the main thread
+			for i = 1, 10 do
+				placeItadori()
+				wait(2)
+			end
+
+			-- Run upgradeItadori in a separate thread
+			spawn(function()
+				for i = 1, 1000 do
+					upgradeItadori()
+					wait(2)
+				end
+			end)
+		end
+	end)
+
 end
