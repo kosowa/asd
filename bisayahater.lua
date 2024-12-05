@@ -477,7 +477,7 @@ do
 			hideHolder()
 
 			-- Run placeItadori in the main thread
-			for i = 1, 15 do
+			for i = 1, 18 do
 				placeItadori()
 				wait(2)
 			end
