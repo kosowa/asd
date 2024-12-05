@@ -1,4 +1,4 @@
---- x5
+--- x6
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -379,14 +379,14 @@ do
 			hideHolder()
 
 			-- Run placeItadori in the main thread
-			for i = 1, 10 do
+			for i = 1, 15 do
 				placeItadori()
 				wait(2)
 			end
 
 			-- Run upgradeItadori in a separate thread
 			spawn(function()
-				for i = 1, 1000 do
+				for i = 1, 3000 do
 					upgradeItadori()
 					wait(2)
 				end
