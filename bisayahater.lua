@@ -1,4 +1,4 @@
---- x7
+--- x8
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -103,8 +103,8 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME REALMS",
-    SubTitle = "by maris racal🟢",
+    Title = "ANIME REALMS ✅",
+    SubTitle = "by maris racal",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 280),
     Acrylic = false,
@@ -113,7 +113,8 @@ local Window = Fluent:CreateWindow({
 })
 
 local Tabs = {
-    Main = Window:AddTab({ Title = "Auto Play", Icon = "boxes" }),
+    Main = Window:AddTab({ Title = "Auto Play", Icon = "play" }),
+    Optimize = Window:AddTab({ Title = "Optimizer", Icon = "boxes" }),
 }
 
 local Options = Fluent.Options
@@ -209,7 +210,63 @@ end)
 
 --------------------------------------------------
 
+-- Function to remove laggy objects and textures
+local function removeLaggyObjects()
+    -- Disable unnecessary visual effects
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Decal") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Texture") then
+            v:Destroy()
+        end
+    end
+
+    -- Adjust lighting settings for anti-lag
+    local lighting = game:GetService("Lighting")
+    lighting.GlobalShadows = false
+    lighting.Brightness = 1
+    lighting.FogEnd = 9e9
+    lighting.EnvironmentDiffuseScale = 0
+    lighting.EnvironmentSpecularScale = 0
+
+    -- Remove textures from parts and change material to SmoothPlastic
+    for _, part in pairs(workspace:GetDescendants()) do
+        if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
+            part.Material = Enum.Material.SmoothPlastic
+
+            -- Remove SurfaceGuis, Decals, and Textures
+            for _, child in pairs(part:GetDescendants()) do
+                if child:IsA("Decal") or child:IsA("Texture") or child:IsA("SurfaceGui") then
+                    child:Destroy()
+                end
+            end
+        -- If it's a MeshPart, set RenderFidelity to Performance
+            if part:IsA("MeshPart") then
+                part.RenderFidelity = Enum.RenderFidelity.Performance
+            end
+        end
+    end
+    print("Laggy objects removed and textures disabled")
+end
+
+--------------------------------------------------------------
+
+local function deleteMap()
+    wait(1)
+    local map = workspace:FindFirstChild("_map")
+
+    if map then
+        for _, child in ipairs(map:GetChildren()) do
+            child:Destroy()
+        end
+        print("All children under _map have been deleted.")
+    else
+        print("_map not found in the workspace.")
+    end
+end
+
+--------------------------------------------------------------
+
 function joinLobby()
+    wait(5)
     if not workspace:FindFirstChild("DefaultLobby") then
         print("MLobby does not exist. NOT JOINING")
         return
@@ -292,6 +349,47 @@ do
         Title = "AUTOPLAY",
         Content = "USE REMOTE SPY TO GET UR UNIT ID"
     })
+
+    Tabs.Optimize:AddParagraph({
+        Title = "OPTIMIZER",
+        Content = "MARIS RACAL EFFECT IN GAME"
+    })
+
+    local disableTextureState = settings["DisableTexture"] or false
+    local ToggleDisableTexture = Tabs.Optimize:AddToggle("MyToggleDisableTexture", {
+        Title = "Disable Texture",
+        Default = disableTextureState
+    })
+
+    -- Toggle Disable Textures
+    ToggleDisableTexture:OnChanged(function()
+        settings["DisableTexture"] = Options.MyToggleDisableTexture.Value
+        saveSettings(settings)
+        print("Disable Texture Toggle changed:", Options.MyToggleDisableTexture.Value)
+        
+        if Options.MyToggleDisableTexture.Value then
+            removeLaggyObjects()
+        end
+    end)
+
+    -- Toggle for delete map
+    local deleteMapState = settings["DeleteMap"] or false
+    local ToggleDeleteMap = Tabs.Optimize:AddToggle("MyToggleDeleteMap", {
+        Title = "Clean Map",
+        Default = deleteMapState
+    })
+
+    -- Toggle Delete Map
+    ToggleDeleteMap:OnChanged(function()
+        settings["DeleteMap"] = Options.MyToggleDeleteMap.Value
+        saveSettings(settings)
+        print("Delete Map Toggle changed:", Options.MyToggleDeleteMap.Value)
+
+        -- Trigger deleteMapObjects() if toggle is enabled
+        if Options.MyToggleDeleteMap.Value then
+            deleteMap()
+        end
+    end)
 
     local unitIdState = settings["UnitID"] or ""
 	local Input = Tabs.Main:AddInput("Input", {
@@ -393,5 +491,4 @@ do
 			end)
 		end
 	end)
-
 end
