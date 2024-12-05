@@ -1,4 +1,4 @@
---- x6
+--- x7
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -230,7 +230,7 @@ function joinMap()
         [1] = "P10",
         [2] = "marineford_infinite",
         [3] = true,
-        [4] = "Hard"
+        [4] = "Normal"
     }
 
     game:GetService("ReplicatedStorage").endpoints.client_to_server.request_lock_level:InvokeServer(unpack(args))
