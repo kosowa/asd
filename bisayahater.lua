@@ -1,4 +1,4 @@
---- x8
+--- x9
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -114,6 +114,7 @@ local Window = Fluent:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab({ Title = "Auto Play", Icon = "play" }),
+    Legend = Window:AddTab({ Title = "Legend Stage", Icon = "shield" }),
     Optimize = Window:AddTab({ Title = "Optimizer", Icon = "boxes" }),
 }
 
@@ -293,6 +294,21 @@ function joinMap()
     game:GetService("ReplicatedStorage").endpoints.client_to_server.request_lock_level:InvokeServer(unpack(args))
 end
 
+local function joinLegendStage()
+    if not workspace:FindFirstChild("DefaultLobby") then
+        print("MLobby does not exist. NOT JOINING")
+        return
+    end
+    local args = {
+            [1] = "P10",
+            [2] = "shibuya_legend_2",
+            [3] = true,
+            [4] = "Normal"
+        }
+    
+        game:GetService("ReplicatedStorage").endpoints.client_to_server.request_lock_level:InvokeServer(unpack(args))
+    end
+
 function startLobby()
     if not workspace:FindFirstChild("DefaultLobby") then
         print("MLobby does not exist. NOT JOINING")
@@ -314,6 +330,29 @@ function voteStart()
     game:GetService("ReplicatedStorage").endpoints.client_to_server.vote_start:InvokeServer()
 end
 
+-- legend stage getu unit
+local function placeUnit()
+    local args = {
+        [1] = "7ebd5df0938c42f",
+        [2] = {
+            ["Direction"] = Vector3.new(-0.47703832387924194, -0.6543081998825073, -0.5867838859558105),
+            ["Origin"] = Vector3.new(360.7114562988281, 95.65676879882812, -470.47613525390625)
+        },
+        [3] = 0
+    }
+
+    game:GetService("ReplicatedStorage").endpoints.client_to_server.spawn_unit:InvokeServer(unpack(args))
+end
+
+local function upgradeGetu()
+    local args = {
+        [1] = "7ebd5df0938c42f1"
+    }
+
+    game:GetService("ReplicatedStorage").endpoints.client_to_server.upgrade_unit_ingame:InvokeServer(unpack(args))
+end
+
+-----------------------------------------------------------------------------------------------------
 
 local player = game:GetService("Players").LocalPlayer
 local holder = player.PlayerGui:WaitForChild("ResultsUI"):WaitForChild("Holder")
@@ -348,6 +387,11 @@ do
     Tabs.Main:AddParagraph({
         Title = "AUTOPLAY",
         Content = "USE REMOTE SPY TO GET UR UNIT ID"
+    })
+
+    Tabs.Legend:AddParagraph({
+        Title = "LEGEND STAGE",
+        Content = "MUST USE EVO GETO LVL 50"
     })
 
     Tabs.Optimize:AddParagraph({
@@ -477,7 +521,7 @@ do
 			hideHolder()
 
 			-- Run placeItadori in the main thread
-			for i = 1, 18 do
+			for i = 1, 15 do
 				placeItadori()
 				wait(2)
 			end
@@ -489,6 +533,38 @@ do
 					wait(2)
 				end
 			end)
+		end
+	end)
+
+    local legendStageState = settings["AutoLegendStage"] or false
+    local ToggleLegendStage = Tabs.Legend:AddToggle("MyToggleLegendStage", {
+        Title = "Auto Legend Stage",
+        Default = legendStageState
+    })
+
+    ToggleLegendStage:OnChanged(function(isEnabled)
+		legendStageState = isEnabled
+		settings["AutoLegendStage"] = isEnabled
+		saveSettings(settings)
+
+		if legendStageState then
+			joinLobby()
+			wait(1)
+			joinLegendStage()
+			wait(1)
+			startLobby()
+			voteStart()
+			hideHolder()
+
+			for i = 1, 24 do
+				placeUnit()
+				wait(2)
+			end
+
+			for i = 1, 300 do
+                upgradeGetu()
+                wait(2)
+            end
 		end
 	end)
 end
