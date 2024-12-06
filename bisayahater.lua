@@ -1,4 +1,4 @@
---- x19
+--- x20
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -627,6 +627,7 @@ do
 		saveSettings(settings)
 
 		if autoplayState then
+			wait(10)
 			joinLobby()
 			wait(1)
 			joinMap()
@@ -663,6 +664,7 @@ do
 		saveSettings(settings)
 
 		if legendStageState then
+			wait(10)
 			joinLobby()
 			wait(1)
 			joinLegendStage()
