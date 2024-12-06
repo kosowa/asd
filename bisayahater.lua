@@ -1,4 +1,4 @@
---- x17
+--- x18
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -394,8 +394,13 @@ end
 local player = game:GetService("Players").LocalPlayer
 local holder = player.PlayerGui:WaitForChild("ResultsUI"):WaitForChild("Holder")
 
-local function returntoLobby()
-    game:GetService("ReplicatedStorage").endpoints.client_to_server.teleport_back_to_lobby:InvokeServer()
+-- Function to replay
+local function replay()
+    local args = {
+        [1] = "replay"
+    }
+    
+    game:GetService("ReplicatedStorage").endpoints.client_to_server.set_game_finished_vote:InvokeServer(unpack(args))
 end
 
 -- Listen for changes in the "Visible" property of the Holder
@@ -405,7 +410,7 @@ holder:GetPropertyChangedSignal("Visible"):Connect(function()
         wait(0.5)
         clickRewards()
         wait(1)
-        returntoLobby()
+        replay()
     end
 end)
 
@@ -541,28 +546,58 @@ do
 		settings["AutoPlay"] = isEnabled
 		saveSettings(settings)
 
-		if autoplayState then
-			joinLobby()
-			wait(1)
-			joinMap()
-			wait(1)
-			startLobby()
-			voteStart()
-			hideHolder()
+		while true do
+			if autoplayState then
+				-- Start the main sequence
+				joinLobby()
+				wait(1)
+				joinMap()
+				wait(1)
+				startLobby()
+				voteStart()
+				hideHolder()
 
-			-- Run placeItadori in the main thread
-			for i = 1, 15 do
-				placeItadori()
-				wait(2)
-			end
-
-			-- Run upgradeItadori in a separate thread
-			spawn(function()
-				for i = 1, 3000 do
-					upgradeItadori()
+				-- Run placeItadori in the main thread
+				local placeItadoriFinished = false
+				for i = 1, 15 do
+					placeItadori()
 					wait(2)
+					if holder.Visible then
+						break
+					end
 				end
-			end)
+
+				-- Run upgradeItadori in a separate thread
+				local upgradeFinished = false
+				local upgradeThread = spawn(function()
+					for i = 1, 3000 do
+						upgradeItadori()
+						wait(2)
+						if holder.Visible then
+							break
+						end
+					end
+					upgradeFinished = true  -- Mark upgrade as finished when loop ends
+				end)
+
+				-- Wait for either the upgrade loop to finish or holder.Visible to become true
+				while not upgradeFinished do
+					if holder.Visible then
+						break
+					end
+					wait(0.5)
+				end
+
+				-- Restart the process if holder.Visible is true
+				if holder.Visible then
+					print("Restarting due to holder becoming visible")
+					wait(10)
+					continue -- Restart the while loop
+				end
+				
+			else
+				wait(1) -- Wait if autoplayState is false
+			end
 		end
 	end)
 
@@ -577,24 +612,48 @@ do
 		settings["AutoLegendStage"] = isEnabled
 		saveSettings(settings)
 
-		if legendStageState then
-			joinLobby()
-			wait(1)
-			joinLegendStage()
-			wait(5)
-			startLobby()
-			voteStart()
-			hideHolder()
+		while true do
+			if legendStageState then
+				joinLobby()
+				wait(1)
+				joinLegendStage()
+				wait(5)
+				startLobby()
+				voteStart()
+				hideHolder()
 
-			for i = 1, 24 do
-				placeUnit()
-				wait(2)
+				for i = 1, 24 do
+					placeUnit()
+					wait(2)
+				end
+
+				local upgradeFinished = false
+				local upgradeThread = spawn(function()
+					for i = 1, 3000 do
+						upgradeGetu()
+						wait(2)
+						if holder.Visible then
+							break
+						end
+					end
+					upgradeFinished = true  -- Mark upgrade as finished when loop ends
+				end)
+
+				-- Wait for either the upgrade loop to finish or holder.Visible to become true
+				while not upgradeFinished do
+					if holder.Visible then
+						break
+					end
+					wait(0.5)
+				end
+
+				-- Restart the process if holder.Visible is true
+				if holder.Visible then
+					print("Restarting due to holder becoming visible")
+					wait(10)
+					continue -- Restart the while loop
+				end
 			end
-
-			for i = 1, 300 do
-                upgradeGetu()
-                wait(2)
-            end
 		end
 	end)
 end
