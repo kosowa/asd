@@ -1,4 +1,4 @@
---- x18
+--- x17
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -102,7 +102,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "[✅]ANIME REALMS | BY MARIS RACAL",
+    Title = " ✅ANIME REALMS | BY MARIS RACAL",
     SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 280),
@@ -112,9 +112,10 @@ local Window = Fluent:CreateWindow({
 })
 
 local Tabs = {
-    Main = Window:AddTab({ Title = "Auto Play", Icon = "play" }),
-    Legend = Window:AddTab({ Title = "Legend Stage", Icon = "shield" }),
-    Optimize = Window:AddTab({ Title = "Optimizer", Icon = "boxes" }),
+    Main = Window:AddTab({ Title = "|  Auto Play", Icon = "play" }),
+    Legend = Window:AddTab({ Title = "|  Legend Stage", Icon = "shield" }),
+    Optimize = Window:AddTab({ Title = "|  Optimizer", Icon = "boxes" }),
+    Webhook = Window:AddTab({ Title = "|  Webhook", Icon = "globe" }),
 }
 
 local Options = Fluent.Options
@@ -352,6 +353,70 @@ local function upgradeGetu()
 end
 
 -----------------------------------------------------------------------------------------------------
+
+local webhookURL = webhookInputState
+
+local function sendToWebhook(playerName, gemAmount, goldAmount)
+    local httpRequest = (syn and syn.request) or (http and http.request) or (request)
+    
+    if not httpRequest then
+        warn("HTTP request method not available in this executor.")
+        return
+    end
+
+    -- Prepare the embed data
+    local embed = {
+        ["title"] = "Anime Realms | MCNRS",
+        ["color"] = 16776960, -- Yellow color in decimal
+        ["fields"] = {
+            {
+                ["name"] = "USER",
+                ["value"] = playerName,
+                ["inline"] = false
+            },
+            {
+                ["name"] = "GEMS",
+                ["value"] = tostring(gemAmount),
+                ["inline"] = true
+            },
+            {
+                ["name"] = "GOLD",
+                ["value"] = tostring(goldAmount),
+                ["inline"] = true
+            }
+        },
+        ["thumbnail"] = {
+            ["url"] = "https://cdn.discordapp.com/attachments/1246859825019748425/1301168477259956234/20241030_205841.png?ex=67544693&is=6752f513&hm=6fd708979b056c25eb5335cfe02734d9cdd02147f64deb2425fa3b94ab694fcf&"
+        }
+    }
+
+    local data = {
+        ["embeds"] = {embed}
+    }
+
+    local headers = {
+        ["Content-Type"] = "application/json"
+    }
+
+    -- Make the HTTP POST request
+    httpRequest({
+        Url = webhookURL,
+        Method = "POST",
+        Headers = headers,
+        Body = game:GetService("HttpService"):JSONEncode(data)
+    })
+end
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+LocalPlayer:WaitForChild("_stats")
+local stats = LocalPlayer._stats
+local gemAmount = stats:WaitForChild("gem_amount")
+local goldAmount = stats:WaitForChild("gold_amount")
+
+-----------------------------------------------------------------------------------------------------
+
 local GuiService = game:GetService("GuiService")
 local VirtualInputManager = game:GetService("VirtualInputManager")
 
@@ -394,13 +459,8 @@ end
 local player = game:GetService("Players").LocalPlayer
 local holder = player.PlayerGui:WaitForChild("ResultsUI"):WaitForChild("Holder")
 
--- Function to replay
-local function replay()
-    local args = {
-        [1] = "replay"
-    }
-    
-    game:GetService("ReplicatedStorage").endpoints.client_to_server.set_game_finished_vote:InvokeServer(unpack(args))
+local function returntoLobby()
+    game:GetService("ReplicatedStorage").endpoints.client_to_server.teleport_back_to_lobby:InvokeServer()
 end
 
 -- Listen for changes in the "Visible" property of the Holder
@@ -410,7 +470,7 @@ holder:GetPropertyChangedSignal("Visible"):Connect(function()
         wait(0.5)
         clickRewards()
         wait(1)
-        replay()
+        returntoLobby()
     end
 end)
 
@@ -432,6 +492,11 @@ do
     Tabs.Optimize:AddParagraph({
         Title = "OPTIMIZER",
         Content = "MARIS RACAL EFFECT IN GAME"
+    })
+
+    Tabs.Webhook:AddParagraph({
+        Title = "WEBHOOK",
+        Content = "GET NOTIFIED"
     })
 
     local disableTextureState = settings["DisableTexture"] or false
@@ -469,6 +534,21 @@ do
             deleteMap()
         end
     end)
+
+	local webhookInputState = settings["Webhook"] or ""
+	local Input = Tabs.Webhook:AddInput("Input", {
+		Title = "Webhook",
+		Default = webhookInputState,
+		Placeholder = "Enter Webhook Url",
+		Numeric = false, -- Allows alphanumeric input
+		Finished = false,
+		Callback = function(Value)
+			webhookInputState = Value
+			settings["Webhook"] = Value
+			saveSettings(settings)
+			print("Webhook updated to:", webhookInputState)
+		end
+	})
 
     local unitIdState = settings["UnitID"] or ""
 	local Input = Tabs.Main:AddInput("Input", {
@@ -546,58 +626,28 @@ do
 		settings["AutoPlay"] = isEnabled
 		saveSettings(settings)
 
-		while true do
-			if autoplayState then
-				-- Start the main sequence
-				joinLobby()
-				wait(1)
-				joinMap()
-				wait(1)
-				startLobby()
-				voteStart()
-				hideHolder()
+		if autoplayState then
+			joinLobby()
+			wait(1)
+			joinMap()
+			wait(1)
+			startLobby()
+			voteStart()
+			hideHolder()
 
-				-- Run placeItadori in the main thread
-				local placeItadoriFinished = false
-				for i = 1, 15 do
-					placeItadori()
-					wait(2)
-					if holder.Visible then
-						break
-					end
-				end
-
-				-- Run upgradeItadori in a separate thread
-				local upgradeFinished = false
-				local upgradeThread = spawn(function()
-					for i = 1, 3000 do
-						upgradeItadori()
-						wait(2)
-						if holder.Visible then
-							break
-						end
-					end
-					upgradeFinished = true  -- Mark upgrade as finished when loop ends
-				end)
-
-				-- Wait for either the upgrade loop to finish or holder.Visible to become true
-				while not upgradeFinished do
-					if holder.Visible then
-						break
-					end
-					wait(0.5)
-				end
-
-				-- Restart the process if holder.Visible is true
-				if holder.Visible then
-					print("Restarting due to holder becoming visible")
-					wait(10)
-					continue -- Restart the while loop
-				end
-				
-			else
-				wait(1) -- Wait if autoplayState is false
+			-- Run placeItadori in the main thread
+			for i = 1, 15 do
+				placeItadori()
+				wait(2)
 			end
+
+			-- Run upgradeItadori in a separate thread
+			spawn(function()
+				for i = 1, 3000 do
+					upgradeItadori()
+					wait(2)
+				end
+			end)
 		end
 	end)
 
@@ -612,48 +662,24 @@ do
 		settings["AutoLegendStage"] = isEnabled
 		saveSettings(settings)
 
-		while true do
-			if legendStageState then
-				joinLobby()
-				wait(1)
-				joinLegendStage()
-				wait(5)
-				startLobby()
-				voteStart()
-				hideHolder()
+		if legendStageState then
+			joinLobby()
+			wait(1)
+			joinLegendStage()
+			wait(5)
+			startLobby()
+			voteStart()
+			hideHolder()
 
-				for i = 1, 24 do
-					placeUnit()
-					wait(2)
-				end
-
-				local upgradeFinished = false
-				local upgradeThread = spawn(function()
-					for i = 1, 3000 do
-						upgradeGetu()
-						wait(2)
-						if holder.Visible then
-							break
-						end
-					end
-					upgradeFinished = true  -- Mark upgrade as finished when loop ends
-				end)
-
-				-- Wait for either the upgrade loop to finish or holder.Visible to become true
-				while not upgradeFinished do
-					if holder.Visible then
-						break
-					end
-					wait(0.5)
-				end
-
-				-- Restart the process if holder.Visible is true
-				if holder.Visible then
-					print("Restarting due to holder becoming visible")
-					wait(10)
-					continue -- Restart the while loop
-				end
+			for i = 1, 24 do
+				placeUnit()
+				wait(2)
 			end
+
+			for i = 1, 300 do
+                upgradeGetu()
+                wait(2)
+            end
 		end
 	end)
 end
