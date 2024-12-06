@@ -1,4 +1,4 @@
---- x12
+--- x13
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -266,7 +266,7 @@ end
 --------------------------------------------------------------
 
 function joinLobby()
-    wait(5)
+    wait(15)
     if not workspace:FindFirstChild("DefaultLobby") then
         print("MLobby does not exist. NOT JOINING")
         return
@@ -300,7 +300,7 @@ local function joinLegendStage()
     end
     local args = {
             [1] = "P10",
-            [2] = "shibuya_legend_2",
+            [2] = "shibuya_legend_1",
             [3] = true,
             [4] = "Normal"
         }
