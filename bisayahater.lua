@@ -1,4 +1,4 @@
---- x16
+--- x17
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -581,7 +581,7 @@ do
 			joinLobby()
 			wait(1)
 			joinLegendStage()
-			wait(1)
+			wait(5)
 			startLobby()
 			voteStart()
 			hideHolder()
