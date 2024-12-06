@@ -1,4 +1,4 @@
---- x14
+--- x15
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -102,8 +102,8 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME REALMS ✅",
-    SubTitle = "by maris racal",
+    Title = "[✅]ANIME REALMS | BY MARIS RACAL",
+    SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 280),
     Acrylic = false,
@@ -266,7 +266,7 @@ end
 --------------------------------------------------------------
 
 function joinLobby()
-    wait(15)
+    wait(5)
     if not workspace:FindFirstChild("DefaultLobby") then
         print("MLobby does not exist. NOT JOINING")
         return
@@ -300,7 +300,7 @@ local function joinLegendStage()
     end
     local args = {
             [1] = "P10",
-            [2] = "shibuya_legend_1",
+            [2] = "shibuya_legend_2",
             [3] = true,
             [4] = "Normal"
         }
@@ -352,6 +352,36 @@ local function upgradeGetu()
 end
 
 -----------------------------------------------------------------------------------------------------
+local GuiService = game:GetService("GuiService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local function pressEnter()
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+    wait(0.1)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+end
+
+local function resultUI()
+    local player = game:GetService("Players").LocalPlayer
+    local nextButton = player.PlayerGui.ResultsUI.Holder.Buttons.Next
+
+    if nextButton then
+        GuiService.AutoSelectGuiEnabled = true
+        GuiService.SelectedObject = nextButton
+        wait(1)
+        pressEnter()
+    end
+end
+
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local function clickRewards()
+    for i = 1, 5 do
+        VirtualInputManager:SendMouseButtonEvent(500, 150, 0, true, game, 1)
+        VirtualInputManager:SendMouseButtonEvent(500, 150, 0, false, game, 1)
+        wait(1)
+    end
+end
 
 local player = game:GetService("Players").LocalPlayer
 local holder = player.PlayerGui:WaitForChild("ResultsUI"):WaitForChild("Holder")
@@ -371,10 +401,15 @@ end
 -- Listen for changes in the "Visible" property of the Holder
 holder:GetPropertyChangedSignal("Visible"):Connect(function()
     if holder.Visible then
-	wait(10)
+        resultUI()
+        wait(0.5)
+        clickRewards()
+        wait(1)
         returntoLobby()
     end
 end)
+
+
 
 -------------------------------------------------------------------------
 
