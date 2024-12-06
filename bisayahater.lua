@@ -1,4 +1,4 @@
---- x10
+--- x11
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -267,7 +267,7 @@ end
 --------------------------------------------------------------
 
 function joinLobby()
-    wait(5)
+    wait(15)
     if not workspace:FindFirstChild("DefaultLobby") then
         print("MLobby does not exist. NOT JOINING")
         return
