@@ -1,4 +1,4 @@
---- x11
+--- x12
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -95,7 +95,6 @@ end
 -- Trigger the webhook send
 sendWebhook()
 ---------------------------------------------
-
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
@@ -267,7 +266,7 @@ end
 --------------------------------------------------------------
 
 function joinLobby()
-    wait(15)
+    wait(5)
     if not workspace:FindFirstChild("DefaultLobby") then
         print("MLobby does not exist. NOT JOINING")
         return
@@ -301,7 +300,7 @@ local function joinLegendStage()
     end
     local args = {
             [1] = "P10",
-            [2] = "shibuya_legend_1",
+            [2] = "shibuya_legend_2",
             [3] = true,
             [4] = "Normal"
         }
@@ -365,19 +364,14 @@ end
 local player = game:GetService("Players").LocalPlayer
 local holder = player.PlayerGui:WaitForChild("ResultsUI"):WaitForChild("Holder")
 
--- Function to replay
-local function replay()
-    local args = {
-        [1] = "replay"
-    }
-    
-    game:GetService("ReplicatedStorage").endpoints.client_to_server.set_game_finished_vote:InvokeServer(unpack(args))
+local function returntoLobby()
+    game:GetService("ReplicatedStorage").endpoints.client_to_server.teleport_back_to_lobby:InvokeServer()
 end
 
 -- Listen for changes in the "Visible" property of the Holder
 holder:GetPropertyChangedSignal("Visible"):Connect(function()
     if holder.Visible then
-        replay()
+        returntoLobby()
     end
 end)
 
