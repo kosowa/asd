@@ -1,4 +1,4 @@
---- x13
+--- x14
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -371,6 +371,7 @@ end
 -- Listen for changes in the "Visible" property of the Holder
 holder:GetPropertyChangedSignal("Visible"):Connect(function()
     if holder.Visible then
+	wait(10)
         returntoLobby()
     end
 end)
