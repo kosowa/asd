@@ -1,4 +1,4 @@
---- x15
+--- x16
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -300,7 +300,7 @@ local function joinLegendStage()
     end
     local args = {
             [1] = "P10",
-            [2] = "shibuya_legend_2",
+            [2] = "shibuya_legend_1",
             [3] = true,
             [4] = "Normal"
         }
