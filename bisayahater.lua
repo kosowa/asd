@@ -1,4 +1,12 @@
---- x20
+--- x21
+-- Anti-AFK Script
+local VirtualUser = game:GetService("VirtualUser")
+
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+end)
+
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
