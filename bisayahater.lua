@@ -1,4 +1,4 @@
--- V1
+-- V2
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -501,6 +501,17 @@ do
         Default = selectedAct,
     })
 
+    local fastWaveState = settings["FastWave"] or false
+	local ToggleFastWave = Tabs.Legend:AddToggle("Fast Wave", {
+        Title = "Fast Wave",
+        Default = fastWaveState,
+    })
+
+    local function skipWave()
+        game:GetService("ReplicatedStorage").endpoints.client_to_server.vote_wave_skip:InvokeServer()
+        print("wave skipped")
+    end
+
 	---------------------------------------------------------------------------------
 
 	-- Disable Textures
@@ -553,6 +564,27 @@ do
 			wait(1)
 			startLobby()
 		end
+    end)
+
+    ToggleFastWave:OnChanged(function(isEnabled)
+        fastWaveState = isEnabled
+        settings["FastWave"] = isEnabled
+        saveSettings(settings)
+        
+        if fastWaveState then
+
+            task.spawn(function()
+                while fastWaveState do
+                    local voteStartGui = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("VoteStart")
+                    if voteStartGui and not voteStartGui.Enabled then
+                        skipWave()
+                    else
+                        print("VoteStart is enabled, skipping not performed")
+                    end
+                    wait(1.1)
+                end
+            end)
+        end
     end)
 end
 
