@@ -1,5 +1,4 @@
---- x21
--- Anti-AFK Script
+-- V1
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -115,8 +114,9 @@ local Window = Fluent:CreateWindow({
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 280),
     Acrylic = false,
-    Theme = "Darker",
+    Theme = "Amethyst",
     MinimizeKey = Enum.KeyCode.LeftControl,
+	Transparency = false
 })
 
 local Tabs = {
@@ -217,18 +217,16 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
---------------------------------------------------
+-------------------------------------------------------------------------
 
 -- Function to remove laggy objects and textures
 local function removeLaggyObjects()
-    -- Disable unnecessary visual effects
     for _, v in pairs(workspace:GetDescendants()) do
         if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Decal") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Texture") then
             v:Destroy()
         end
     end
 
-    -- Adjust lighting settings for anti-lag
     local lighting = game:GetService("Lighting")
     lighting.GlobalShadows = false
     lighting.Brightness = 1
@@ -236,7 +234,6 @@ local function removeLaggyObjects()
     lighting.EnvironmentDiffuseScale = 0
     lighting.EnvironmentSpecularScale = 0
 
-    -- Remove textures from parts and change material to SmoothPlastic
     for _, part in pairs(workspace:GetDescendants()) do
         if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
             part.Material = Enum.Material.SmoothPlastic
@@ -247,10 +244,6 @@ local function removeLaggyObjects()
                     child:Destroy()
                 end
             end
-        -- If it's a MeshPart, set RenderFidelity to Performance
-            if part:IsA("MeshPart") then
-                part.RenderFidelity = Enum.RenderFidelity.Performance
-            end
         end
     end
     print("Laggy objects removed and textures disabled")
@@ -260,6 +253,10 @@ end
 
 local function deleteMap()
     wait(1)
+	if not workspace:FindFirstChild("_map") then
+        print("no map detected")
+        return
+    end
     local map = workspace:FindFirstChild("_map")
 
     if map then
@@ -267,55 +264,39 @@ local function deleteMap()
             child:Destroy()
         end
         print("All children under _map have been deleted.")
-    else
-        print("_map not found in the workspace.")
     end
 end
 
---------------------------------------------------------------
+-------------------------------------------------------------------------
 
-function joinLobby()
-    wait(5)
-    if not workspace:FindFirstChild("DefaultLobby") then
-        print("MLobby does not exist. NOT JOINING")
-        return
-    end
-    local args = {
-        [1] = "P10"
-    }
+local function joinLobby()
+	wait(5)
+	if not workspace:FindFirstChild("DefaultLobby") then
+		print("MLobby does not exist. NOT JOINING")
+		return
+	end
+	local args = {
+		[1] = "P10"
+	}
 
-    game:GetService("ReplicatedStorage").endpoints.client_to_server.request_join_lobby:InvokeServer(unpack(args))
+	game:GetService("ReplicatedStorage").endpoints.client_to_server.request_join_lobby:InvokeServer(unpack(args))
 end
 
-function joinMap()
-    if not workspace:FindFirstChild("DefaultLobby") then
-        print("MLobby does not exist. NOT JOINING")
-        return
-    end
-    local args = {
-        [1] = "P10",
-        [2] = "marineford_infinite",
-        [3] = true,
-        [4] = "Normal"
-    }
+local function selectStage(selectedMap, selectedAct)
+	if not workspace:FindFirstChild("DefaultLobby") then
+		print("MLobby does not exist. NOT JOINING")
+		return
+	end
 
-    game:GetService("ReplicatedStorage").endpoints.client_to_server.request_lock_level:InvokeServer(unpack(args))
+	local args = {
+			[1] = "P10",
+			[2] = selectedMap .. selectedAct,
+			[3] = true,
+			[4] = "Normal"
+		}
+	
+	game:GetService("ReplicatedStorage").endpoints.client_to_server.request_lock_level:InvokeServer(unpack(args))
 end
-
-local function joinLegendStage()
-    if not workspace:FindFirstChild("DefaultLobby") then
-        print("MLobby does not exist. NOT JOINING")
-        return
-    end
-    local args = {
-            [1] = "P10",
-            [2] = "shibuya_legend_1",
-            [3] = true,
-            [4] = "Normal"
-        }
-    
-        game:GetService("ReplicatedStorage").endpoints.client_to_server.request_lock_level:InvokeServer(unpack(args))
-    end
 
 function startLobby()
     if not workspace:FindFirstChild("DefaultLobby") then
@@ -329,42 +310,7 @@ function startLobby()
     game:GetService("ReplicatedStorage").endpoints.client_to_server.request_start_game:InvokeServer(unpack(args))
 end
 
-function voteStart()
-    if not workspace:FindFirstChild("_map") then
-        print("Map didnt detect")
-        return
-    end
-
-    game:GetService("ReplicatedStorage").endpoints.client_to_server.vote_start:InvokeServer()
-end
-
--- legend stage getu unit
-local function placeUnit()
-    local args = {
-        [1] = "7ebd5df0938c42f",
-        [2] = {
-            ["Direction"] = Vector3.new(-0.47703832387924194, -0.6543081998825073, -0.5867838859558105),
-            ["Origin"] = Vector3.new(360.7114562988281, 95.65676879882812, -470.47613525390625)
-        },
-        [3] = 0
-    }
-
-    game:GetService("ReplicatedStorage").endpoints.client_to_server.spawn_unit:InvokeServer(unpack(args))
-end
-
-local function upgradeGetu()
-    local args = {
-        [1] = "7ebd5df0938c42f1"
-    }
-
-    game:GetService("ReplicatedStorage").endpoints.client_to_server.upgrade_unit_ingame:InvokeServer(unpack(args))
-end
-
------------------------------------------------------------------------------------------------------
-
-
-
------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------
 
 local GuiService = game:GetService("GuiService")
 local VirtualInputManager = game:GetService("VirtualInputManager")
@@ -400,31 +346,23 @@ end
 local player = game:GetService("Players").LocalPlayer
 local holder = player.PlayerGui:WaitForChild("ResultsUI"):WaitForChild("Holder")
 
--- Function to set Holder.Visible to false
 local function hideHolder()
     holder.Visible = false
 end
 
-local player = game:GetService("Players").LocalPlayer
-local holder = player.PlayerGui:WaitForChild("ResultsUI"):WaitForChild("Holder")
-
-local function returntoLobby()
-    game:GetService("ReplicatedStorage").endpoints.client_to_server.teleport_back_to_lobby:InvokeServer()
-end
-
-
+hideHolder()
 
 -------------------------------------------------------------------------
 
 do
     Tabs.Main:AddParagraph({
         Title = "AUTOPLAY",
-        Content = "USE REMOTE SPY TO GET UR UNIT ID"
+        Content = "AUTO JOIN GAME LOBBY"
     })
 
     Tabs.Legend:AddParagraph({
         Title = "LEGEND STAGE",
-        Content = "MUST USE EVO GETO LVL 50"
+        Content = "AUTO JOIN LEGEND STAGES LOBBY"
     })
 
     Tabs.Optimize:AddParagraph({
@@ -437,48 +375,27 @@ do
         Content = "GET NOTIFIED"
     })
 
-    local disableTextureState = settings["DisableTexture"] or false
+	-- Disable Textures
+	local disableTextureState = settings["DisableTexture"] or false
     local ToggleDisableTexture = Tabs.Optimize:AddToggle("MyToggleDisableTexture", {
         Title = "Disable Texture",
         Default = disableTextureState
     })
 
-    -- Toggle Disable Textures
-    ToggleDisableTexture:OnChanged(function()
-        settings["DisableTexture"] = Options.MyToggleDisableTexture.Value
-        saveSettings(settings)
-        print("Disable Texture Toggle changed:", Options.MyToggleDisableTexture.Value)
-        
-        if Options.MyToggleDisableTexture.Value then
-            removeLaggyObjects()
-        end
-    end)
-
-    -- Toggle for delete map
+	-- Toggle for delete map
     local deleteMapState = settings["DeleteMap"] or false
     local ToggleDeleteMap = Tabs.Optimize:AddToggle("MyToggleDeleteMap", {
         Title = "Clean Map",
         Default = deleteMapState
     })
 
-    -- Toggle Delete Map
-    ToggleDeleteMap:OnChanged(function()
-        settings["DeleteMap"] = Options.MyToggleDeleteMap.Value
-        saveSettings(settings)
-        print("Delete Map Toggle changed:", Options.MyToggleDeleteMap.Value)
-
-        -- Trigger deleteMapObjects() if toggle is enabled
-        if Options.MyToggleDeleteMap.Value then
-            deleteMap()
-        end
-    end)
-
+	-- Webhook
 	local webhookInputState = settings["Webhook"] or ""
 	local Input = Tabs.Webhook:AddInput("Input", {
 		Title = "Webhook",
 		Default = webhookInputState,
 		Placeholder = "Enter Webhook Url",
-		Numeric = false, -- Allows alphanumeric input
+		Numeric = false,
 		Finished = false,
 		Callback = function(Value)
 			webhookInputState = Value
@@ -487,6 +404,7 @@ do
 			print("Webhook updated to:", webhookInputState)
 		end
 	})
+
 	local webhookURL = webhookInputState
 	local function sendToWebhook(playerName, gemAmount, goldAmount)
 		local httpRequest = (syn and syn.request) or (http and http.request) or (request)
@@ -495,7 +413,7 @@ do
 			warn("HTTP request method not available in this executor.")
 			return
 		end
-
+	
 		-- Prepare the embed data
 		local embed = {
 			["title"] = "Anime Realms | MCNRS",
@@ -521,15 +439,15 @@ do
 				["url"] = "https://cdn.discordapp.com/attachments/1246859825019748425/1301168477259956234/20241030_205841.png?ex=67544693&is=6752f513&hm=6fd708979b056c25eb5335cfe02734d9cdd02147f64deb2425fa3b94ab694fcf&"
 			}
 		}
-
+	
 		local data = {
 			["embeds"] = {embed}
 		}
-
+	
 		local headers = {
 			["Content-Type"] = "application/json"
 		}
-
+	
 		-- Make the HTTP POST request
 		httpRequest({
 			Url = webhookURL,
@@ -538,10 +456,10 @@ do
 			Body = game:GetService("HttpService"):JSONEncode(data)
 		})
 	end
-
+	
 	local Players = game:GetService("Players")
 	local LocalPlayer = Players.LocalPlayer
-
+	
 	LocalPlayer:WaitForChild("_stats")
 	local stats = LocalPlayer._stats
 	local gemAmount = stats:WaitForChild("gem_amount")
@@ -550,146 +468,96 @@ do
 	holder:GetPropertyChangedSignal("Visible"):Connect(function()
 		if holder.Visible then
 			resultUI()
+			sendToWebhook(LocalPlayer.Name, gemAmount.Value, goldAmount.Value)
 			wait(0.5)
 			clickRewards()
-			sendToWebhook(LocalPlayer.Name, gemAmount.Value, goldAmount.Value)
-			wait(1)
-			returntoLobby()
 		end
 	end)
-	
-    local unitIdState = settings["UnitID"] or ""
-	local Input = Tabs.Main:AddInput("Input", {
-		Title = "Unit ID",
-		Default = unitIdState, -- Load saved value
-		Placeholder = "Enter Unit ID",
-		Numeric = false, -- Allows alphanumeric input
-		Finished = false,
-		Callback = function(Value)
-			unitIdState = Value -- Update the state
-			settings["UnitID"] = Value -- Save the new value to settings
-			saveSettings(settings) -- Persist the updated settings
-			print("Unit ID updated to:", unitIdState) -- Debug
-		end
-	})
 
-		-- Function to place Itadori
-	local function placeItadori()
-		if not workspace:FindFirstChild("_map") then
-			print("Map not detected")
-			return
-		end
+	---------------------------------------
 
-		print("Using Unit ID:", unitIdState) -- Debug
-
-		if not unitIdState or unitIdState == "Default" or unitIdState == "" then
-			print("Unit ID is not set or invalid.")
-			return
-		end
-
-		local args = {
-			[1] = unitIdState,
-			[2] = {
-				["Direction"] = Vector3.new(-0.026689914986491203, -0.8567215204238892, -0.5150881409645081),
-				["Origin"] = Vector3.new(-210.1964874267578, 32.95851135253906, 13.914166450500488)
-			},
-			[3] = 0
-		}
-
-		game:GetService("ReplicatedStorage").endpoints.client_to_server.spawn_unit:InvokeServer(unpack(args))
-	end
-
-	local function upgradeItadori()
-		if not workspace:FindFirstChild("_map") then
-			print("Map not detected")
-			return
-		end
-
-		if not unitIdState or unitIdState == "Default" or unitIdState == "" then
-			print("Unit ID is not set or invalid.")
-			return
-		end
-
-		-- Append "1" to the Unit ID for upgrades
-		local upgradedUnitId = tostring(unitIdState) .. "1"
-
-		local args = {
-			[1] = upgradedUnitId
-		}
-
-		game:GetService("ReplicatedStorage").endpoints.client_to_server.upgrade_unit_ingame:InvokeServer(unpack(args))
-	end
-	
-
-    
-    local autoplayState = settings["AutoPlay"] or false
-    local ToggleAutoPlay = Tabs.Main:AddToggle("MyToggleAutoPlay", {
-        Title = "Auto Play",
-        Default = autoplayState
+	-- Toggle AutoJoin Lobby
+	local autoJoinEnabled = settings["AutoJoin"] or false
+	local ToggleAutoJoin = Tabs.Main:AddToggle("Auto Join", {
+        Title = "Auto Join Map",
+        Default = autoJoinEnabled,
     })
 
-    ---
-    ToggleAutoPlay:OnChanged(function(isEnabled)
-		autoplayState = isEnabled
-		settings["AutoPlay"] = isEnabled
-		saveSettings(settings)
-
-		if autoplayState then
-			wait(10)
-			joinLobby()
-			wait(1)
-			joinMap()
-			wait(1)
-			startLobby()
-			voteStart()
-			hideHolder()
-
-			-- Run placeItadori in the main thread
-			for i = 1, 15 do
-				placeItadori()
-				wait(2)
-			end
-
-			-- Run upgradeItadori in a separate thread
-			spawn(function()
-				for i = 1, 3000 do
-					upgradeItadori()
-					wait(2)
-				end
-			end)
-		end
-	end)
-
-    local legendStageState = settings["AutoLegendStage"] or false
-    local ToggleLegendStage = Tabs.Legend:AddToggle("MyToggleLegendStage", {
-        Title = "Auto Legend Stage",
-        Default = legendStageState
+	-- Map Select Dropdown
+	local selectedMap = settings["SelectedMap"] or "namek_"
+    local DropdownMap = Tabs.Main:AddDropdown("Map Select", {
+        Title = "Maps",
+        Values = {"namek_", "marineford_", "karakura_", "shibuya_"},
+        Multi = false,
+        Default = selectedMap,
     })
 
-    ToggleLegendStage:OnChanged(function(isEnabled)
-		legendStageState = isEnabled
-		settings["AutoLegendStage"] = isEnabled
-		saveSettings(settings)
+	-- Act Select Dropdown
+	local selectedAct = settings["SelectedAct"] or "infinite"
+    local DropdownAct = Tabs.Main:AddDropdown("Act Select", {
+        Title = "Act",
+        Values = {"infinite", "level_1", "level_2", "level_3", "level_4", "level_5", "level_6"},
+        Multi = false,
+        Default = selectedAct,
+    })
 
-		if legendStageState then
-			wait(10)
+	---------------------------------------------------------------------------------
+
+	-- Disable Textures
+	ToggleDisableTexture:OnChanged(function()
+        settings["DisableTexture"] = Options.MyToggleDisableTexture.Value
+        saveSettings(settings)
+        print("Disable Texture Toggle changed:", Options.MyToggleDisableTexture.Value)
+        
+        if Options.MyToggleDisableTexture.Value then
+            removeLaggyObjects()
+        end
+    end)
+
+	-- Toggle Delete Map
+    ToggleDeleteMap:OnChanged(function()
+        settings["DeleteMap"] = Options.MyToggleDeleteMap.Value
+        saveSettings(settings)
+        print("Delete Map Toggle changed:", Options.MyToggleDeleteMap.Value)
+
+        if Options.MyToggleDeleteMap.Value then
+            deleteMap()
+        end
+    end)
+
+	-- Map Select Dropdown
+    DropdownMap:OnChanged(function(Value)
+        selectedMap = Value
+        settings["SelectedMap"] = Value
+        saveSettings(settings)
+        --
+    end)
+
+	-- Act Select Dropdown
+    DropdownAct:OnChanged(function(Value)
+        selectedAct = Value
+        settings["SelectedAct"] = Value
+        saveSettings(settings)
+        --
+    end)
+
+	-- Auto Join Toggle
+    ToggleAutoJoin:OnChanged(function(isEnabled)
+        autoJoinEnabled = isEnabled
+        settings["AutoJoin"] = isEnabled
+        saveSettings(settings)
+		if autoJoinEnabled then
 			joinLobby()
 			wait(1)
-			joinLegendStage()
-			wait(5)
+			selectStage(selectedMap, selectedAct)
+			wait(1)
 			startLobby()
-			voteStart()
-			hideHolder()
-
-			for i = 1, 24 do
-				placeUnit()
-				wait(2)
-			end
-
-			for i = 1, 1000 do
-                upgradeGetu()
-                wait(2)
-            end
 		end
-	end)
+    end)
 end
+
+Fluent:Notify({
+    Title = "FUCK YOU NIGGER",
+    Content = "suck my dick",
+    Duration = 8
+})
