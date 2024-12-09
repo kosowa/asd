@@ -1,4 +1,4 @@
--- V5
+-- V6
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -684,6 +684,7 @@ do
             end
 
             task.spawn(function()
+                wait(5)
                 while fastWaveState do
                     local voteStartGui = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("VoteStart")
                     if voteStartGui and not voteStartGui.Enabled then
