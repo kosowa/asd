@@ -457,7 +457,7 @@ do
 		-- Prepare the embed data
 		local embed = {
 			["title"] = "Anime Realms | MCNRS",
-			["color"] = 16776960, -- Yellow color in decimal
+			["color"] = 16711680, -- Yellow color in decimal
 			["fields"] = {
 				{
 					["name"] = "USER",
