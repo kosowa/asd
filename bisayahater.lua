@@ -1,4 +1,4 @@
--- V6
+-- V7
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -445,80 +445,105 @@ do
 		end
 	})
 
-	local webhookURL = webhookInputState
-	local function sendToWebhook(playerName, gemAmount, goldAmount)
-		local httpRequest = (syn and syn.request) or (http and http.request) or (request)
-		
-		if not httpRequest then
-			warn("HTTP request method not available in this executor.")
-			return
-		end
-	
-		-- Prepare the embed data
-		local embed = {
-			["title"] = "Anime Realms | MCNRS",
-			["color"] = 16711680, -- Yellow color in decimal
-			["fields"] = {
-				{
-					["name"] = "USER",
-					["value"] = playerName,
+    local webhookURL = webhookInputState
+    local function sendToWebhook(playerName, gemAmount, goldAmount, rewardAmount, gameResult)
+        local httpRequest = (syn and syn.request) or (http and http.request) or (request)
+        
+        if not httpRequest then
+            warn("HTTP request method not available in this executor.")
+            return
+        end
+    
+        -- Prepare the embed data
+        local embed = {
+            ["title"] = "Anime Realms | MCNRS",
+            ["color"] = 16711680,
+            ["fields"] = {
+                {
+					["name"] = "User",
+					["value"] = "||" .. playerName .. "||",
 					["inline"] = false
 				},
-				{
-					["name"] = "GEMS",
-					["value"] = tostring(gemAmount),
-					["inline"] = true
-				},
-				{
-					["name"] = "GOLD",
-					["value"] = tostring(goldAmount),
-					["inline"] = true
-				}
-			},
-			["thumbnail"] = {
-				["url"] = "https://cdn.discordapp.com/attachments/1246859825019748425/1301168477259956234/20241030_205841.png?ex=67544693&is=6752f513&hm=6fd708979b056c25eb5335cfe02734d9cdd02147f64deb2425fa3b94ab694fcf&"
-			},
+                {
+                    ["name"] = "Player Stats",
+                    ["value"] = "Gems: `" .. tostring(gemAmount) .. "`\nGold: `" .. tostring(goldAmount) .. "`",
+                    ["inline"] = false
+                },
+                {
+                    ["name"] = "Rewards",
+                    ["value"] = "`" .. tostring(rewardAmount) .. "`",
+                    ["inline"] = false
+                },
+                {
+                    ["name"] = "Match Result",
+                    ["value"] = "`" .. tostring(gameResult) .. "`",
+                    ["inline"] = false
+                }
+            },
+            ["thumbnail"] = {
+                ["url"] = "https://cdn.discordapp.com/attachments/1246859825019748425/1301168477259956234/20241030_205841.png?ex=67544693&is=6752f513&hm=6fd708979b056c25eb5335cfe02734d9cdd02147f64deb2425fa3b94ab694fcf&"
+            },
             ["footer"] = {
                 ["text"] = "discord.gg/FQTCAVF6rF"
             }
-		}
+        }
+    
+        local data = {
+            ["embeds"] = {embed}
+        }
+    
+        local headers = {
+            ["Content-Type"] = "application/json"
+        }
+        
+        httpRequest({
+            Url = webhookURL,
+            Method = "POST",
+            Headers = headers,
+            Body = game:GetService("HttpService"):JSONEncode(data)
+        })
+    end
 	
-		local data = {
-			["embeds"] = {embed}
-		}
-	
-		local headers = {
-			["Content-Type"] = "application/json"
-		}
-	
-		-- Make the HTTP POST request
-		httpRequest({
-			Url = webhookURL,
-			Method = "POST",
-			Headers = headers,
-			Body = game:GetService("HttpService"):JSONEncode(data)
-		})
-	end
-	
-	local Players = game:GetService("Players")
-	local LocalPlayer = Players.LocalPlayer
-	
-	LocalPlayer:WaitForChild("_stats")
-	local stats = LocalPlayer._stats
-	local gemAmount = stats:WaitForChild("gem_amount")
-	local goldAmount = stats:WaitForChild("gold_amount")
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    
+    LocalPlayer:WaitForChild("_stats")
+    local stats = LocalPlayer._stats
+    local gemAmount = stats:WaitForChild("gem_amount").Value
+    local goldAmount = stats:WaitForChild("gold_amount").Value
 
-	holder:GetPropertyChangedSignal("Visible"):Connect(function()
-		if holder.Visible then
-			resultUI()
-			sendToWebhook(LocalPlayer.Name, gemAmount.Value, goldAmount.Value)
-			wait(0.5)
-			clickRewards()
+    holder:GetPropertyChangedSignal("Visible"):Connect(function()
+        if holder.Visible then
+            local gameResult
+            local success2 = pcall(function()
+                gameResult = LocalPlayer:WaitForChild("PlayerGui")
+                    :WaitForChild("ResultsUI")
+                    :WaitForChild("Holder")
+                    :WaitForChild("Middle")
+                    :WaitForChild("Timer").ContentText
+            end)
+            local gemRewardTotal
+            local success1 = pcall(function()
+                gemRewardTotal = LocalPlayer:WaitForChild("PlayerGui")
+                    :WaitForChild("Waves")
+                    :WaitForChild("HealthBar")
+                    :WaitForChild("IngameRewards")
+                    :WaitForChild("GemRewardTotal")
+                    :WaitForChild("Holder")
+                    :WaitForChild("Main")
+                    :WaitForChild("Amount").ContentText
+            end)
+            sendToWebhook(LocalPlayer.Name, gemAmount, goldAmount, gemRewardTotal, gameResult)
+            wait(1)
+            resultUI()
+            wait(0.5)
+            clickRewards()
+    
             if replayState then
                 replay()
             end
-		end
-	end)
+        end
+    end)
 
 	---------------------------------------
 
