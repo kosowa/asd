@@ -1,4 +1,4 @@
--- V3
+-- V4
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -459,7 +459,7 @@ do
 			},
 			["thumbnail"] = {
 				["url"] = "https://cdn.discordapp.com/attachments/1246859825019748425/1301168477259956234/20241030_205841.png?ex=67544693&is=6752f513&hm=6fd708979b056c25eb5335cfe02734d9cdd02147f64deb2425fa3b94ab694fcf&"
-			}
+			},
             ["footer"] = {
                 ["text"] = "discord.gg/FQTCAVF6rF"
             }
