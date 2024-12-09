@@ -1,4 +1,4 @@
--- V2
+-- V3
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -122,6 +122,7 @@ local Window = Fluent:CreateWindow({
 local Tabs = {
     Main = Window:AddTab({ Title = "|  Auto Play", Icon = "play" }),
     Legend = Window:AddTab({ Title = "|  Legend Stage", Icon = "shield" }),
+    Game = Window:AddTab({ Title = "|  Game", Icon = "gamepad" }),
     Optimize = Window:AddTab({ Title = "|  Optimizer", Icon = "boxes" }),
     Webhook = Window:AddTab({ Title = "|  Webhook", Icon = "globe" }),
 }
@@ -298,6 +299,22 @@ local function selectStage(selectedMap, selectedAct)
 	game:GetService("ReplicatedStorage").endpoints.client_to_server.request_lock_level:InvokeServer(unpack(args))
 end
 
+local function selectLegendStage(selectedMapLegend, selectedActLegend)
+	if not workspace:FindFirstChild("DefaultLobby") then
+		print("MLobby does not exist. NOT JOINING")
+		return
+	end
+
+	local args = {
+			[1] = "P10",
+			[2] = selectedMapLegend .. selectedActLegend,
+			[3] = true,
+			[4] = "Normal"
+		}
+	
+	game:GetService("ReplicatedStorage").endpoints.client_to_server.request_lock_level:InvokeServer(unpack(args))
+end
+
 function startLobby()
     if not workspace:FindFirstChild("DefaultLobby") then
         print("MLobby does not exist. NOT JOINING")
@@ -357,12 +374,17 @@ hideHolder()
 do
     Tabs.Main:AddParagraph({
         Title = "AUTOPLAY",
-        Content = "AUTO JOIN GAME LOBBY"
+        Content = "AUTO JOIN GAME NORMAL MODE"
     })
 
     Tabs.Legend:AddParagraph({
         Title = "LEGEND STAGE",
-        Content = "AUTO JOIN LEGEND STAGES LOBBY"
+        Content = "AUTO JOIN LEGEND STAGES NORMAL MODE"
+    })
+
+    Tabs.Game:AddParagraph({
+        Title = "GAME FUNCTION",
+        Content = "WOMP WOMP"
     })
 
     Tabs.Optimize:AddParagraph({
@@ -438,6 +460,9 @@ do
 			["thumbnail"] = {
 				["url"] = "https://cdn.discordapp.com/attachments/1246859825019748425/1301168477259956234/20241030_205841.png?ex=67544693&is=6752f513&hm=6fd708979b056c25eb5335cfe02734d9cdd02147f64deb2425fa3b94ab694fcf&"
 			}
+            ["footer"] = {
+                ["text"] = "discord.gg/FQTCAVF6rF"
+            }
 		}
 	
 		local data = {
@@ -501,8 +526,33 @@ do
         Default = selectedAct,
     })
 
+    -- Toggle AutoJoin Legend Stages
+	local autoJoinLegendEnabled = settings["AutoJoinLegend"] or false
+	local ToggleAutoJoinLegend = Tabs.Legend:AddToggle("Auto Join Legend", {
+        Title = "Auto Join Legend Stage",
+        Default = autoJoinLegendEnabled,
+    })
+
+    -- Map Legend Select Dropdown
+	local selectedMapLegend = settings["SelectedMapLegend"] or "shibuya_"
+    local DropdownMapLegend = Tabs.Legend:AddDropdown("Map Legend Select", {
+        Title = "Maps",
+        Values = {"shibuya_"},
+        Multi = false,
+        Default = selectedMapLegend,
+    })
+
+    -- Act Legend Select Dropdown
+	local selectedActLegend = settings["SelectedActLegend"] or "legend_1"
+    local DropdownActLegend = Tabs.Legend:AddDropdown("Act Select", {
+        Title = "Act",
+        Values = {"legend_1", "legend_2", "legend_3"},
+        Multi = false,
+        Default = selectedActLegend,
+    })
+
     local fastWaveState = settings["FastWave"] or false
-	local ToggleFastWave = Tabs.Legend:AddToggle("Fast Wave", {
+	local ToggleFastWave = Tabs.Game:AddToggle("Fast Wave", {
         Title = "Fast Wave",
         Default = fastWaveState,
     })
@@ -566,12 +616,45 @@ do
 		end
     end)
 
+    -- Map Legend Select Dropdown
+    DropdownMapLegend:OnChanged(function(Value)
+        selectedMapLegend = Value
+        settings["SelectedMapLegend"] = Value
+        saveSettings(settings)
+        --
+    end)
+
+    -- Act Legend Select Dropdown
+    DropdownActLegend:OnChanged(function(Value)
+        selectedActLegend = Value
+        settings["SelectedActLegend"] = Value
+        saveSettings(settings)
+        --
+    end)
+
+    -- Auto Join Legend Toggle
+    ToggleAutoJoinLegend:OnChanged(function(isEnabled)
+        autoJoinLegendEnabled = isEnabled
+        settings["AutoJoinLegend"] = isEnabled
+        saveSettings(settings)
+		if autoJoinLegendEnabled then
+			joinLobby()
+			wait(1)
+			selectLegendStage(selectedMapLegend, selectedActLegend)
+			wait(1)
+			startLobby()
+		end
+    end)
+
     ToggleFastWave:OnChanged(function(isEnabled)
         fastWaveState = isEnabled
         settings["FastWave"] = isEnabled
         saveSettings(settings)
         
         if fastWaveState then
+            if not workspace:FindFirstChild("_map") then
+                return
+            end
 
             task.spawn(function()
                 while fastWaveState do
