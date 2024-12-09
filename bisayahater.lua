@@ -1,4 +1,4 @@
--- V4
+-- V5
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -369,6 +369,18 @@ end
 
 hideHolder()
 
+local function replay()
+    local args = {
+        [1] = "replay"
+    }
+
+    game:GetService("ReplicatedStorage").endpoints.client_to_server.set_game_finished_vote:InvokeServer(unpack(args))
+end
+
+local function returntoLobby()
+    game:GetService("ReplicatedStorage").endpoints.client_to_server.teleport_back_to_lobby:InvokeServer()
+end
+
 -------------------------------------------------------------------------
 
 do
@@ -409,6 +421,12 @@ do
     local ToggleDeleteMap = Tabs.Optimize:AddToggle("MyToggleDeleteMap", {
         Title = "Clean Map",
         Default = deleteMapState
+    })
+
+    local replayState = settings["Replay"] or false
+	local ToggleReplay = Tabs.Game:AddToggle("Replay", {
+        Title = "Auto Replay",
+        Default = replayState,
     })
 
 	-- Webhook
@@ -496,6 +514,9 @@ do
 			sendToWebhook(LocalPlayer.Name, gemAmount.Value, goldAmount.Value)
 			wait(0.5)
 			clickRewards()
+            if replayState then
+                replay()
+            end
 		end
 	end)
 
@@ -644,6 +665,12 @@ do
 			wait(1)
 			startLobby()
 		end
+    end)
+
+    ToggleReplay:OnChanged(function(isEnabled)
+        replayState = isEnabled
+        settings["Replay"] = isEnabled
+        saveSettings(settings)
     end)
 
     ToggleFastWave:OnChanged(function(isEnabled)
