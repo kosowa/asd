@@ -125,6 +125,7 @@ local Tabs = {
     Game = Window:AddTab({ Title = "|  Game", Icon = "gamepad" }),
     Optimize = Window:AddTab({ Title = "|  Optimizer", Icon = "boxes" }),
     Webhook = Window:AddTab({ Title = "|  Webhook", Icon = "globe" }),
+    Settings = Window:AddTab({ Title = "| Settings", Icon = "settings" })
 }
 
 local Options = Fluent.Options
