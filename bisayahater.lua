@@ -1,4 +1,4 @@
--- V7.2
+-- V7.3
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -481,7 +481,7 @@ do
                 }
             },
             ["thumbnail"] = {
-                ["url"] = "https://cdn.discordapp.com/attachments/1301525075366903839/1307297759631642656/lv_0_20241116161510.gif?ex=67581dea&is=6756cc6a&hm=903c120feefa7ae5b9708959896e0becfe56348f568a020f94e9c7ed97eb05fc&"
+                ["url"] = "https://cdn.discordapp.com/attachments/942805757936672821/1307254555796307998/xmaslogo.png?ex=67589e6d&is=67574ced&hm=1667fd2a2f92f3fea6e3d3503ec446bff07affad9b87121eb30860b02edde39c&"
             },
             ["footer"] = {
                 ["text"] = "discord.gg/FQTCAVF6rF"
