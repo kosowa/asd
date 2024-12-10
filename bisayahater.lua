@@ -1,4 +1,4 @@
--- V7.1
+-- V7.2
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -471,7 +471,7 @@ do
                 },
                 {
                     ["name"] = "Rewards",
-                    ["value"] = "`" .. tostring(rewardAmount) .. "`",
+                    ["value"] = "`" .. tostring(rewardAmount) .. "` GEMS",
                     ["inline"] = false
                 },
                 {
