@@ -109,7 +109,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = " ✅ANIME REALMS | BY MARIS RACAL",
+    Title = "ANIME REALMS | V7.3",
     SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 280),
