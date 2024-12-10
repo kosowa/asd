@@ -1,4 +1,4 @@
--- V7.3
+-- V7.4
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -109,12 +109,12 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME REALMS | V7.3",
+    Title = "ANIME REALMS | V7.4",
     SubTitle = "",
     TabWidth = 160,
-    Size = UDim2.fromOffset(500, 280),
+    Size = UDim2.fromOffset(500, 300),
     Acrylic = false,
-    Theme = "Rose",
+    Theme = "Darker",
     MinimizeKey = Enum.KeyCode.LeftControl,
 	Transparency = false
 })
@@ -481,7 +481,7 @@ do
                 }
             },
             ["thumbnail"] = {
-                ["url"] = "https://cdn.discordapp.com/attachments/942805757936672821/1307254555796307998/xmaslogo.png?ex=67589e6d&is=67574ced&hm=1667fd2a2f92f3fea6e3d3503ec446bff07affad9b87121eb30860b02edde39c&"
+                ["url"] = "https://media.discordapp.net/attachments/942805757936672821/1307254555796307998/xmaslogo.png?ex=6759472d&is=6757f5ad&hm=1534b40e2b6d584e325a18068bd9e376ff5df30d3d18f6e8bd636f79f7ba873f&=&format=webp&quality=lossless&width=595&height=595"
             },
             ["footer"] = {
                 ["text"] = "discord.gg/FQTCAVF6rF"
@@ -598,10 +598,12 @@ do
     })
 
     local fastWaveState = settings["FastWave"] or false
-	local ToggleFastWave = Tabs.Game:AddToggle("Fast Wave", {
+    local ToggleFastWave = Tabs.Game:AddToggle("Fast Wave", {
         Title = "Fast Wave",
         Default = fastWaveState,
     })
+    
+    local waveChangeConnection
 
     local function skipWave()
         game:GetService("ReplicatedStorage").endpoints.client_to_server.vote_wave_skip:InvokeServer()
@@ -609,6 +611,38 @@ do
     end
 
 	---------------------------------------------------------------------------------
+
+    ToggleFastWave:OnChanged(function(isEnabled)
+        fastWaveState = isEnabled
+        settings["FastWave"] = isEnabled
+        saveSettings(settings)
+        
+        -- Disconnect previous connection if it exists
+        if waveChangeConnection then
+            waveChangeConnection:Disconnect()
+            waveChangeConnection = nil
+        end
+    
+        if fastWaveState then
+            if not workspace:FindFirstChild("_map") then
+                print("_map not found, aborting.")
+                return
+            end
+    
+            local waveNum = workspace:FindFirstChild("_wave_num")
+    
+            if waveNum and waveNum:IsA("NumberValue") then
+                waveChangeConnection = waveNum:GetPropertyChangedSignal("Value"):Connect(function()
+                    wait(0.4)
+                    skipWave()
+                end)
+            else
+                print("_wave_num not found or is not a NumberValue!")
+            end
+        else
+            print("Fast Wave disabled.")
+        end
+    end)
 
 	-- Disable Textures
 	ToggleDisableTexture:OnChanged(function()
@@ -697,35 +731,9 @@ do
         settings["Replay"] = isEnabled
         saveSettings(settings)
     end)
-
-    ToggleFastWave:OnChanged(function(isEnabled)
-        fastWaveState = isEnabled
-        settings["FastWave"] = isEnabled
-        saveSettings(settings)
-        
-        if fastWaveState then
-            if not workspace:FindFirstChild("_map") then
-                return
-            end
-
-            task.spawn(function()
-                wait(5)
-                while fastWaveState do
-                    local voteStartGui = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("VoteStart")
-                    if voteStartGui and not voteStartGui.Enabled then
-                        skipWave()
-                    else
-                        print("VoteStart is enabled, skipping not performed")
-                    end
-                    wait(1.1)
-                end
-            end)
-        end
-    end)
 end
 
-Fluent:Notify({
-    Title = "FUCK YOU NIGGER",
-    Content = "suck my dick",
-    Duration = 8
-})
+InterfaceManager:SetLibrary(Fluent)
+InterfaceManager:SetFolder("FluentScriptHub")
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
