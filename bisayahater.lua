@@ -471,7 +471,7 @@ do
                 },
                 {
                     ["name"] = "Rewards",
-                    ["value"] = "`" .. tostring(rewardAmount) .. "` GEMS",
+                    ["value"] = "`" .. tostring(rewardAmount) .. " GEMS`",
                     ["inline"] = false
                 },
                 {
