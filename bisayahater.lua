@@ -1,4 +1,4 @@
--- V7.6
+-- V7.6.1
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -651,6 +651,7 @@ do
                     CheckVoteStart()
                 end)
             end
+            CheckVoteStart()
         end
     end)
 
