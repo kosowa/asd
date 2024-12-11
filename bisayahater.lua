@@ -1,4 +1,4 @@
--- V7.6.2
+-- V7.6.3
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -371,6 +371,7 @@ local function hideHolder()
 end
 
 hideHolder()
+print("holder has been set to hidden")
 
 local function replay()
     local args = {
@@ -461,7 +462,7 @@ do
 	})
 
     local webhookURL = webhookInputState
-    local function sendToWebhook(playerName, gemAmount, goldAmount, rewardAmount, gameResult)
+    local function sendToWebhook(playerName, gemAmount, goldAmount, gemRewardTotal, gameResult)
         local httpRequest = (syn and syn.request) or (http and http.request) or (request)
         
         if not httpRequest then
@@ -529,31 +530,11 @@ do
 
     holder:GetPropertyChangedSignal("Visible"):Connect(function()
         if holder.Visible then
-            local gameResult
-            local success2 = pcall(function()
-                gameResult = LocalPlayer:WaitForChild("PlayerGui")
-                    :WaitForChild("ResultsUI")
-                    :WaitForChild("Holder")
-                    :WaitForChild("Middle")
-                    :WaitForChild("Timer").ContentText
-            end)
-            local gemRewardTotal
-            local success1 = pcall(function()
-                gemRewardTotal = LocalPlayer:WaitForChild("PlayerGui")
-                    :WaitForChild("Waves")
-                    :WaitForChild("HealthBar")
-                    :WaitForChild("IngameRewards")
-                    :WaitForChild("GemRewardTotal")
-                    :WaitForChild("Holder")
-                    :WaitForChild("Main")
-                    :WaitForChild("Amount").ContentText
-            end)
-            sendToWebhook(LocalPlayer.Name, gemAmount, goldAmount, gemRewardTotal, gameResult)
             resultUI()
             clickRewards()
     
             if replayState then
-                for i = 1, 5 do
+                for i = 1, 3 do
                     replay()
                     wait(1)
                 end
