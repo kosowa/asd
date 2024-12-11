@@ -1,4 +1,4 @@
--- V7.6.1
+-- V7.6.2
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -620,6 +620,7 @@ do
         Title = "Auto Start",
         Default = AutoStartState,
     })
+    local voteStartListener
 
     -- fastwave toggle
     local fastWaveState = settings["FastWave"] or false
@@ -646,12 +647,24 @@ do
         if AutoStartState then
             local voteStartGui = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("VoteStart")
             if voteStartGui then
+                -- Avoid adding multiple listeners by disconnecting the previous one
+                if voteStartListener then
+                    voteStartListener:Disconnect()
+                end
+    
                 -- Listen for changes in the 'Enabled' property of the VoteStart GUI
-                voteStartGui:GetPropertyChangedSignal("Enabled"):Connect(function()
-                    CheckVoteStart()
+                voteStartListener = voteStartGui:GetPropertyChangedSignal("Enabled"):Connect(function()
+                    CheckVoteStart()  -- Call CheckVoteStart when the Enabled property changes
                 end)
+    
+                -- Immediately check the state of VoteStart GUI and trigger VoteStart if it's enabled
+                CheckVoteStart()
             end
-            CheckVoteStart()
+        else
+            -- Optionally disconnect the listener when AutoStart is turned off
+            if voteStartListener then
+                voteStartListener:Disconnect()
+            end
         end
     end)
 
