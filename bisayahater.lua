@@ -1,4 +1,4 @@
--- V7.4.1
+-- V7.5
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -109,7 +109,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME REALMS | V7.4",
+    Title = "ANIME REALMS | V7.5",
     SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 300),
@@ -131,6 +131,10 @@ local Tabs = {
 local Options = Fluent.Options
 Window:SelectTab(1)
 Window:Minimize()
+
+InterfaceManager:SetLibrary(Fluent)
+InterfaceManager:SetFolder("FluentScriptHub")
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
 
 --------------------------------------------------------------------------------------
 --AUTO LOAD SETTINGS
@@ -335,7 +339,6 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 
 local function pressEnter()
     VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
-    wait(0.1)
     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
 end
 
@@ -346,7 +349,7 @@ local function resultUI()
     if nextButton then
         GuiService.AutoSelectGuiEnabled = true
         GuiService.SelectedObject = nextButton
-        wait(1)
+        wait(0.1)
         pressEnter()
     end
 end
@@ -382,7 +385,7 @@ local function returntoLobby()
     game:GetService("ReplicatedStorage").endpoints.client_to_server.teleport_back_to_lobby:InvokeServer()
 end
 
--------------------------------------------------------------------------
+--------------------------------------------------------------------------
 
 do
     Tabs.Main:AddParagraph({
@@ -535,13 +538,14 @@ do
                     :WaitForChild("Amount").ContentText
             end)
             sendToWebhook(LocalPlayer.Name, gemAmount, goldAmount, gemRewardTotal, gameResult)
-            wait(1)
             resultUI()
-            wait(0.5)
             clickRewards()
     
             if replayState then
-                replay()
+                for i = 1, 5 do
+                    replay()
+                    wait(1)
+                end
             end
         end
     end)
@@ -733,7 +737,3 @@ do
         saveSettings(settings)
     end)
 end
-
-InterfaceManager:SetLibrary(Fluent)
-InterfaceManager:SetFolder("FluentScriptHub")
-InterfaceManager:BuildInterfaceSection(Tabs.Settings)
