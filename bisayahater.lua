@@ -1,4 +1,4 @@
--- V7.5
+-- V7.6
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -109,14 +109,13 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME REALMS | V7.5",
+    Title = "ANIME REALMS | V7.6",
     SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 300),
     Acrylic = false,
     Theme = "Darker",
     MinimizeKey = Enum.KeyCode.LeftControl,
-	Transparency = false
 })
 
 local Tabs = {
@@ -125,7 +124,7 @@ local Tabs = {
     Game = Window:AddTab({ Title = "|  Game", Icon = "gamepad" }),
     Optimize = Window:AddTab({ Title = "|  Optimizer", Icon = "boxes" }),
     Webhook = Window:AddTab({ Title = "|  Webhook", Icon = "globe" }),
-    Settings = Window:AddTab({ Title = "| Settings", Icon = "settings" })
+    Settings = Window:AddTab({ Title = "|  Settings", Icon = "settings" })
 }
 
 local Options = Fluent.Options
@@ -360,7 +359,7 @@ local function clickRewards()
     for i = 1, 5 do
         VirtualInputManager:SendMouseButtonEvent(500, 150, 0, true, game, 1)
         VirtualInputManager:SendMouseButtonEvent(500, 150, 0, false, game, 1)
-        wait(1)
+        wait(0.5)
     end
 end
 
@@ -384,6 +383,18 @@ end
 local function returntoLobby()
     game:GetService("ReplicatedStorage").endpoints.client_to_server.teleport_back_to_lobby:InvokeServer()
 end
+
+local function VoteStart()
+    game:GetService("ReplicatedStorage").endpoints.client_to_server.vote_start:InvokeServer()
+end
+-- Function to check if VoteStart GUI is enabled and trigger VoteStart
+local function CheckVoteStart()
+    local voteStartGui = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("VoteStart")
+    if voteStartGui and voteStartGui.Enabled then
+        VoteStart()
+    end
+end
+
 
 --------------------------------------------------------------------------
 
@@ -552,6 +563,7 @@ do
 
 	---------------------------------------
 
+
 	-- Toggle AutoJoin Lobby
 	local autoJoinEnabled = settings["AutoJoin"] or false
 	local ToggleAutoJoin = Tabs.Main:AddToggle("Auto Join", {
@@ -602,6 +614,14 @@ do
         Default = selectedActLegend,
     })
 
+    -- auto start toggle
+    local AutoStartState = settings["AutoStart"] or false
+    local ToggleAutoStart = Tabs.Game:AddToggle("AutoStart", {
+        Title = "Auto Start",
+        Default = AutoStartState,
+    })
+
+    -- fastwave toggle
     local fastWaveState = settings["FastWave"] or false
     local ToggleFastWave = Tabs.Game:AddToggle("Fast Wave", {
         Title = "Fast Wave",
@@ -616,6 +636,23 @@ do
     end
 
 	---------------------------------------------------------------------------------
+
+    -- Auto Start
+    ToggleAutoStart:OnChanged(function(isEnabled)
+        AutoStartState = isEnabled
+        settings["AutoStart"] = isEnabled
+        saveSettings(settings)
+        
+        if AutoStartState then
+            local voteStartGui = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("VoteStart")
+            if voteStartGui then
+                -- Listen for changes in the 'Enabled' property of the VoteStart GUI
+                voteStartGui:GetPropertyChangedSignal("Enabled"):Connect(function()
+                    CheckVoteStart()
+                end)
+            end
+        end
+    end)
 
     ToggleFastWave:OnChanged(function(isEnabled)
         fastWaveState = isEnabled
@@ -638,7 +675,7 @@ do
     
             if waveNum and waveNum:IsA("NumberValue") then
                 waveChangeConnection = waveNum:GetPropertyChangedSignal("Value"):Connect(function()
-                    wait(0.4)
+                    wait(0.5)
                     skipWave()
                 end)
             else
