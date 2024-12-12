@@ -1,4 +1,4 @@
--- V7.6.3
+-- V7.6.4
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -534,10 +534,7 @@ do
             clickRewards()
     
             if replayState then
-                for i = 1, 3 do
-                    replay()
-                    wait(1)
-                end
+                replay()
             end
         end
     end)
