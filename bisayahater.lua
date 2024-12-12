@@ -1,4 +1,4 @@
--- V7.6.4
+-- V7.6.5
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -530,6 +530,7 @@ do
 
     holder:GetPropertyChangedSignal("Visible"):Connect(function()
         if holder.Visible then
+	    sendToWebhook(playerName, gemAmount, goldAmount, gemRewardTotal, gameResult)
             resultUI()
             clickRewards()
     
