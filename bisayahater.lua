@@ -1,4 +1,4 @@
--- V7.6.5
+-- V7.6.6
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -530,7 +530,26 @@ do
 
     holder:GetPropertyChangedSignal("Visible"):Connect(function()
         if holder.Visible then
-	    sendToWebhook(playerName, gemAmount, goldAmount, gemRewardTotal, gameResult)
+            local gameResult
+            local success2 = pcall(function()
+                gameResult = LocalPlayer:WaitForChild("PlayerGui")
+                    :WaitForChild("ResultsUI")
+                    :WaitForChild("Holder")
+                    :WaitForChild("Middle")
+                    :WaitForChild("Timer").ContentText
+            end)
+            local gemRewardTotal
+            local success1 = pcall(function()
+                gemRewardTotal = LocalPlayer:WaitForChild("PlayerGui")
+                    :WaitForChild("Waves")
+                    :WaitForChild("HealthBar")
+                    :WaitForChild("IngameRewards")
+                    :WaitForChild("GemRewardTotal")
+                    :WaitForChild("Holder")
+                    :WaitForChild("Main")
+                    :WaitForChild("Amount").ContentText
+            end)
+            sendToWebhook(LocalPlayer.Name, gemAmount, goldAmount, gemRewardTotal, gameResult)
             resultUI()
             clickRewards()
     
