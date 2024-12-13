@@ -1,4 +1,4 @@
--- V7.6.8
+-- V7.7.0
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -109,7 +109,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME REALMS | V7.6",
+    Title = "ANIME REALMS | V7.7",
     SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 300),
@@ -122,6 +122,7 @@ local Tabs = {
     Main = Window:AddTab({ Title = "|  Auto Play", Icon = "play" }),
     Legend = Window:AddTab({ Title = "|  Legend Stage", Icon = "shield" }),
     Game = Window:AddTab({ Title = "|  Game", Icon = "gamepad" }),
+    Summon = Window:AddTab({ Title = "|  Remnants", Icon = "coins" }),
     Optimize = Window:AddTab({ Title = "|  Optimizer", Icon = "boxes" }),
     Webhook = Window:AddTab({ Title = "|  Webhook", Icon = "globe" }),
     Settings = Window:AddTab({ Title = "|  Settings", Icon = "settings" })
@@ -396,6 +397,20 @@ local function CheckVoteStart()
     end
 end
 
+local function summonBanner()
+    local args = {
+        [1] = "EventClover",
+        [2] = "gems"
+    }
+
+    game:GetService("ReplicatedStorage").endpoints.client_to_server.buy_from_banner:InvokeServer(unpack(args))
+end
+
+local function clickSummonUnits()
+    VirtualInputManager:SendMouseButtonEvent(500, 150, 0, true, game, 1)
+    VirtualInputManager:SendMouseButtonEvent(500, 150, 0, false, game, 1)
+end
+
 
 --------------------------------------------------------------------------
 
@@ -413,6 +428,11 @@ do
     Tabs.Game:AddParagraph({
         Title = "GAME FUNCTION",
         Content = "WOMP WOMP"
+    })
+
+    Tabs.Summon:AddParagraph({
+        Title = "SUMMON BANNER",
+        Content = "EZ REMNANTS & SECRET FARM"
     })
 
     Tabs.Optimize:AddParagraph({
@@ -634,7 +654,32 @@ do
         print("wave skipped")
     end
 
+    -- summon
+	local SummonState = settings["Summon"] or false
+    local ToggleSummon = Tabs.Summon:AddToggle("Summon Toggle", {
+        Title = "remnants farm",
+        Default = SummonState
+    })
+
 	---------------------------------------------------------------------------------
+
+    ToggleSummon:OnChanged(function(isEnabled)
+        SummonState = isEnabled
+        settings["Summon"] = isEnabled
+        saveSettings(settings)
+
+        if SummonState then
+            while SummonState do
+                summonBanner()
+                clickSummonUnits()
+                wait(0.5)
+        
+                if not SummonState then
+                    break
+                end
+            end
+        end
+    end)
 
     -- Auto Start
     ToggleAutoStart:OnChanged(function(isEnabled)
