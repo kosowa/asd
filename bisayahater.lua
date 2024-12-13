@@ -1,4 +1,4 @@
--- V7.7.3
+-- V7.7.4
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -109,7 +109,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME REALMS | V7.7.1",
+    Title = "ANIME REALMS | V7.7.4",
     SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 300),
@@ -225,34 +225,53 @@ end)
 
 -------------------------------------------------------------------------
 
--- Function to remove laggy objects and textures
-local function removeLaggyObjects()
+local function AntiLag()
     for _, v in pairs(workspace:GetDescendants()) do
         if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Decal") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Texture") then
             v:Destroy()
         end
     end
-
-    local lighting = game:GetService("Lighting")
-    lighting.GlobalShadows = false
-    lighting.Brightness = 1
-    lighting.FogEnd = 9e9
-    lighting.EnvironmentDiffuseScale = 0
-    lighting.EnvironmentSpecularScale = 0
-
-    for _, part in pairs(workspace:GetDescendants()) do
-        if part:IsA("Part") or part:IsA("MeshPart") or part:IsA("UnionOperation") then
-            part.Material = Enum.Material.SmoothPlastic
-
-            -- Remove SurfaceGuis, Decals, and Textures
-            for _, child in pairs(part:GetDescendants()) do
-                if child:IsA("Decal") or child:IsA("Texture") or child:IsA("SurfaceGui") then
-                    child:Destroy()
-                end
-            end
+    -- Apply settings to parts, meshes, decals, etc.
+    for i, v in pairs(game:GetDescendants()) do
+        if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+            v.Material = "Plastic"
+            v.Reflectance = 0
+        elseif v:IsA("Decal") then
+            v.Transparency = 1
+        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+            v.Lifetime = NumberRange.new(0)
+        elseif v:IsA("Explosion") then
+            v.BlastPressure = 1
+            v.BlastRadius = 1
         end
     end
-    print("Laggy objects removed and textures disabled")
+
+    -- Remove new objects like forcefields, sparkles, etc.
+    workspace.DescendantAdded:Connect(function(child)
+        task.spawn(function()
+            if child:IsA('ForceField') then
+                child:Destroy()
+            elseif child:IsA('Sparkles') then
+                child:Destroy()
+            elseif child:IsA('Smoke') or child:IsA('Fire') then
+                child:Destroy()
+            end
+        end)
+    end)
+    local Lighting = game:GetService("Lighting") -- Ensure Lighting is properly referenced
+    local Terrain = workspace:FindFirstChildOfClass('Terrain')
+    
+    -- Terrain settings
+    Terrain.WaterWaveSize = 0
+    Terrain.WaterWaveSpeed = 0
+    Terrain.WaterReflectance = 0
+    Terrain.WaterTransparency = 0
+    
+    -- Lighting settings
+    Lighting.GlobalShadows = false
+    Lighting.FogEnd = 9e9
+	Lighting.Brightness = 1
+    print("ANTILAG ON")
 end
 
 --------------------------------------------------------------
@@ -446,10 +465,10 @@ do
     })
 
 	-- Disable Textures
-	local disableTextureState = settings["DisableTexture"] or false
-    local ToggleDisableTexture = Tabs.Optimize:AddToggle("MyToggleDisableTexture", {
-        Title = "Disable Texture",
-        Default = disableTextureState
+	local AntiLagState = settings["Antilag"] or false
+    local ToggleAntiLag = Tabs.Optimize:AddToggle("Antilag", {
+        Title = "Anti Lag",
+        Default = AntiLagState
     })
 
 	-- Toggle for delete map
@@ -682,6 +701,18 @@ do
         end
     end)
 
+    	-- Disable Textures
+	ToggleAntiLag:OnChanged(function(isEnabled)
+        AntiLagState = isEnabled
+        settings["Antilag"] = isEnabled
+        saveSettings(settings)
+
+        if AntiLagState then
+            AntiLag()
+        end
+    end)
+
+
     -- Auto Start
     ToggleAutoStart:OnChanged(function(isEnabled)
         AutoStartState = isEnabled
@@ -741,17 +772,6 @@ do
             end
         else
             print("Fast Wave disabled.")
-        end
-    end)
-
-	-- Disable Textures
-	ToggleDisableTexture:OnChanged(function()
-        settings["DisableTexture"] = Options.MyToggleDisableTexture.Value
-        saveSettings(settings)
-        print("Disable Texture Toggle changed:", Options.MyToggleDisableTexture.Value)
-        
-        if Options.MyToggleDisableTexture.Value then
-            removeLaggyObjects()
         end
     end)
 
