@@ -1,4 +1,4 @@
--- V7.7.0
+-- V7.7.1
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -109,7 +109,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME REALMS | V7.7",
+    Title = "ANIME REALMS | V7.7.1",
     SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 300),
@@ -669,6 +669,7 @@ do
         saveSettings(settings)
 
         if SummonState then
+	    Window:Minimize()
             while SummonState do
                 summonBanner()
                 clickSummonUnits()
