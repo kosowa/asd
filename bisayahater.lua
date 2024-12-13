@@ -1,4 +1,4 @@
--- V7.7.1
+-- V7.7.2
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -673,7 +673,7 @@ do
             while SummonState do
                 summonBanner()
                 clickSummonUnits()
-                wait(0.5)
+                wait(0.1)
         
                 if not SummonState then
                     break
