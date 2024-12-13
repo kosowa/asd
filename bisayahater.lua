@@ -1,4 +1,4 @@
--- V7.6.7
+-- V7.6.8
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -462,7 +462,7 @@ do
 	})
 
     local webhookURL = webhookInputState
-    local function sendToWebhook(playerName, gemAmount, goldAmount, rewardAmount, gameResult)
+    local function sendToWebhook(playerName, gemAmount, goldAmount, gemRewardTotal, gameResult)
         local httpRequest = (syn and syn.request) or (http and http.request) or (request)
         
         if not httpRequest then
@@ -487,7 +487,7 @@ do
                 },
                 {
                     ["name"] = "Rewards",
-                    ["value"] = "`" .. tostring(rewardAmount) .. " GEMS`",
+                    ["value"] = "`" .. tostring(gemRewardTotal) .. " GEMS`",
                     ["inline"] = false
                 },
                 {
