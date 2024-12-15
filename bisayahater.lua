@@ -1,4 +1,4 @@
--- V7.7.4
+-- V7.8.0
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -109,7 +109,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME REALMS | V7.7.4",
+    Title = "ANIME REALMS | V7.8.0",
     SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 300),
@@ -430,6 +430,34 @@ local function clickSummonUnits()
     VirtualInputManager:SendMouseButtonEvent(500, 150, 0, false, game, 1)
 end
 
+local deleteConnection
+
+local function DeleteEnemies()
+    local unitsFolder = workspace:FindFirstChild("_UNITS")
+    if not unitsFolder then
+        warn("_UNITS folder not found in workspace.")
+        return
+    end
+
+    for _, child in ipairs(unitsFolder:GetChildren()) do
+        if child:IsA("Model") and (string.match(child.Name, "^pve%d+$") or string.match(child.Name, "^player%d+$")) then
+            child:Destroy()
+        end
+    end
+
+    deleteConnection = unitsFolder.ChildAdded:Connect(function(child)
+        if child:IsA("Model") and (string.match(child.Name, "^pve%d+$") or string.match(child.Name, "^player%d+$")) then
+            child:Destroy()
+        end
+    end)
+end
+
+local function stopDeleteEnemies()
+    if deleteConnection then
+        deleteConnection:Disconnect()
+        deleteConnection = nil
+    end
+end
 
 --------------------------------------------------------------------------
 
@@ -462,6 +490,13 @@ do
     Tabs.Webhook:AddParagraph({
         Title = "WEBHOOK",
         Content = "GET NOTIFIED"
+    })
+
+    -- delete enemies
+    local DeleteEnemiesState = settings["DeleteEnemies"] or false
+    local ToggleDeleteEnemies = Tabs.Optimize:AddToggle("Delete Enemies", {
+        Title = "Delete Enemies",
+        Default = DeleteEnemiesState,
     })
 
 	-- Disable Textures
@@ -772,6 +807,19 @@ do
             end
         else
             print("Fast Wave disabled.")
+        end
+    end)
+
+    -- delete enemies
+	ToggleDeleteEnemies:OnChanged(function(isEnabled)
+        DeleteEnemiesState = isEnabled
+        settings["DeleteEnemies"] = isEnabled
+        saveSettings(settings)
+
+        if DeleteEnemiesState then
+            DeleteEnemies()
+        else
+            stopDeleteEnemies()
         end
     end)
 
