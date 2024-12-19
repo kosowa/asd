@@ -1,4 +1,4 @@
--- V7.8.0
+-- V7.8.1
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -296,10 +296,6 @@ end
 
 local function joinLobby()
 	wait(5)
-	if not workspace:FindFirstChild("DefaultLobby") then
-		print("MLobby does not exist. NOT JOINING")
-		return
-	end
 	local args = {
 		[1] = "P10"
 	}
