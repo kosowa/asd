@@ -1,4 +1,4 @@
--- V7.8.1
+-- V7.9.0
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -109,7 +109,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME REALMS | V7.8.0",
+    Title = "ANIME REALMS | V7.9.0",
     SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 300),
@@ -119,6 +119,7 @@ local Window = Fluent:CreateWindow({
 })
 
 local Tabs = {
+    Macro = Window:AddTab({ Title = "|  Macro", Icon = "circle" }),
     Main = Window:AddTab({ Title = "|  Auto Play", Icon = "play" }),
     Legend = Window:AddTab({ Title = "|  Legend Stage", Icon = "shield" }),
     Game = Window:AddTab({ Title = "|  Game", Icon = "gamepad" }),
@@ -140,6 +141,7 @@ InterfaceManager:BuildInterfaceSection(Tabs.Settings)
 --AUTO LOAD SETTINGS
 -- Services
 local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local saveFileName = "AnimeRealmsSettings.json"
 
 -- Function to load settings
@@ -222,6 +224,148 @@ UserInputService.InputChanged:Connect(function(input)
         updateInput(input)
     end
 end)
+
+-------------------------------------------------------------------------
+
+-- Macro System
+local jsonFilePath = "MACROTEST.json"
+local recordedRemotes = {}
+local isRecording = false
+local isReplaying = false
+
+-- Function to save/load macros
+local function saveToFile(data)
+    local success, result = pcall(function()
+        return HttpService:JSONEncode(data)
+    end)
+
+    if success then
+        writefile(jsonFilePath, result)
+    else
+        warn("Failed to encode data to JSON:", result)
+    end
+end
+
+local function loadFromFile()
+    if isfile(jsonFilePath) then
+        return HttpService:JSONDecode(readfile(jsonFilePath))
+    end
+    return {}
+end
+
+recordedRemotes = loadFromFile()
+
+-- Sanitize arguments for recording
+local function sanitizeArgs(args)
+    local sanitized = {}
+    for i, arg in ipairs(args) do
+        if typeof(arg) == "Vector3" then
+            sanitized[i] = {X = arg.X, Y = arg.Y, Z = arg.Z}
+        elseif typeof(arg) == "table" then
+            sanitized[i] = table.clone(arg)
+            if arg.Origin and typeof(arg.Origin) == "Vector3" then
+                sanitized[i].Origin = {X = arg.Origin.X, Y = arg.Origin.Y, Z = arg.Origin.Z}
+            end
+            if arg.Direction and typeof(arg.Direction) == "Vector3" then
+                sanitized[i].Direction = {X = arg.Direction.X, Y = arg.Direction.Y, Z = arg.Direction.Z}
+            end
+        else
+            sanitized[i] = arg
+        end
+    end
+    return sanitized
+end
+
+-- Get player money
+local Players = game:GetService("Players")
+local function getPlayerMoney()
+    local playerGui = Players.LocalPlayer:FindFirstChild("PlayerGui")
+    if playerGui then
+        local moneyLabel = playerGui:FindFirstChild("spawn_units", true)
+        if moneyLabel and moneyLabel:FindFirstChild("Lives") then
+            local moneyText = moneyLabel.Lives.Frame.Resource.Money.text.ContentText
+            return tonumber(moneyText) or 0
+        end
+    end
+    return 0
+end
+
+-- Hook __namecall for delayed recording
+local oldNamecall
+oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+    local args = {...}
+    local method = getnamecallmethod()
+    local remoteName = tostring(self.Name)
+
+    -- Preserve default behavior and add delayed recording
+    if isRecording and method == "InvokeServer" and (remoteName == "spawn_unit" or remoteName == "upgrade_unit_ingame") then
+        local originalArgs = table.clone(args)
+
+        -- Add a delay before capturing money requirement
+        task.delay(1, function()
+            local currentMoney = getPlayerMoney()
+
+            -- Add another delay before saving to JSON
+            task.delay(1, function()
+                local sanitizedArgs = sanitizeArgs(originalArgs)
+                table.insert(recordedRemotes, {
+                    type = self.ClassName,
+                    name = remoteName,
+                    args = sanitizedArgs,
+                    moneyreq = tostring(currentMoney),
+                })
+                saveToFile(recordedRemotes)
+                print("Recorded after delay:", remoteName, "Args:", sanitizedArgs, "MoneyReq:", currentMoney)
+            end)
+        end)
+    end
+
+    -- Always call the original method
+    return oldNamecall(self, ...)
+end)
+
+-- Replay Recorded Remotes with Delay
+local function deserializeArgs(args)
+    for i, arg in ipairs(args) do
+        if typeof(arg) == "table" then
+            if arg.X and arg.Y and arg.Z then
+                args[i] = Vector3.new(arg.X, arg.Y, arg.Z)
+            elseif arg.Origin and arg.Origin.X then
+                arg.Origin = Vector3.new(arg.Origin.X, arg.Origin.Y, arg.Origin.Z)
+            end
+            if arg.Direction and arg.Direction.X then
+                arg.Direction = Vector3.new(arg.Direction.X, arg.Direction.Y, arg.Direction.Z)
+            end
+        end
+    end
+    return args
+end
+
+local function replayRemotes()
+    if isReplaying then return end
+    isReplaying = true
+    for _, remote in ipairs(recordedRemotes) do
+        local targetRemote = ReplicatedStorage:FindFirstChild(remote.name, true)
+        if targetRemote then
+            while getPlayerMoney() < tonumber(remote.moneyreq) do
+                print("Waiting for enough money... Required:", remote.moneyreq)
+                task.wait(1) -- Wait until the player has enough money
+            end
+
+            task.wait(1) -- Add delay between each replay
+            local deserializedArgs = deserializeArgs(remote.args)
+            if remote.type == "RemoteFunction" then
+                targetRemote:InvokeServer(unpack(deserializedArgs))
+                print("Replayed:", remote.name, "Args:", deserializedArgs, "MoneyReq:", remote.moneyreq)
+            else
+                warn("Unsupported remote type:", remote.type)
+            end
+        else
+            warn("Remote not found:", remote.name)
+        end
+    end
+    isReplaying = false
+end
 
 -------------------------------------------------------------------------
 
@@ -458,6 +602,11 @@ end
 --------------------------------------------------------------------------
 
 do
+    Tabs.Macro:AddParagraph({
+        Title = "MACRO RECORDER",
+        Content = "THIS IS JUST TESTING, MY TINY AZZ BRAIN HURTING"
+    })
+
     Tabs.Main:AddParagraph({
         Title = "AUTOPLAY",
         Content = "AUTO JOIN GAME NORMAL MODE"
@@ -486,6 +635,17 @@ do
     Tabs.Webhook:AddParagraph({
         Title = "WEBHOOK",
         Content = "GET NOTIFIED"
+    })
+
+    local ToggleRecordMacro = Tabs.Macro:AddToggle("RecordMacro", {
+        Title = "Record Macro",
+        Default = RecordMacroState,
+    })
+
+    local PlayMacroState = settings["PlayMacro"] or false
+    local TogglePlayMacro = Tabs.Macro:AddToggle("PlayMacro", {
+        Title = "Play Macro",
+        Default = PlayMacroState,
     })
 
     -- delete enemies
@@ -713,6 +873,21 @@ do
 
 	---------------------------------------------------------------------------------
 
+    ToggleRecordMacro:OnChanged(function(enabled)
+        isRecording = enabled
+        settings["RecordMacro"] = enabled
+        saveSettings(settings)
+    
+        if isRecording then
+            -- Clear previous recordings to start fresh
+            recordedRemotes = {}
+            saveToFile(recordedRemotes) -- Overwrite the JSON file with an empty table
+            print("Recording Started. Previous recordings cleared.")
+        else
+            print("Recording Stopped")
+        end
+    end)
+
     ToggleSummon:OnChanged(function(isEnabled)
         SummonState = isEnabled
         settings["Summon"] = isEnabled
@@ -894,5 +1069,16 @@ do
         replayState = isEnabled
         settings["Replay"] = isEnabled
         saveSettings(settings)
+    end)
+
+    TogglePlayMacro:OnChanged(function(enabled)
+        PlayMacroState = enabled
+        settings["PlayMacro"] = enabled
+        saveSettings(settings)
+        if enabled then
+            print("Replaying Macro...")
+            replayRemotes()
+            print("Replay Finished!")
+        end
     end)
 end
