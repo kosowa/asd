@@ -1,4 +1,4 @@
---v1.2
+--v2
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -65,6 +65,7 @@ local Window = Fluent:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab({ Title = "|  Christian Event", Icon = "play" }),
+    Optimize = Window:AddTab({ Title = "|  Optimizer", Icon = "boxes" }),
     Settings = Window:AddTab({ Title = "|  Settings", Icon = "settings" })
 }
 
@@ -172,11 +173,11 @@ local function safezone()
             child.snow:Destroy()
         end
     end
-
+    
     if workspace._map.player:FindFirstChild("Beacon") then
         workspace._map.player.Beacon:Destroy()
     end
-
+    
     local area = workspace._map.player:FindFirstChild("area")
     if area then
         area.BrickColor = BrickColor.new("Lime green")
@@ -189,7 +190,7 @@ local function safezone()
             attachment:Destroy()
         end
     end
-
+    
     for _, bisaya in ipairs(workspace._map:GetChildren()) do
         if bisaya:IsA("Model") then
             for _, child in ipairs(bisaya:GetChildren()) do
@@ -199,8 +200,25 @@ local function safezone()
             end
         end
     end
+    
+    for _, child in ipairs(workspace._map:GetChildren()) do
+        if child:IsA("MeshPart") then
+            child:Destroy()
+        end
+    end
+    
+    local wind_beams = workspace._map:FindFirstChild("_wind_beams")
+    if wind_beams then
+        wind_beams:Destroy()
+    end
+    
+    local folder = workspace._map:FindFirstChild("Folder")
+    if folder then
+        folder:Destroy()
+    end
 end
 
+--FROZEN MATCHMAKE
 local function ChristmasFindMatch()
     local args = {
         [1] = "christmas_event"
@@ -209,12 +227,67 @@ local function ChristmasFindMatch()
     game:GetService("ReplicatedStorage").endpoints.client_to_server.request_matchmaking:InvokeServer(unpack(args))
 end
 
+--ANTILAG
+local function AntiLag()
+    for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Decal") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Texture") then
+            v:Destroy()
+        end
+    end
+    -- Apply settings to parts, meshes, decals, etc.
+    for i, v in pairs(game:GetDescendants()) do
+        if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+            v.Material = "Plastic"
+            v.Reflectance = 0
+        elseif v:IsA("Decal") then
+            v.Transparency = 1
+        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+            v.Lifetime = NumberRange.new(0)
+        elseif v:IsA("Explosion") then
+            v.BlastPressure = 1
+            v.BlastRadius = 1
+        end
+    end
+
+    -- Remove new objects like forcefields, sparkles, etc.
+    workspace.DescendantAdded:Connect(function(child)
+        task.spawn(function()
+            if child:IsA('ForceField') then
+                child:Destroy()
+            elseif child:IsA('Sparkles') then
+                child:Destroy()
+            elseif child:IsA('Smoke') or child:IsA('Fire') then
+                child:Destroy()
+            end
+        end)
+    end)
+    local Lighting = game:GetService("Lighting") -- Ensure Lighting is properly referenced
+    local Terrain = workspace:FindFirstChildOfClass('Terrain')
+    
+    -- Terrain settings
+    Terrain.WaterWaveSize = 0
+    Terrain.WaterWaveSpeed = 0
+    Terrain.WaterReflectance = 0
+    Terrain.WaterTransparency = 0
+    
+    -- Lighting settings
+    Lighting.GlobalShadows = false
+    Lighting.FogEnd = 9e9
+	Lighting.Brightness = 1
+    print("ANTILAG ON")
+end
+
 -------------------------------------------------------------------------
 
 do
     Tabs.Main:AddParagraph({
         Title = "AUTO JOIN",
         Content = "AUTO JOIN GAME"
+    })
+
+    Tabs.Optimize:AddParagraph({
+        Title = "OPTIMIZER",
+        Content = "ANTILAG"
     })
 
     local XmasFindMatchState = settings["XmasFindMatch"] or false
@@ -227,6 +300,12 @@ do
     local Safezone = Tabs.Main:AddToggle("Safezone", {
         Title = "Safezone Abyss",
         Default = SafezoneState,
+    })
+
+	local AntiLagState = settings["Antilag"] or false
+    local ToggleAntiLag = Tabs.Optimize:AddToggle("Antilag", {
+        Title = "Anti Lag",
+        Default = AntiLagState
     })
 
     XmasFindMatch:OnChanged(function(isEnabled)
@@ -247,6 +326,16 @@ do
     
         if SafezoneState then
             safezone()
+        end
+    end)
+
+	ToggleAntiLag:OnChanged(function(isEnabled)
+        AntiLagState = isEnabled
+        settings["Antilag"] = isEnabled
+        saveSettings(settings)
+
+        if AntiLagState then
+            AntiLag()
         end
     end)
 end
