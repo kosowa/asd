@@ -1,4 +1,4 @@
---v2
+--v2.5
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -277,6 +277,34 @@ local function AntiLag()
     print("ANTILAG ON")
 end
 
+----
+
+local runService = game:GetService("RunService")
+local deleteLoop
+
+local function StartDeleteEnemies()
+    local unitsFolder = workspace:FindFirstChild("_UNITS")
+    if not unitsFolder then
+        warn("_UNITS folder not found in workspace.")
+        return
+    end
+
+    deleteLoop = runService.Heartbeat:Connect(function()
+        for _, child in ipairs(unitsFolder:GetChildren()) do
+            if child:IsA("Model") and child.Name:sub(1, 9) == "christmas" then
+                child:Destroy()
+            end
+        end
+    end)
+end
+
+local function StopDeleteEnemies()
+    if deleteLoop then
+        deleteLoop:Disconnect()
+        deleteLoop = nil
+    end
+end
+
 -------------------------------------------------------------------------
 
 do
@@ -308,6 +336,12 @@ do
         Default = AntiLagState
     })
 
+    local DeleteEnemyState = settings["DeleteEnemies"] or false
+    local DeleteEnemiesToggle = Tabs.Optimize:AddToggle("DeleteEnemies", {
+        Title = "Delete Enemies",
+        Default = DeleteEnemyState,
+    })
+
     XmasFindMatch:OnChanged(function(isEnabled)
         XmasFindMatchState = isEnabled
         settings["XmasFindMatch"] = isEnabled
@@ -336,6 +370,18 @@ do
 
         if AntiLagState then
             AntiLag()
+        end
+    end)
+
+    DeleteEnemiesToggle:OnChanged(function(isEnabled)
+        DeleteEnemyState = isEnabled
+        settings["DeleteEnemies"] = isEnabled
+        saveSettings(settings)
+    
+        if DeleteEnemyState then
+            StartDeleteEnemies()
+        else
+            StopDeleteEnemies()
         end
     end)
 end
