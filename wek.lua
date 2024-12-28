@@ -1,3 +1,4 @@
+--v1
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -9,7 +10,7 @@ local playerName = game.Players.LocalPlayer and game.Players.LocalPlayer.Name or
 
 local function sendWebhook()
 
-    local avatarUrl = "https://cdn.discordapp.com/attachments/1301525075366903839/1307297759631642656/lv_0_20241116161510.gif?ex=676e876a&is=676d35ea&hm=36fbfa24b5de95c9fd562c53c7a9099c211fd00f25202dce750059e8e23569f4&"
+    local avatarUrl = "https://cdn.discordapp.com/attachments/942805757936672821/1307254555796307998/xmaslogo.png?ex=6771022d&is=676fb0ad&hm=5e86e3ebdfe413903f7cc793f60e98bf114e84e23abdf4d5282f5f0d518ec67b&"
 
     local data = {
         ["embeds"] = {{
@@ -63,7 +64,7 @@ local Window = Fluent:CreateWindow({
 })
 
 local Tabs = {
-    Main = Window:AddTab({ Title = "|  Auto Join", Icon = "play" }),
+    Main = Window:AddTab({ Title = "|  Christian Event", Icon = "play" }),
     Settings = Window:AddTab({ Title = "|  Settings", Icon = "settings" })
 }
 
@@ -165,6 +166,41 @@ end)
 
 -------------------------------------------------------------------------
 
+local function safezone()
+    for _, child in ipairs(workspace._map:GetChildren()) do
+        if child:FindFirstChild("snow") then
+            child.snow:Destroy()
+        end
+    end
+
+    if workspace._map.player:FindFirstChild("Beacon") then
+        workspace._map.player.Beacon:Destroy()
+    end
+
+    local area = workspace._map.player:FindFirstChild("area")
+    if area then
+        area.BrickColor = BrickColor.new("Lime green")
+        area.Color = Color3.fromRGB(0, 255, 0)
+        area.Size = Vector3.new(0.3, 15, 15)
+        area.Shape = Enum.PartType.Block
+        
+        local attachment = area:FindFirstChild("Attachment")
+        if attachment then
+            attachment:Destroy()
+        end
+    end
+
+    for _, bisaya in ipairs(workspace._map:GetChildren()) do
+        if bisaya:IsA("Model") then
+            for _, child in ipairs(bisaya:GetChildren()) do
+                if child.Name == "Model" or child.Name == "side" then
+                    child:Destroy()
+                end
+            end
+        end
+    end
+end
+
 local function ChristmasFindMatch()
     local args = {
         [1] = "christmas_event"
@@ -183,8 +219,14 @@ do
 
     local XmasFindMatchState = settings["XmasFindMatch"] or false
     local XmasFindMatch = Tabs.Main:AddToggle("FindMatch", {
-        Title = "Christian Find Match",
+        Title = "Christian FindMatch",
         Default = XmasFindMatchState,
+    })
+
+    local SafezoneState = settings["Safezone"] or false
+    local Safezone = Tabs.Main:AddToggle("Safezone", {
+        Title = "Safezone Abyss",
+        Default = SafezoneState,
     })
 
     XmasFindMatch:OnChanged(function(isEnabled)
@@ -195,6 +237,16 @@ do
         if XmasFindMatchState then
             wait(5)
             ChristmasFindMatch()
+        end
+    end)
+
+    Safezone:OnChanged(function(isEnabled)
+        SafezoneState = isEnabled
+        settings["Safezone"] = isEnabled
+        saveSettings(settings)
+    
+        if SafezoneState then
+            safezone()
         end
     end)
 end
