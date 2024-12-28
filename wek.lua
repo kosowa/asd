@@ -1,4 +1,4 @@
---v2.5
+--v2.6
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -66,6 +66,7 @@ local Window = Fluent:CreateWindow({
 local Tabs = {
     Main = Window:AddTab({ Title = "|  Christian Event", Icon = "play" }),
     Optimize = Window:AddTab({ Title = "|  Optimizer", Icon = "boxes" }),
+    Summon = Window:AddTab({ Title = "|  Summon", Icon = "coins" }),
     Settings = Window:AddTab({ Title = "|  Settings", Icon = "settings" })
 }
 
@@ -168,6 +169,11 @@ end)
 -------------------------------------------------------------------------
 
 local function safezone()
+    if not workspace:FindFirstChild("_map") then
+        print("no map detected")
+        return
+    end
+
     for _, child in ipairs(workspace._map:GetChildren()) do
         if child:FindFirstChild("snow") then
             child.snow:Destroy()
@@ -277,7 +283,18 @@ local function AntiLag()
     print("ANTILAG ON")
 end
 
-----
+----------------------------------------------------------------------
+
+local function XmasStarSummon()
+    local args = {
+        [1] = "Christmas2024",
+        [2] = "gems"
+    }
+
+    game:GetService("ReplicatedStorage").endpoints.client_to_server.buy_from_banner:InvokeServer(unpack(args))
+end
+
+----------------------------------------------------------------------
 
 local runService = game:GetService("RunService")
 local deleteLoop
@@ -318,6 +335,11 @@ do
         Content = "ANTILAG"
     })
 
+    Tabs.Summon:AddParagraph({
+        Title = "AUTO SUMMON",
+        Content = "NIGGRO"
+    })
+
     local XmasFindMatchState = settings["XmasFindMatch"] or false
     local XmasFindMatch = Tabs.Main:AddToggle("FindMatch", {
         Title = "Christian FindMatch",
@@ -328,6 +350,12 @@ do
     local Safezone = Tabs.Main:AddToggle("Safezone", {
         Title = "Safezone Abyss",
         Default = SafezoneState,
+    })
+
+    local SummonState = settings["Summon"] or false
+    local ToggleSummon = Tabs.Summon:AddToggle("Summon Toggle", {
+        Title = "Auto Xmas Star",
+        Default = SummonState
     })
 
 	local AntiLagState = settings["Antilag"] or false
@@ -370,6 +398,23 @@ do
 
         if AntiLagState then
             AntiLag()
+        end
+    end)
+
+    ToggleSummon:OnChanged(function(isEnabled)
+        SummonState = isEnabled
+        settings["Summon"] = isEnabled
+        saveSettings(settings)
+
+        if SummonState then
+	    Window:Minimize()
+            while SummonState do
+                XmasStarSummon()
+                wait(0.1)
+                if not SummonState then
+                    break
+                end
+            end
         end
     end)
 
