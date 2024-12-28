@@ -1,4 +1,4 @@
---v2.6
+--v2.7
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -106,64 +106,56 @@ local settings = loadSettings()
 -------------------------------------------------------------------------
 
 -- BUTTON MINIMIZE
--- Create a ScreenGui and add it to CoreGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "CustomButtonGUI"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = game:GetService("CoreGui")
-
 -- Button creation
 local button = Instance.new("ImageButton")
 button.Position = UDim2.new(0.9, 0, 0.1, 0)
-button.Size = UDim2.new(0, 57, 0, 57)
+button.Size = UDim2.new(0, 45, 0, 45)
 button.Image = "rbxassetid://129162302366411"
 button.BackgroundTransparency = 1
 button.ScaleType = Enum.ScaleType.Fit
 button.ZIndex = 10
-button.Parent = screenGui
+
+local parentPath = game:GetService("CoreGui"):FindFirstChild("TopBarApp")
+if parentPath then
+    local unibarLeftFrame = parentPath:FindFirstChild("UnibarLeftFrame")
+    if unibarLeftFrame then
+        local stackedElements = unibarLeftFrame:FindFirstChild("StackedElements")
+        if stackedElements then
+            button.Parent = stackedElements
+        else
+            warn("StackedElements not found in UnibarLeftFrame.")
+        end
+    else
+        warn("UnibarLeftFrame not found in TopBarApp.")
+    end
+else
+    warn("TopBarApp not found in CoreGui.")
+end
 
 -- Function to minimize Fluent GUI when the button is clicked
 button.MouseButton1Click:Connect(function()
+    local originalSize = button.Size
+
+    local tweenService = game:GetService("TweenService")
+    local popTweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local shrinkTweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+
+    local popGoal = {Size = UDim2.new(0, 55, 0, 55)}
+    local popTween = tweenService:Create(button, popTweenInfo, popGoal)
+
+    local shrinkGoal = {Size = originalSize}
+    local shrinkTween = tweenService:Create(button, shrinkTweenInfo, shrinkGoal)
+
     if Window and Window.Minimize then
         Window:Minimize() 
     else
         warn("Fluent GUI window not found or minimize function unavailable!")
     end
-end)
 
--- Draggable button logic
-local dragging, dragInput, dragStart, startPos
-local UserInputService = game:GetService("UserInputService")
-
-local function updateInput(input)
-    local delta = input.Position - dragStart
-    button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-end
-
-button.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = button.Position
-
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-button.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if dragging and input == dragInput then
-        updateInput(input)
-    end
+    popTween:Play()
+    popTween.Completed:Connect(function()
+        shrinkTween:Play()
+    end)
 end)
 
 -------------------------------------------------------------------------
