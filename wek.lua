@@ -1,4 +1,4 @@
---v1.1
+--v1.2
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -112,7 +112,7 @@ screenGui.Parent = game:GetService("CoreGui")
 
 -- Button creation
 local button = Instance.new("ImageButton")
-button.Position = UDim2.new(0.05, 0, 0.1, 0)
+button.Position = UDim2.new(0.9, 0, 0.1, 0)
 button.Size = UDim2.new(0, 57, 0, 57)
 button.Image = "rbxassetid://129162302366411"
 button.BackgroundTransparency = 1
