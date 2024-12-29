@@ -1,4 +1,4 @@
---v2.7
+--v3
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -64,9 +64,11 @@ local Window = Fluent:CreateWindow({
 })
 
 local Tabs = {
-    Main = Window:AddTab({ Title = "|  Christian Event", Icon = "play" }),
+    Buffer = Window:AddTab({ Title = "|  Buffer", Icon = "swords" }),
+    Main = Window:AddTab({ Title = "|  Event", Icon = "play" }),
     Optimize = Window:AddTab({ Title = "|  Optimizer", Icon = "boxes" }),
     Summon = Window:AddTab({ Title = "|  Summon", Icon = "coins" }),
+    Misc = Window:AddTab({ Title = "|  Misc", Icon = "square" }),
     Settings = Window:AddTab({ Title = "|  Settings", Icon = "settings" })
 }
 
@@ -104,6 +106,80 @@ end
 -- Load settings on startup
 local settings = loadSettings()
 -------------------------------------------------------------------------
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+
+-- Ensure the player's character exists in the Workspace
+local character = workspace:WaitForChild(localPlayer.Name)
+local vipGradient = character:WaitForChild("Head")
+    :WaitForChild("_overhead")
+    :WaitForChild("Frame")
+    :WaitForChild("Name_Frame")
+    :WaitForChild("Name_Text")
+    :WaitForChild("VIP_Gradient")
+
+local titleRename = character:WaitForChild("Head")
+    :WaitForChild("_overhead")
+    :WaitForChild("Frame")
+    :WaitForChild("TitleFrame")
+    :WaitForChild("Title_Text")
+
+-- Set the title text
+titleRename.Text = "MCNRS ON TOP"
+
+-- Enable the gradient
+vipGradient.Enabled = true
+
+-- Define rainbow colors
+local colors = {
+    Color3.new(1, 0, 0),   -- Red
+    Color3.new(1, 0.5, 0), -- Orange
+    Color3.new(1, 1, 0),   -- Yellow
+    Color3.new(0, 1, 0),   -- Green
+    Color3.new(0, 1, 1),   -- Cyan
+    Color3.new(0, 0, 1),   -- Blue
+    Color3.new(0.5, 0, 1), -- Purple
+}
+
+local totalSteps = 100
+local animationSpeed = 0.02
+local step = 0
+
+-- Function to interpolate colors
+local function interpolateColors(colors, step, totalSteps)
+    local totalColors = #colors
+    local progress = step / totalSteps
+    local keypoints = {}
+
+    for i = 1, totalColors do
+        local currentIndex = ((progress + (i - 1) / totalColors) % 1) * totalColors
+        local lowerIndex = math.floor(currentIndex) + 1
+        local upperIndex = (lowerIndex % totalColors) + 1
+
+        local lerpFactor = currentIndex % 1
+        local startColor = colors[lowerIndex]
+        local endColor = colors[upperIndex]
+        local interpolatedColor = startColor:Lerp(endColor, lerpFactor)
+
+        table.insert(keypoints, ColorSequenceKeypoint.new((i - 1) / (totalColors - 1), interpolatedColor))
+    end
+
+    return ColorSequence.new(keypoints)
+end
+
+-- Gradient animation
+local function startGradientAnimation()
+    RunService.RenderStepped:Connect(function()
+        step = (step + 1) % totalSteps
+        vipGradient.Color = interpolateColors(colors, step, totalSteps)
+    end)
+end
+
+startGradientAnimation()
+
+------------------------------------------------------------------
 
 -- BUTTON MINIMIZE
 -- Button creation
@@ -159,6 +235,92 @@ button.MouseButton1Click:Connect(function()
 end)
 
 -------------------------------------------------------------------------
+
+local function Reconnect()
+    game:GetService("GuiService").ErrorMessageChanged:Connect(function()
+        wait(2)
+        game:GetService("TeleportService"):Teleport(8304191830)
+    end)
+end
+
+local function autoBuff()
+    -- Configuration
+    local Identifier = {
+        ["Erwin"] = "erwin",
+        ["Wendy"] = "wendy",
+        ["Leafa"] = "leafa_evolved",
+    }
+    local Delay = 16.4
+
+    -- Ensure the game is loaded
+    repeat task.wait() until game:IsLoaded()
+    if game.PlaceId == 8304191830 then return end
+    repeat task.wait() until workspace:WaitForChild("_waves_started").Value == true
+
+    -- Services and dependencies
+    local Player = game:GetService("Players").LocalPlayer
+    local GameFinished = game:GetService("Workspace"):WaitForChild("_DATA"):WaitForChild("GameFinished")
+    local Loader = require(game:GetService("ReplicatedStorage").src.Loader)
+    local ItemInventoryService = Loader.load_client_service(script, "ItemInventoryServiceClient")
+
+    -- Auto Buff logic
+    for ID, Name in pairs(Identifier) do
+        local Start = false
+        for _, UUID in pairs(ItemInventoryService["session"]["collection"]["collection_profile_data"]["equipped_units"]) do
+            if ItemInventoryService["session"]["collection"]["collection_profile_data"]["owned_units"][UUID]["unit_id"] == Name then
+                Start = true
+                break
+            end
+        end
+        if Start then
+            task.spawn(function()
+                if getgenv().Library then
+                    getgenv().Library:Notify("Auto Buff [" .. ID .. "] Started", 5)
+                else
+                    print("Auto Buff [" .. ID .. "] Started")
+                end
+                repeat
+                    task.wait()
+                    if GameFinished.Value then break end
+                    local Container = {}
+
+                    for _, Unit in pairs(game:GetService("Workspace"):WaitForChild("_UNITS"):GetChildren()) do
+                        if GameFinished.Value then break end
+                        if Unit:WaitForChild("_stats"):WaitForChild("id").Value ~= Name then continue end
+                        if Unit:WaitForChild("_stats"):WaitForChild("active_attack").Value == "nil" then continue end
+                        if Unit:WaitForChild("_stats"):WaitForChild("player").Value == Player then
+                            table.insert(Container, Unit)
+                        end
+                    end
+
+                    if #Container == 4 then
+                        local Broken = false
+                        while not Broken do
+                            task.wait()
+                            for Idx = 1, 4 do
+                                if GameFinished.Value then Broken = true break end
+                                if #Container < 4 then Broken = true break end
+                                if Container[Idx].Parent ~= game:GetService("Workspace"):WaitForChild("_UNITS") then
+                                    Broken = true
+                                    break
+                                end
+                                pcall(function()
+                                    game:GetService("ReplicatedStorage")["endpoints"]["client_to_server"]["use_active_attack"]:InvokeServer(Container[Idx])
+                                end)
+                                task.wait(Delay)
+                            end
+                        end
+                    end
+                until GameFinished.Value
+                if getgenv().Library then
+                    getgenv().Library:Notify("Auto Buff [" .. ID .. "] Ended", 5)
+                else
+                    print("Auto Buff [" .. ID .. "] Ended")
+                end
+            end)
+        end
+    end
+end
 
 local function safezone()
     if not workspace:FindFirstChild("_map") then
@@ -317,6 +479,11 @@ end
 -------------------------------------------------------------------------
 
 do
+    Tabs.Buffer:AddParagraph({
+        Title = "AUTO BUFF",
+        Content = "ERWIN,WENDA,LEAFY"
+    })
+
     Tabs.Main:AddParagraph({
         Title = "AUTO JOIN",
         Content = "AUTO JOIN GAME"
@@ -332,9 +499,20 @@ do
         Content = "NIGGRO"
     })
 
+    Tabs.Misc:AddParagraph({
+        Title = "MISCELLANEOUS",
+        Content = "NIGGRO"
+    })
+
+    local AutoBuffState = settings["AutoBuff"] or false
+    local AutoBuff = Tabs.Buffer:AddToggle("AutoBuff", {
+        Title = "Better Buffer",
+        Default = AutoBuffState,
+    })
+
     local XmasFindMatchState = settings["XmasFindMatch"] or false
     local XmasFindMatch = Tabs.Main:AddToggle("FindMatch", {
-        Title = "Christian FindMatch",
+        Title = "Frozen Matchmake",
         Default = XmasFindMatchState,
     })
 
@@ -352,7 +530,7 @@ do
 
 	local AntiLagState = settings["Antilag"] or false
     local ToggleAntiLag = Tabs.Optimize:AddToggle("Antilag", {
-        Title = "Anti Lag",
+        Title = "FPS Boost",
         Default = AntiLagState
     })
 
@@ -361,6 +539,22 @@ do
         Title = "Delete Enemies",
         Default = DeleteEnemyState,
     })
+
+    local AutoReconnectState = settings["AutoReconnect"] or false
+    local AutoReconnect = Tabs.Misc:AddToggle("AutoReconnect", {
+        Title = "Auto Reconnect",
+        Default = AutoReconnectState,
+    })
+
+    AutoBuff:OnChanged(function(isEnabled)
+        AutoBuffState = isEnabled
+        settings["AutoBuff"] = isEnabled
+        saveSettings(settings)
+    
+        if AutoBuffState then
+            autoBuff()
+        end
+    end)
 
     XmasFindMatch:OnChanged(function(isEnabled)
         XmasFindMatchState = isEnabled
@@ -419,6 +613,16 @@ do
             StartDeleteEnemies()
         else
             StopDeleteEnemies()
+        end
+    end)
+
+    AutoReconnect:OnChanged(function(isEnabled)
+        AutoReconnectState = isEnabled
+        settings["AutoReconnect"] = isEnabled
+        saveSettings(settings)
+    
+        if AutoReconnectState then
+            Reconnect()
         end
     end)
 end
