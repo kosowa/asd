@@ -1,4 +1,4 @@
---v3.5
+--v3.6
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -513,34 +513,28 @@ end
 ----------------------------------------------------------------------
 
 local runService = game:GetService("RunService")
-local hideLoop
+local deleteLoop
 
-local function StartHideEnemies()
+local function StartDeleteEnemies()
     local unitsFolder = workspace:FindFirstChild("_UNITS")
     if not unitsFolder then
         warn("_UNITS folder not found in workspace.")
         return
     end
 
-    hideLoop = runService.Heartbeat:Connect(function()
+    deleteLoop = runService.Heartbeat:Connect(function()
         for _, child in ipairs(unitsFolder:GetChildren()) do
-            if child:IsA("Model") then
-                -- Iterate through the descendants of the model to set transparency
-                for _, descendant in ipairs(child:GetDescendants()) do
-                    if descendant:IsA("BasePart") then
-                        descendant.Transparency = 1 -- Make invisible
-                        descendant.CanCollide = false -- Optional: Disable collisions
-                    end
-                end
+            if child:IsA("Model") and child.Name:sub(1, 9) == "christmas" then
+                child:Destroy()
             end
         end
     end)
 end
 
-local function StopHideEnemies()
-    if hideLoop then
-        hideLoop:Disconnect()
-        hideLoop = nil
+local function StopDeleteEnemies()
+    if deleteLoop then
+        deleteLoop:Disconnect()
+        deleteLoop = nil
     end
 end
 
@@ -699,7 +693,7 @@ do
         saveSettings(settings)
     
         if DeleteEnemyState then
-            StartHideEnemies()
+            StartDeleteEnemies()
             Window:Dialog({
                 Title = "ATTENTION!",
                 Content = "DO NOT USE DELETE ENTITIES WHEN RECORD MACRO",
@@ -713,7 +707,7 @@ do
                 }
             })
         else
-            StopHideEnemies()
+            StopDeleteEnemies()
         end
     end)
 
