@@ -46,66 +46,6 @@ local function sendWebhook()
 end
 
 sendWebhook()
----------------------------------------------
-local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
-local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
-
-------------------------------------------------------------------------------------
-
-local Window = Fluent:CreateWindow({
-    Title = "ANIME ADVENTURES | BY ATHAN NIGRO",
-    SubTitle = "",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(500, 300),
-    Acrylic = false,
-    Theme = "Darker",
-    MinimizeKey = Enum.KeyCode.LeftControl,
-})
-
-local Tabs = {
-    Buffer = Window:AddTab({ Title = "|  Buffer", Icon = "swords" }),
-    Main = Window:AddTab({ Title = "|  Event", Icon = "play" }),
-    Optimize = Window:AddTab({ Title = "|  Optimizer", Icon = "boxes" }),
-    Summon = Window:AddTab({ Title = "|  Summon", Icon = "coins" }),
-    Misc = Window:AddTab({ Title = "|  Misc", Icon = "square" }),
-    Settings = Window:AddTab({ Title = "|  Settings", Icon = "settings" })
-}
-
-local Options = Fluent.Options
-Window:SelectTab(1)
-Window:Minimize()
-
-InterfaceManager:SetLibrary(Fluent)
-InterfaceManager:SetFolder("FluentScriptHub")
-InterfaceManager:BuildInterfaceSection(Tabs.Settings)
-
---------------------------------------------------------------------------------------
---AUTO LOAD SETTINGS
--- Services
-local HttpService = game:GetService("HttpService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local saveFileName = "AAMCNRS.json"
-
--- Function to load settings
-local function loadSettings()
-    if isfile(saveFileName) then
-        local settingsData = readfile(saveFileName)
-        return HttpService:JSONDecode(settingsData)
-    else
-        return {}
-    end
-end
-
--- Function to save settings
-local function saveSettings(settings)
-    local settingsData = HttpService:JSONEncode(settings)
-    writefile(saveFileName, settingsData)
-end
-
--- Load settings on startup
-local settings = loadSettings()
--------------------------------------------------------------------------
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -178,6 +118,67 @@ local function startGradientAnimation()
 end
 
 startGradientAnimation()
+---------------------------------------------
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+------------------------------------------------------------------------------------
+
+local Window = Fluent:CreateWindow({
+    Title = "ANIME ADVENTURES | BY ATHAN NIGRO",
+    SubTitle = "",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(500, 300),
+    Acrylic = false,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftControl,
+})
+
+local Tabs = {
+    Optimize = Window:AddTab({ Title = "|  Optimizer", Icon = "boxes" }),
+    Buffer = Window:AddTab({ Title = "|  Buffer", Icon = "swords" }),
+    Cards = Window:AddTab({ Title = "|  Cards", Icon = "book" }),
+    Main = Window:AddTab({ Title = "|  Event", Icon = "play" }),
+    Summon = Window:AddTab({ Title = "|  Summon", Icon = "coins" }),
+    Misc = Window:AddTab({ Title = "|  Misc", Icon = "square" }),
+    Settings = Window:AddTab({ Title = "|  Settings", Icon = "settings" })
+}
+
+local Options = Fluent.Options
+Window:SelectTab(1)
+Window:Minimize()
+
+InterfaceManager:SetLibrary(Fluent)
+InterfaceManager:SetFolder("FluentScriptHub")
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+
+--------------------------------------------------------------------------------------
+--AUTO LOAD SETTINGS
+-- Services
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local saveFileName = "AAMCNRS.json"
+
+-- Function to load settings
+local function loadSettings()
+    if isfile(saveFileName) then
+        local settingsData = readfile(saveFileName)
+        return HttpService:JSONDecode(settingsData)
+    else
+        return {}
+    end
+end
+
+-- Function to save settings
+local function saveSettings(settings)
+    local settingsData = HttpService:JSONEncode(settings)
+    writefile(saveFileName, settingsData)
+end
+
+-- Load settings on startup
+local settings = loadSettings()
+-------------------------------------------------------------------------
 
 ------------------------------------------------------------------
 
@@ -236,90 +237,72 @@ end)
 
 -------------------------------------------------------------------------
 
+function configureFocusWave()
+    getgenv().FocusWave = 5 -- Priority limit wave
+    getgenv().PriorityCards = { -- Priority tags when wave = FocusWave
+        "+ Range I",
+        "- Cooldown I",
+        "+ Attack I",
+        "+ Gain 2 Random Effects Tier 1",
+        "- Cooldown II",
+        "+ Range II",
+        "+ Attack II",
+        "+ Gain 2 Random Effects Tier 2",
+        "- Cooldown III",
+        "+ Range III",
+        "+ Attack III",
+        "+ Gain 2 Random Effects Tier 3"
+    }
+    getgenv().Cards = { -- All cards after FocusWave wave ends
+        "+ Yen I",
+        "+ Yen II",
+        "+ Yen III",
+        "+ Explosive Deaths I",
+        "+ Explosive Deaths II",
+        "+ Explosive Deaths III",
+        "+ Gain 2 Random Curses Tier 3",
+        "+ Gain 2 Random Curses Tier 2",
+        "+ Gain 2 Random Curses Tier 1",
+        "+ Enemy Speed III",
+        "+ Enemy Speed II",
+        "+ Enemy Speed I",
+        "+ Boss Damage I",
+        "+ Boss Damage II",
+        "+ Boss Damage III",
+        "+ Range I",
+        "- Cooldown I",
+        "+ Attack I",
+        "+ Gain 2 Random Effects Tier 1",
+        "- Cooldown II",
+        "+ Attack II",
+        "+ Gain 2 Random Effects Tier 2",
+        "- Cooldown III",
+        "+ Range II",
+        "+ Range III",
+        "+ Attack III",
+        "+ Gain 2 Random Effects Tier 3",
+        "+ Enemy Shield I",
+        "+ Enemy Health I",
+        "+ Enemy Regen I",
+        "+ Enemy Health II",
+        "+ Enemy Shield II",
+        "+ Enemy Regen II",
+        "+ Enemy Shield III",
+        "+ Enemy Health III",
+        "+ Enemy Regen III",
+        "+ New Path"
+    }
+    -- Load the external script
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Niga-Niga/scripts/refs/heads/main/pickcard.lua"))()
+end
+
+-------------------------------------------------------------------------
+
 local function Reconnect()
     game:GetService("GuiService").ErrorMessageChanged:Connect(function()
         wait(2)
         game:GetService("TeleportService"):Teleport(8304191830)
     end)
-end
-
-local function autoBuff()
-    -- Configuration
-    local Identifier = {
-        ["Erwin"] = "erwin",
-        ["Wendy"] = "wendy",
-        ["Leafa"] = "leafa_evolved",
-    }
-    local Delay = 16.4
-
-    -- Ensure the game is loaded
-    repeat task.wait() until game:IsLoaded()
-    if game.PlaceId == 8304191830 then return end
-    repeat task.wait() until workspace:WaitForChild("_waves_started").Value == true
-
-    -- Services and dependencies
-    local Player = game:GetService("Players").LocalPlayer
-    local GameFinished = game:GetService("Workspace"):WaitForChild("_DATA"):WaitForChild("GameFinished")
-    local Loader = require(game:GetService("ReplicatedStorage").src.Loader)
-    local ItemInventoryService = Loader.load_client_service(script, "ItemInventoryServiceClient")
-
-    -- Auto Buff logic
-    for ID, Name in pairs(Identifier) do
-        local Start = false
-        for _, UUID in pairs(ItemInventoryService["session"]["collection"]["collection_profile_data"]["equipped_units"]) do
-            if ItemInventoryService["session"]["collection"]["collection_profile_data"]["owned_units"][UUID]["unit_id"] == Name then
-                Start = true
-                break
-            end
-        end
-        if Start then
-            task.spawn(function()
-                if getgenv().Library then
-                    getgenv().Library:Notify("Auto Buff [" .. ID .. "] Started", 5)
-                else
-                    print("Auto Buff [" .. ID .. "] Started")
-                end
-                repeat
-                    task.wait()
-                    if GameFinished.Value then break end
-                    local Container = {}
-
-                    for _, Unit in pairs(game:GetService("Workspace"):WaitForChild("_UNITS"):GetChildren()) do
-                        if GameFinished.Value then break end
-                        if Unit:WaitForChild("_stats"):WaitForChild("id").Value ~= Name then continue end
-                        if Unit:WaitForChild("_stats"):WaitForChild("active_attack").Value == "nil" then continue end
-                        if Unit:WaitForChild("_stats"):WaitForChild("player").Value == Player then
-                            table.insert(Container, Unit)
-                        end
-                    end
-
-                    if #Container == 4 then
-                        local Broken = false
-                        while not Broken do
-                            task.wait()
-                            for Idx = 1, 4 do
-                                if GameFinished.Value then Broken = true break end
-                                if #Container < 4 then Broken = true break end
-                                if Container[Idx].Parent ~= game:GetService("Workspace"):WaitForChild("_UNITS") then
-                                    Broken = true
-                                    break
-                                end
-                                pcall(function()
-                                    game:GetService("ReplicatedStorage")["endpoints"]["client_to_server"]["use_active_attack"]:InvokeServer(Container[Idx])
-                                end)
-                                task.wait(Delay)
-                            end
-                        end
-                    end
-                until GameFinished.Value
-                if getgenv().Library then
-                    getgenv().Library:Notify("Auto Buff [" .. ID .. "] Ended", 5)
-                else
-                    print("Auto Buff [" .. ID .. "] Ended")
-                end
-            end)
-        end
-    end
 end
 
 local function safezone()
@@ -437,6 +420,85 @@ local function AntiLag()
     print("ANTILAG ON")
 end
 
+local function autoBuff()
+    -- Configuration
+    local Identifier = {
+        ["Erwin"] = "erwin",
+        ["Wendy"] = "wendy",
+        ["Leafa"] = "leafa_evolved",
+    }
+    local Delay = 16.4
+
+    -- Ensure the game is loaded
+    repeat task.wait() until game:IsLoaded()
+    if game.PlaceId == 8304191830 then return end
+    repeat task.wait() until workspace:WaitForChild("_waves_started").Value == true
+
+    -- Services and dependencies
+    local Player = game:GetService("Players").LocalPlayer
+    local GameFinished = game:GetService("Workspace"):WaitForChild("_DATA"):WaitForChild("GameFinished")
+    local Loader = require(game:GetService("ReplicatedStorage").src.Loader)
+    local ItemInventoryService = Loader.load_client_service(script, "ItemInventoryServiceClient")
+
+    -- Auto Buff logic
+    for ID, Name in pairs(Identifier) do
+        local Start = false
+        for _, UUID in pairs(ItemInventoryService["session"]["collection"]["collection_profile_data"]["equipped_units"]) do
+            if ItemInventoryService["session"]["collection"]["collection_profile_data"]["owned_units"][UUID]["unit_id"] == Name then
+                Start = true
+                break
+            end
+        end
+        if Start then
+            task.spawn(function()
+                if getgenv().Library then
+                    getgenv().Library:Notify("Auto Buff [" .. ID .. "] Started", 5)
+                else
+                    print("Auto Buff [" .. ID .. "] Started")
+                end
+                repeat
+                    task.wait()
+                    if GameFinished.Value then break end
+                    local Container = {}
+
+                    for _, Unit in pairs(game:GetService("Workspace"):WaitForChild("_UNITS"):GetChildren()) do
+                        if GameFinished.Value then break end
+                        if Unit:WaitForChild("_stats"):WaitForChild("id").Value ~= Name then continue end
+                        if Unit:WaitForChild("_stats"):WaitForChild("active_attack").Value == "nil" then continue end
+                        if Unit:WaitForChild("_stats"):WaitForChild("player").Value == Player then
+                            table.insert(Container, Unit)
+                        end
+                    end
+
+                    if #Container == 4 then
+                        local Broken = false
+                        while not Broken do
+                            task.wait()
+                            for Idx = 1, 4 do
+                                if GameFinished.Value then Broken = true break end
+                                if #Container < 4 then Broken = true break end
+                                if Container[Idx].Parent ~= game:GetService("Workspace"):WaitForChild("_UNITS") then
+                                    Broken = true
+                                    break
+                                end
+                                pcall(function()
+                                    game:GetService("ReplicatedStorage")["endpoints"]["client_to_server"]["use_active_attack"]:InvokeServer(Container[Idx])
+                                end)
+                                task.wait(Delay)
+                            end
+                        end
+                    end
+                until GameFinished.Value
+                if getgenv().Library then
+                    getgenv().Library:Notify("Auto Buff [" .. ID .. "] Ended", 5)
+                else
+                    print("Auto Buff [" .. ID .. "] Ended")
+                end
+            end)
+        end
+    end
+end
+
 ----------------------------------------------------------------------
 
 local function XmasStarSummon()
@@ -462,7 +524,7 @@ local function StartDeleteEnemies()
 
     deleteLoop = runService.Heartbeat:Connect(function()
         for _, child in ipairs(unitsFolder:GetChildren()) do
-            if child:IsA("Model") and child.Name:sub(1, 9) == "christmas" then
+            if child:IsA("Model") then
                 child:Destroy()
             end
         end
@@ -479,19 +541,24 @@ end
 -------------------------------------------------------------------------
 
 do
+    Tabs.Optimize:AddParagraph({
+        Title = "OPTIMIZER",
+        Content = "ANTILAG"
+    })
+
     Tabs.Buffer:AddParagraph({
         Title = "AUTO BUFF",
         Content = "ERWIN,WENDA,LEAFY"
     })
 
+    Tabs.Cards:AddParagraph({
+        Title = "AUTO CARD PICKER",
+        Content = "JUANMEL BASCO PALAKITO"
+    })
+
     Tabs.Main:AddParagraph({
         Title = "AUTO JOIN",
         Content = "AUTO JOIN GAME"
-    })
-
-    Tabs.Optimize:AddParagraph({
-        Title = "OPTIMIZER",
-        Content = "ANTILAG"
     })
 
     Tabs.Summon:AddParagraph({
@@ -508,6 +575,12 @@ do
     local AutoBuff = Tabs.Buffer:AddToggle("AutoBuff", {
         Title = "Better Buffer",
         Default = AutoBuffState,
+    })
+
+    local AutoCardState = settings["AutoCard"] or false
+    local AutoCard = Tabs.Cards:AddToggle("AutoCard", {
+        Title = "Card Picker",
+        Default = AutoCardState,
     })
 
     local XmasFindMatchState = settings["XmasFindMatch"] or false
@@ -536,7 +609,7 @@ do
 
     local DeleteEnemyState = settings["DeleteEnemies"] or false
     local DeleteEnemiesToggle = Tabs.Optimize:AddToggle("DeleteEnemies", {
-        Title = "Delete Enemies",
+        Title = "Delete Entities",
         Default = DeleteEnemyState,
     })
 
@@ -553,6 +626,16 @@ do
     
         if AutoBuffState then
             autoBuff()
+        end
+    end)
+
+    AutoCard:OnChanged(function(isEnabled)
+        AutoCardState = isEnabled
+        settings["AutoCard"] = isEnabled
+        saveSettings(settings)
+    
+        if AutoCardState then
+            configureFocusWave()
         end
     end)
 
@@ -611,6 +694,18 @@ do
     
         if DeleteEnemyState then
             StartDeleteEnemies()
+            Window:Dialog({
+                Title = "ATTENTION!",
+                Content = "DO NOT USE DELETE ENTITIES WHEN RECORD MACRO",
+                Buttons = {
+                    {
+                        Title = "YES BOSS",
+                        Callback = function()
+                            print("Confirmed the dialog.")
+                        end
+                    }
+                }
+            })
         else
             StopDeleteEnemies()
         end
