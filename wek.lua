@@ -1,4 +1,4 @@
---v3.9
+--v4
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -310,11 +310,16 @@ local function updateText()
     local candies = stats:FindFirstChild("_resourceCandies") and stats._resourceCandies.Value or 0
     local stars = stats:FindFirstChild("_resourceHolidayStars") and stats._resourceHolidayStars.Value or 0
 
-    gemsLabel.Text = "GEMS: " .. tostring(gems)
-    goldLabel.Text = "GOLD: " .. tostring(gold)
-    candiesLabel.Text = "CANDIES: " .. tostring(candies)
-    starsLabel.Text = "HOLIDAY STARS: " .. tostring(stars)
+    gemsLabel.Text = tostring(gems)
+    goldLabel.Text = tostring(gold)
+    candiesLabel.Text = tostring(candies)
+    starsLabel.Text = tostring(stars)
 end
+
+stats:GetAttributeChangedSignal("gem_amount"):Connect(updateText)
+stats:GetAttributeChangedSignal("gold_amount"):Connect(updateText)
+stats:GetAttributeChangedSignal("_resourceCandies"):Connect(updateText)
+stats:GetAttributeChangedSignal("_resourceHolidayStars"):Connect(updateText)
 
 -------------------------------------------------------------------------
 
