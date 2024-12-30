@@ -1,4 +1,4 @@
---v3.8
+--v3.9
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -234,6 +234,115 @@ button.MouseButton1Click:Connect(function()
         shrinkTween:Play()
     end)
 end)
+-----------------------------------------------------------------------
+
+-------------------------------------------------------------------------
+
+-- Black screen GUI setup
+local player = game.Players.LocalPlayer
+
+-- Create ScreenGui in CoreGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "zBLACKSCREEN"
+screenGui.DisplayOrder = -1
+screenGui.IgnoreGuiInset = true  -- Ignore the Roblox top bar inset
+screenGui.Parent = game:GetService("CoreGui")  -- Parent to CoreGui for higher layering
+
+-- Create black frame
+local blackFrame = Instance.new("Frame")
+blackFrame.Size = UDim2.new(1, 0, 1, 0)  -- Full screen
+blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)  -- Black color
+blackFrame.Visible = false  -- Start hidden
+blackFrame.Parent = screenGui
+
+-- Vertical layout to arrange items
+local layout = Instance.new("UIListLayout")
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.VerticalAlignment = Enum.VerticalAlignment.Center
+layout.Padding = UDim.new(0, 10)  -- Space between rows
+layout.Parent = blackFrame
+
+-- Function to create a row with an image and a label
+local function createRow(imageId, text)
+    local row = Instance.new("Frame")
+    row.Size = UDim2.new(0.5, 0, 0, 50)
+    row.BackgroundTransparency = 1
+    row.Parent = blackFrame
+
+    local rowLayout = Instance.new("UIListLayout")
+    rowLayout.FillDirection = Enum.FillDirection.Horizontal
+    rowLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    rowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    rowLayout.Padding = UDim.new(0, 10)  -- Space between image and text
+    rowLayout.Parent = row
+
+    local image = Instance.new("ImageLabel")
+    image.Size = UDim2.new(0, 50, 0, 50)
+    image.BackgroundTransparency = 1
+    image.Image = "rbxassetid://" .. imageId
+    image.Parent = row
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 200, 0, 50)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.new(1, 1, 1)  -- White color
+    label.Font = Enum.Font.SourceSansBold
+    label.TextSize = 24
+    label.Text = text
+    label.Parent = row
+
+    return label
+end
+
+-- Create rows for stats
+local gemsLabel = createRow("73512171500034", "GEMS: 0")
+local goldLabel = createRow("10481692479", "GOLD: 0")
+local candiesLabel = createRow("11240176807", "CANDIES: 0")
+local starsLabel = createRow("11734233284", "HOLIDAY STARS: 0")
+
+-- Function to update text labels with current stats values
+local function updateText()
+    local stats = player:FindFirstChild("_stats")
+    if not stats then return end
+
+    local gems = stats:FindFirstChild("gem_amount") and stats.gem_amount.Value or 0
+    local gold = stats:FindFirstChild("gold_amount") and stats.gold_amount.Value or 0
+    local candies = stats:FindFirstChild("_resourceCandies") and stats._resourceCandies.Value or 0
+    local stars = stats:FindFirstChild("_resourceHolidayStars") and stats._resourceHolidayStars.Value or 0
+
+    gemsLabel.Text = "GEMS: " .. tostring(gems)
+    goldLabel.Text = "GOLD: " .. tostring(gold)
+    candiesLabel.Text = "CANDIES: " .. tostring(candies)
+    starsLabel.Text = "HOLIDAY STARS: " .. tostring(stars)
+end
+
+-------------------------------------------------------------------------
+
+-- BLACKSCREEN BUTTON
+local button = Instance.new("ImageButton")
+button.Position = UDim2.new(0.9, 0, 0.1, 0)
+button.Size = UDim2.new(0, 45, 0, 45)
+button.Image = "rbxassetid://83204245116453"
+button.BackgroundTransparency = 1
+button.ScaleType = Enum.ScaleType.Fit
+button.ZIndex = 10
+
+local parentPath = game:GetService("CoreGui"):FindFirstChild("TopBarApp")
+if parentPath then
+    local unibarLeftFrame = parentPath:FindFirstChild("UnibarLeftFrame")
+    if unibarLeftFrame then
+        local stackedElements = unibarLeftFrame:FindFirstChild("StackedElements")
+        if stackedElements then
+            button.Parent = stackedElements
+        else
+            warn("StackedElements not found in UnibarLeftFrame.")
+        end
+    else
+        warn("UnibarLeftFrame not found in TopBarApp.")
+    end
+else
+    warn("TopBarApp not found in CoreGui.")
+end
 
 -------------------------------------------------------------------------
 
@@ -514,21 +623,51 @@ end
 
 local runService = game:GetService("RunService")
 local deleteLoop
+local unitsFolderName = "_UNITS"
+
+local function hasChristmasModel(unitsFolder)
+    for _, child in ipairs(unitsFolder:GetChildren()) do
+        if child:IsA("Model") and child.Name:sub(1, 9) == "christmas" then
+            return true
+        end
+    end
+    return false
+end
+
+local function startLoopIfNeeded(unitsFolder)
+    if not deleteLoop and hasChristmasModel(unitsFolder) then
+        deleteLoop = runService.Heartbeat:Connect(function()
+            for _, child in ipairs(unitsFolder:GetChildren()) do
+                if child:IsA("Model") and child.Name:sub(1, 9) == "christmas" then
+                    child:Destroy()
+                end
+            end
+
+            -- Stop the loop if no more matching models exist
+            if not hasChristmasModel(unitsFolder) then
+                deleteLoop:Disconnect()
+                deleteLoop = nil
+            end
+        end)
+    end
+end
 
 local function StartDeleteEnemies()
-    local unitsFolder = workspace:FindFirstChild("_UNITS")
+    local unitsFolder = workspace:FindFirstChild(unitsFolderName)
     if not unitsFolder then
-        warn("_UNITS folder not found in workspace.")
+        warn(unitsFolderName .. " folder not found in workspace.")
         return
     end
 
-    deleteLoop = runService.Heartbeat:Connect(function()
-        for _, child in ipairs(unitsFolder:GetChildren()) do
-            if child:IsA("Model") and child.Name:sub(1, 9) == "christmas" then
-                child:Destroy()
-            end
+    -- Check for new children being added to `_UNITS`
+    unitsFolder.ChildAdded:Connect(function(child)
+        if child:IsA("Model") and child.Name:sub(1, 9) == "christmas" then
+            startLoopIfNeeded(unitsFolder)
         end
     end)
+
+    -- Initialize loop if models already exist
+    startLoopIfNeeded(unitsFolder)
 end
 
 local function StopDeleteEnemies()
@@ -571,6 +710,13 @@ do
         Content = "NIGGRO"
     })
 
+    local BlackScreenState = settings["BlackScreen"] or false
+    local ToggleBlackScreen = Tabs.Optimize:AddToggle("BlackScreen", {
+        Title = "Black Screen",
+        Default = BlackScreenState,
+    })
+
+
     local AutoReconnectState = settings["AutoReconnect"] or false
     local AutoReconnect = Tabs.Misc:AddToggle("AutoReconnect", {
         Title = "Auto Reconnect",
@@ -598,7 +744,7 @@ do
 	local AntiLagState = settings["Antilag"] or false
     local ToggleAntiLag = Tabs.Optimize:AddToggle("Antilag", {
         Title = "FPS Boost",
-        Default = AntiLagState
+        Default = AntiLagState,
     })
 
     local AutoBuffState = settings["AutoBuff"] or false
@@ -618,6 +764,42 @@ do
         Title = "Delete Entities",
         Default = DeleteEnemyState,
     })
+
+    ToggleBlackScreen:OnChanged(function(isEnabled)
+        BlackScreenState = isEnabled
+        settings["BlackScreen"] = isEnabled
+        saveSettings(settings)
+    
+        if BlackScreenState then
+            blackFrame.Visible = true
+            updateText()
+        else
+            blackFrame.Visible = false
+        end
+    end)
+
+    local isBlackScreenVisible = BlackScreenState -- Store the state to toggle
+    button.MouseButton1Click:Connect(function()
+        local originalSize = button.Size
+    
+        local tweenService = game:GetService("TweenService")
+        local popTweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local shrinkTweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+    
+        local popGoal = {Size = UDim2.new(0, 55, 0, 55)}
+        local popTween = tweenService:Create(button, popTweenInfo, popGoal)
+    
+        local shrinkGoal = {Size = originalSize}
+        local shrinkTween = tweenService:Create(button, shrinkTweenInfo, shrinkGoal)
+    
+        popTween:Play()
+        popTween.Completed:Connect(function()
+            shrinkTween:Play()
+        end)
+    
+        -- Toggle the BlackScreen state directly
+        ToggleBlackScreen:SetValue(not BlackScreenState)
+    end)
 
     XmasFindMatch:OnChanged(function(isEnabled)
         XmasFindMatchState = isEnabled
@@ -706,10 +888,10 @@ do
             StartDeleteEnemies()
             Window:Dialog({
                 Title = "ATTENTION!",
-                Content = "DO NOT USE DELETE ENTITIES WHEN RECORD MACRO",
+                Content = "DO NOT USE DELETE ENTITIES WHEN RECORDING MACRO",
                 Buttons = {
                     {
-                        Title = "YES BOSS",
+                        Title = "YES DADDY",
                         Callback = function()
                             print("Confirmed the dialog.")
                         end
