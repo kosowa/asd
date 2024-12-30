@@ -1,4 +1,4 @@
---v4.2
+--v4.3
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -179,6 +179,74 @@ end
 -- Load settings on startup
 local settings = loadSettings()
 -------------------------------------------------------------------------
+
+-- Parent to CoreGui TopBar
+local topBar = game:GetService("CoreGui"):WaitForChild("TopBarApp", 5)
+local unibarLeftFrame = topBar and topBar:FindFirstChild("UnibarLeftFrame", true)
+local stackedElements = unibarLeftFrame and unibarLeftFrame:FindFirstChild("StackedElements", true)
+
+if stackedElements then
+
+    local backgroundTransparency = 0.30
+
+    local background = Instance.new("Frame")
+    background.Size = UDim2.new(0, 100, 0, 45) -- Adjust size for FPS display
+    background.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
+    background.BackgroundTransparency = backgroundTransparency -- Apply transparency
+    background.Parent = stackedElements
+
+    -- Add corner rounding
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0) -- Adjust the radius for rounding
+    corner.Parent = background
+
+    -- Create FPS Label
+    local fpsLabel = Instance.new("TextLabel")
+    fpsLabel.Size = UDim2.new(1, 0, 1, 0) -- Full size of the background
+    fpsLabel.BackgroundTransparency = 1 -- Transparent background
+    fpsLabel.Font = Enum.Font.FredokaOne
+    fpsLabel.TextSize = 25
+    fpsLabel.Text = "FPS: 0"
+    fpsLabel.TextColor3 = Color3.new(1, 1, 1) -- White text for "FPS:"
+    fpsLabel.RichText = true -- Enable RichText for color changes
+    fpsLabel.TextStrokeTransparency = 0 -- Add outline
+    fpsLabel.TextStrokeColor3 = Color3.new(0, 0, 0) -- Black outline
+    fpsLabel.Parent = background
+
+    -- Variables for FPS calculation
+    local lastUpdate = tick()
+    local frameCount = 0
+
+    -- RenderStepped connection for FPS calculation
+    game:GetService("RunService").RenderStepped:Connect(function()
+        frameCount = frameCount + 1
+        local now = tick()
+        local deltaTime = now - lastUpdate
+
+        -- Update every 0.5 seconds
+        if deltaTime >= 0.5 then
+            local fps = math.floor(frameCount / deltaTime)
+            local fpsColor
+
+            -- Set color for FPS value
+            if fps >= 40 then
+                fpsColor = "rgb(0, 255, 0)"
+            elseif fps >= 30 then
+                fpsColor = "rgb(255, 165, 0)"
+            else
+                fpsColor = "rgb(255, 0, 0)"
+            end
+
+            -- Update the label with RichText
+            fpsLabel.Text = string.format('<font color="rgb(255,255,255)">FPS: </font><font color="%s">%d</font>', fpsColor, fps)
+
+            frameCount = 0
+            lastUpdate = now
+        end
+    end)
+else
+    warn("Could not find TopBarApp -> UnibarLeftFrame -> StackedElements")
+end
 
 ------------------------------------------------------------------
 
