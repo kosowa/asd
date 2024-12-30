@@ -1,4 +1,4 @@
---v3.7
+--v3.8
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -571,16 +571,10 @@ do
         Content = "NIGGRO"
     })
 
-    local AutoBuffState = settings["AutoBuff"] or false
-    local AutoBuff = Tabs.Buffer:AddToggle("AutoBuff", {
-        Title = "Better Buffer",
-        Default = AutoBuffState,
-    })
-
-    local AutoCardState = settings["AutoCard"] or false
-    local AutoCard = Tabs.Cards:AddToggle("AutoCard", {
-        Title = "Card Picker",
-        Default = AutoCardState,
+    local AutoReconnectState = settings["AutoReconnect"] or false
+    local AutoReconnect = Tabs.Misc:AddToggle("AutoReconnect", {
+        Title = "Auto Reconnect",
+        Default = AutoReconnectState,
     })
 
     local XmasFindMatchState = settings["XmasFindMatch"] or false
@@ -607,37 +601,23 @@ do
         Default = AntiLagState
     })
 
+    local AutoBuffState = settings["AutoBuff"] or false
+    local AutoBuff = Tabs.Buffer:AddToggle("AutoBuff", {
+        Title = "Better Buffer",
+        Default = AutoBuffState,
+    })
+
+    local AutoCardState = settings["AutoCard"] or false
+    local AutoCard = Tabs.Cards:AddToggle("AutoCard", {
+        Title = "Card Picker",
+        Default = AutoCardState,
+    })
+
     local DeleteEnemyState = settings["DeleteEnemies"] or false
     local DeleteEnemiesToggle = Tabs.Optimize:AddToggle("DeleteEnemies", {
         Title = "Delete Entities",
         Default = DeleteEnemyState,
     })
-
-    local AutoReconnectState = settings["AutoReconnect"] or false
-    local AutoReconnect = Tabs.Misc:AddToggle("AutoReconnect", {
-        Title = "Auto Reconnect",
-        Default = AutoReconnectState,
-    })
-
-    AutoBuff:OnChanged(function(isEnabled)
-        AutoBuffState = isEnabled
-        settings["AutoBuff"] = isEnabled
-        saveSettings(settings)
-    
-        if AutoBuffState then
-            autoBuff()
-        end
-    end)
-
-    AutoCard:OnChanged(function(isEnabled)
-        AutoCardState = isEnabled
-        settings["AutoCard"] = isEnabled
-        saveSettings(settings)
-    
-        if AutoCardState then
-            configureFocusWave()
-        end
-    end)
 
     XmasFindMatch:OnChanged(function(isEnabled)
         XmasFindMatchState = isEnabled
@@ -687,6 +667,36 @@ do
         end
     end)
 
+    AutoReconnect:OnChanged(function(isEnabled)
+        AutoReconnectState = isEnabled
+        settings["AutoReconnect"] = isEnabled
+        saveSettings(settings)
+    
+        if AutoReconnectState then
+            Reconnect()
+        end
+    end)
+
+    AutoBuff:OnChanged(function(isEnabled)
+        AutoBuffState = isEnabled
+        settings["AutoBuff"] = isEnabled
+        saveSettings(settings)
+    
+        if AutoBuffState then
+            autoBuff()
+        end
+    end)
+
+    AutoCard:OnChanged(function(isEnabled)
+        AutoCardState = isEnabled
+        settings["AutoCard"] = isEnabled
+        saveSettings(settings)
+    
+        if AutoCardState then
+            configureFocusWave()
+        end
+    end)
+
     DeleteEnemiesToggle:OnChanged(function(isEnabled)
         DeleteEnemyState = isEnabled
         settings["DeleteEnemies"] = isEnabled
@@ -708,16 +718,6 @@ do
             })
         else
             StopDeleteEnemies()
-        end
-    end)
-
-    AutoReconnect:OnChanged(function(isEnabled)
-        AutoReconnectState = isEnabled
-        settings["AutoReconnect"] = isEnabled
-        saveSettings(settings)
-    
-        if AutoReconnectState then
-            Reconnect()
         end
     end)
 end
