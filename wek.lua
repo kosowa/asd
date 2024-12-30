@@ -1,4 +1,4 @@
---v4
+--v4.1
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -310,16 +310,31 @@ local function updateText()
     local candies = stats:FindFirstChild("_resourceCandies") and stats._resourceCandies.Value or 0
     local stars = stats:FindFirstChild("_resourceHolidayStars") and stats._resourceHolidayStars.Value or 0
 
-    gemsLabel.Text = tostring(gems)
-    goldLabel.Text = tostring(gold)
-    candiesLabel.Text = tostring(candies)
-    starsLabel.Text = tostring(stars)
+    gemsLabel.Text = "GEMS: " .. tostring(gems)
+    goldLabel.Text = "GOLD: " .. tostring(gold)
+    candiesLabel.Text = "CANDIES: " .. tostring(candies)
+    starsLabel.Text = "HOLIDAY STARS: " .. tostring(stars)
 end
 
-stats:GetAttributeChangedSignal("gem_amount"):Connect(updateText)
-stats:GetAttributeChangedSignal("gold_amount"):Connect(updateText)
-stats:GetAttributeChangedSignal("_resourceCandies"):Connect(updateText)
-stats:GetAttributeChangedSignal("_resourceHolidayStars"):Connect(updateText)
+-- Connect value change signals to updateText function
+local stats = player:WaitForChild("_stats", 5)  -- Wait for the _stats folder to exist
+if stats then
+    local function connectValueChange(propertyName, label)
+        local property = stats:FindFirstChild(propertyName)
+        if property then
+            property.Changed:Connect(function()
+                updateText()
+            end)
+        end
+    end
+
+    connectValueChange("gem_amount", gemsLabel)
+    connectValueChange("gold_amount", goldLabel)
+    connectValueChange("_resourceCandies", candiesLabel)
+    connectValueChange("_resourceHolidayStars", starsLabel)
+
+end
+
 
 -------------------------------------------------------------------------
 
