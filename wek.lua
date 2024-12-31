@@ -1,4 +1,4 @@
---v4.4
+--v4.5
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -707,6 +707,7 @@ local function XmasStarSummon()
     game:GetService("ReplicatedStorage").endpoints.client_to_server.buy_from_banner:InvokeServer(unpack(args))
 end
 
+local VirtualInputManager = game:GetService("VirtualInputManager")
 local function clickSummonUnits()
     VirtualInputManager:SendMouseButtonEvent(500, 150, 0, true, game, 1)
     VirtualInputManager:SendMouseButtonEvent(500, 150, 0, false, game, 1)
