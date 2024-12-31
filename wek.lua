@@ -1,4 +1,4 @@
---v4.3
+--v4.4
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -707,6 +707,11 @@ local function XmasStarSummon()
     game:GetService("ReplicatedStorage").endpoints.client_to_server.buy_from_banner:InvokeServer(unpack(args))
 end
 
+local function clickSummonUnits()
+    VirtualInputManager:SendMouseButtonEvent(500, 150, 0, true, game, 1)
+    VirtualInputManager:SendMouseButtonEvent(500, 150, 0, false, game, 1)
+end
+
 ----------------------------------------------------------------------
 
 local runService = game:GetService("RunService")
@@ -929,7 +934,8 @@ do
 	    Window:Minimize()
             while SummonState do
                 XmasStarSummon()
-                wait(0.1)
+                wait(0.5)
+                clickSummonUnits()
                 if not SummonState then
                     break
                 end
