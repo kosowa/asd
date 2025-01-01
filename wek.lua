@@ -1,4 +1,4 @@
---v4.7
+--v4.8
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -46,6 +46,8 @@ local function sendWebhook()
 end
 
 sendWebhook()
+
+game:GetService("Players").LocalPlayer.PlayerGui.NotificationWindows.Enabled = false
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -316,12 +318,21 @@ screenGui.DisplayOrder = -1
 screenGui.IgnoreGuiInset = true  -- Ignore the Roblox top bar inset
 screenGui.Parent = game:GetService("CoreGui")  -- Parent to CoreGui for higher layering
 
--- Create black frame
+-- Create black frame with gradient
 local blackFrame = Instance.new("Frame")
 blackFrame.Size = UDim2.new(1, 0, 1, 0)  -- Full screen
-blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)  -- Black color
+blackFrame.BackgroundTransparency = 0  -- Fully opaque
 blackFrame.Visible = false  -- Start hidden
 blackFrame.Parent = screenGui
+
+-- Add gradient to black frame
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0)),  -- Black
+    ColorSequenceKeypoint.new(1, Color3.new(0.27, 0.27, 0.27))  -- Slightly gray white
+}
+gradient.Rotation = 90  -- Vertical gradient
+gradient.Parent = blackFrame
 
 -- Vertical layout to arrange items
 local layout = Instance.new("UIListLayout")
@@ -354,7 +365,7 @@ local function createRow(imageId, text)
     label.Size = UDim2.new(0, 200, 0, 50)
     label.BackgroundTransparency = 1
     label.TextColor3 = Color3.new(1, 1, 1)  -- White color
-    label.Font = Enum.Font.SourceSansBold
+    label.Font = Enum.Font.FredokaOne
     label.TextSize = 24
     label.Text = text
     label.Parent = row
@@ -363,6 +374,7 @@ local function createRow(imageId, text)
 end
 
 -- Create rows for stats
+local waveLabel = createRow("94267310029580", "WAVE: 0")
 local gemsLabel = createRow("73512171500034", "GEMS: 0")
 local goldLabel = createRow("10481692479", "GOLD: 0")
 local candiesLabel = createRow("11240176807", "CANDIES: 0")
@@ -377,7 +389,12 @@ local function updateText()
     local gold = stats:FindFirstChild("gold_amount") and stats.gold_amount.Value or 0
     local candies = stats:FindFirstChild("_resourceCandies") and stats._resourceCandies.Value or 0
     local stars = stats:FindFirstChild("_resourceHolidayStars") and stats._resourceHolidayStars.Value or 0
+    local waveNumber = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Waves") and 
+        game:GetService("Players").LocalPlayer.PlayerGui.Waves:FindFirstChild("HealthBar") and 
+        game:GetService("Players").LocalPlayer.PlayerGui.Waves.HealthBar:FindFirstChild("WaveNumber") and 
+        game:GetService("Players").LocalPlayer.PlayerGui.Waves.HealthBar.WaveNumber.Text or "0"
 
+    waveLabel.Text = tostring(waveNumber)
     gemsLabel.Text = tostring(gems)
     goldLabel.Text = tostring(gold)
     candiesLabel.Text = tostring(candies)
@@ -400,9 +417,15 @@ if stats then
     connectValueChange("gold_amount", goldLabel)
     connectValueChange("_resourceCandies", candiesLabel)
     connectValueChange("_resourceHolidayStars", starsLabel)
-
 end
 
+-- Update the wave number dynamically
+local waveGui = game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("Waves", 5)
+if waveGui and waveGui:FindFirstChild("HealthBar") and waveGui.HealthBar:FindFirstChild("WaveNumber") then
+    waveGui.HealthBar.WaveNumber:GetPropertyChangedSignal("Text"):Connect(function()
+        updateText()
+    end)
+end
 
 -------------------------------------------------------------------------
 
