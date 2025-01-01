@@ -1,4 +1,4 @@
---v4.6
+--v4.7
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -698,6 +698,39 @@ end
 
 ----------------------------------------------------------------------
 
+local player = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- Distance to move the camera
+local distance = 100000
+
+-- Function to enable freecam and move the camera
+local function enableFreeCam()
+    -- Get the player's character and root part
+    local character = player.Character or player.CharacterAdded:Wait()
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+
+    -- Set the camera to scriptable mode
+    camera.CameraType = Enum.CameraType.Scriptable
+
+    -- Move the camera 1000 studs away from the player's position
+    local newPosition = rootPart.Position + Vector3.new(0, 0, distance)
+    camera.CFrame = CFrame.new(newPosition, rootPart.Position) -- Make the camera look at the player
+end
+
+-- Function to disable freecam and return the camera to the player's default view
+local function disableFreeCam()
+    -- Get the player's character and root part
+    local character = player.Character or player.CharacterAdded:Wait()
+    local rootPart = character:WaitForChild("HumanoidRootPart")
+
+    -- Set the camera back to the default follow mode
+    camera.CameraType = Enum.CameraType.Custom
+    camera.CFrame = rootPart.CFrame
+end
+
+----------------------------------------------------------------------
+
 local function XmasStarSummon()
     local args = {
         [1] = "Christmas2024",
@@ -866,9 +899,11 @@ do
     
         if BlackScreenState then
             blackFrame.Visible = true
+            enableFreeCam()
             updateText()
         else
             blackFrame.Visible = false
+            disableFreeCam()
         end
     end)
 
