@@ -1,4 +1,4 @@
---v5.3
+--v5.4
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -823,26 +823,37 @@ local runService = game:GetService("RunService")
 local deleteLoop
 local unitsFolderName = "_UNITS"
 
-local function hasChristmasModel(unitsFolder)
+local function hasAnyBasePart(unitsFolder)
     for _, child in ipairs(unitsFolder:GetChildren()) do
-        if child:IsA("Model") and child.Name:sub(1, 9) == "christmas" then
+        if child:IsA("BasePart") or child:IsA("Model") then
             return true
         end
     end
     return false
 end
 
+local function setTransparency(item, transparency)
+    if item:IsA("BasePart") then
+        item.Transparency = transparency
+    elseif item:IsA("Model") then
+        -- Recursively set transparency for all BaseParts in the model
+        for _, descendant in ipairs(item:GetDescendants()) do
+            if descendant:IsA("BasePart") then
+                descendant.Transparency = transparency
+            end
+        end
+    end
+end
+
 local function startLoopIfNeeded(unitsFolder)
-    if not deleteLoop and hasChristmasModel(unitsFolder) then
+    if not deleteLoop and hasAnyBasePart(unitsFolder) then
         deleteLoop = runService.Heartbeat:Connect(function()
             for _, child in ipairs(unitsFolder:GetChildren()) do
-                if child:IsA("Model") and child.Name:sub(1, 9) == "christmas" then
-                    child:Destroy()
-                end
+                setTransparency(child, 1) -- Make everything transparent
             end
 
-            -- Stop the loop if no more matching models exist
-            if not hasChristmasModel(unitsFolder) then
+            -- Stop the loop if no more children exist
+            if not hasAnyBasePart(unitsFolder) then
                 deleteLoop:Disconnect()
                 deleteLoop = nil
             end
@@ -859,12 +870,10 @@ local function StartDeleteEnemies()
 
     -- Check for new children being added to `_UNITS`
     unitsFolder.ChildAdded:Connect(function(child)
-        if child:IsA("Model") and child.Name:sub(1, 9) == "christmas" then
-            startLoopIfNeeded(unitsFolder)
-        end
+        startLoopIfNeeded(unitsFolder)
     end)
 
-    -- Initialize loop if models already exist
+    -- Initialize loop if items already exist
     startLoopIfNeeded(unitsFolder)
 end
 
