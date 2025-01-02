@@ -1,4 +1,4 @@
---v5.1
+--v5.2
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -473,43 +473,34 @@ function configureFocusWave()
         "+ Gain 2 Random Effects Tier 3"
     }
     getgenv().Cards = { -- All cards after FocusWave wave ends
-        "+ Explosive Deaths I",
-        "+ Explosive Deaths II",
-        "+ Explosive Deaths III",
-        "+ Gain 2 Random Curses Tier 3",
-        "+ Gain 2 Random Curses Tier 2",
-        "+ Gain 2 Random Curses Tier 1",
-        "+ Enemy Speed III",
-        "+ Enemy Speed II",
-        "+ Enemy Regen III",
-        "+ Enemy Shield III",
-        "+ Enemy Health III",
-        "+ Enemy Regen II",
-        "+ Enemy Shield II",
-        "+ Enemy Regen I",
-        "+ Enemy Speed I",
-        "+ Enemy Shield I",
-        "+ Enemy Health II",
-        "+ Enemy Health I",
-        "+ Yen I",
-        "+ Yen II",
-        "+ Yen III",
-        "+ Boss Damage I",
-        "- Cooldown I",
-        "+ Gain 2 Random Effects Tier 1",
-        "+ Range I",
-        "+ Attack I",
-        "- Cooldown II",
-        "+ Boss Damage II",
-        "+ Boss Damage III",
-        "- Cooldown III",
-        "+ Gain 2 Random Effects Tier 2",
-        "+ Range II",
-        "+ Attack II",
-        "+ Gain 2 Random Effects Tier 3",
-        "+ Range III",
-        "+ Attack III",
-        "+ New Path"
+    "+ Gain 2 Random Curses Tier 3",
+    "+ Gain 2 Random Curses Tier 2",
+    "+ Gain 2 Random Curses Tier 1",
+    "+ Boss Damage I",
+    "+ Boss Damage II",
+    "+ Boss Damage III",
+    "+ Enemy Shield III",
+    "+ Enemy Shield II",
+    "+ Enemy Shield I",
+    "+ Range I",
+    "+ Cooldown I",
+    "+ Attack I",
+    "+ Gain 2 Random Effects Tier 1",
+    "+ Cooldown II",
+    "+ Attack II",
+    "+ Gain 2 Random Effects Tier 2",
+    "+ Cooldown III",
+    "+ Range II",
+    "+ Range III",
+    "+ Attack III",
+    "+ Gain 2 Random Effects Tier 3",
+    "+ Explosive Deaths I",
+    "+ Explosive Deaths II",
+    "+ Explosive Deaths III",
+    "+ Enemy Regen I",
+    "+ Enemy Regen II",
+    "+ Enemy Regen III",
+    "+ New Path"
     }
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Bocchi-World/Bocchi-Main/refs/heads/main/pickcard.lua"))()
 end
