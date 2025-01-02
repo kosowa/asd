@@ -1,4 +1,4 @@
---v5.2
+--v5.3
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -46,6 +46,11 @@ local function sendWebhook()
 end
 
 sendWebhook()
+
+settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+UserSettings():GetService("UserGameSettings").SavedQualityLevel = Enum.SavedQualitySetting.QualityLevel1
+settings().Rendering.EagerBulkExecution = false
+settings().Network.IncomingReplicationLag = -1000
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -580,53 +585,107 @@ local function ChristmasFindMatch()
 end
 
 --ANTILAG
-local function AntiLag()
-    for _, v in pairs(workspace:GetDescendants()) do
-        if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Decal") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Texture") then
-            v:Destroy()
-        end
+local function runAntilag()
+    print("runAntilag triggered!") -- Debug print
+    if not game:IsLoaded() then
+        game.Loaded:Wait()
+        wait(10)
     end
-    -- Apply settings to parts, meshes, decals, etc.
-    for i, v in pairs(game:GetDescendants()) do
-        if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
-            v.Material = "Plastic"
-            v.Reflectance = 0
-        elseif v:IsA("Decal") then
-            v.Transparency = 1
-        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
-            v.Lifetime = NumberRange.new(0)
-        elseif v:IsA("Explosion") then
-            v.BlastPressure = 1
-            v.BlastRadius = 1
+
+    local function check(inst)
+        local class = inst.ClassName
+        if class == "Decal" or class == "Texture" then 
+            inst.Texture = ""
+        elseif class == "SpecialMesh" then 
+            inst.TextureId = ""
+        elseif class == "ParticleEmitter" then
+            inst.Texture = ""
+            inst.Rate = 0
+        elseif inst:IsA("BasePart") then 
+            inst.Material = Enum.Material.SmoothPlastic
+            inst.Reflectance = 0
+            inst.CastShadow = false
+            if class == "MeshPart" then 
+                inst.TextureID = ""
+                inst.CollisionFidelity = Enum.CollisionFidelity.Hull
+            elseif class == "UnionOperation" then
+                inst.CollisionFidelity = Enum.CollisionFidelity.Hull
+            end
+            if inst.Anchored and inst.Size.Magnitude < 5 then
+                inst.Transparency = 1
+                inst.CanCollide = false
+            end
         end
     end
 
-    -- Remove new objects like forcefields, sparkles, etc.
-    workspace.DescendantAdded:Connect(function(child)
-        task.spawn(function()
-            if child:IsA('ForceField') then
-                child:Destroy()
-            elseif child:IsA('Sparkles') then
-                child:Destroy()
-            elseif child:IsA('Smoke') or child:IsA('Fire') then
-                child:Destroy()
+    local function removeDups(children)
+        if #children > 99 then
+            local myname = tostring(game:GetService("Players").LocalPlayer)
+            local fake = {Name = myname}
+            for i = 1, #children do
+                local name1 = children[i].Name
+                if name1 ~= myname and name1 ~= "Terrain" then
+                    local moved = false
+                    for j = i + 1, #children do
+                        if children[j].Name == name1 then
+                            moved = true
+                            children[j].Parent = workspace.Terrain
+                            children[j] = fake
+                        end
+                    end
+                    if moved then 
+                        children[i].Parent = workspace.Terrain
+                    end
+                end
             end
-        end)
-    end)
-    local Lighting = game:GetService("Lighting") -- Ensure Lighting is properly referenced
-    local Terrain = workspace:FindFirstChildOfClass('Terrain')
-    
-    -- Terrain settings
-    Terrain.WaterWaveSize = 0
-    Terrain.WaterWaveSpeed = 0
-    Terrain.WaterReflectance = 0
-    Terrain.WaterTransparency = 0
-    
-    -- Lighting settings
-    Lighting.GlobalShadows = false
-    Lighting.FogEnd = 9e9
-	Lighting.Brightness = 1
-    print("ANTILAG ON")
+        end
+    end
+
+    workspace:WaitForChild("Terrain")
+    workspace.Terrain.WaterReflectance = 0
+    workspace.Terrain.WaterWaveSize = 0
+    workspace.Terrain.WaterWaveSpeed = 0
+    workspace.Terrain.WaterTransparency = 0
+
+    game:GetService("Lighting").GlobalShadows = false
+
+    workspace.Terrain:Clear()
+    local plates = {}
+
+    if not workspace:FindFirstChild("Baseplate") then
+        for x = -1, 1, 2 do
+            for z = -1, 1, 2 do
+                local part = Instance.new("Part")
+                part.Size = Vector3.new(2048, 5, 2048)
+                part.CFrame = CFrame.new(1024 * x, -5, 1024 * z)
+                part.Anchored = true
+                part.Material = Enum.Material.SmoothPlastic
+                part.Color = Color3.new(0.36, 0.6, 0.3)
+                part.Name = "Baseplate"
+                part.Parent = workspace
+                plates[#plates + 1] = part
+            end
+        end
+    end
+
+    wait(0.3)
+
+    while true do
+        for _, v in ipairs(game:GetService("Lighting"):GetDescendants()) do
+            if v:IsA("PostEffect") then
+                v.Enabled = false
+            end
+        end
+
+        local des = workspace:GetDescendants()
+        for i = 1, #des do
+            check(des[i])
+        end
+
+        wait(0.3)
+        removeDups(workspace:GetChildren())
+        wait(600)
+    end
 end
 
 local function autoBuff()
@@ -953,6 +1012,19 @@ do
         end
     end)
 
+    ToggleAntiLag:OnChanged(function(isEnabled)
+        AntiLagState = isEnabled
+        settings["Antilag"] = isEnabled
+        saveSettings(settings)
+
+        if AntiLagState then
+            print("Starting AntiLag...")
+            task.spawn(runAntilag)
+        else
+            print("AntiLag disabled.")
+        end
+    end)
+
     Safezone:OnChanged(function(isEnabled)
         SafezoneState = isEnabled
         settings["Safezone"] = isEnabled
@@ -960,16 +1032,6 @@ do
     
         if SafezoneState then
             safezone()
-        end
-    end)
-
-	ToggleAntiLag:OnChanged(function(isEnabled)
-        AntiLagState = isEnabled
-        settings["Antilag"] = isEnabled
-        saveSettings(settings)
-
-        if AntiLagState then
-            AntiLag()
         end
     end)
 
