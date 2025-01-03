@@ -1,4 +1,4 @@
---v5.5
+--v5.6
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -131,10 +131,10 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME ADVENTURES | BY ATHAN NIGRO",
+    Title = "ANIME ADVENTURES | MERCENARIES",
     SubTitle = "",
     TabWidth = 160,
-    Size = UDim2.fromOffset(500, 300),
+    Size = UDim2.fromOffset(600, 400),
     Acrylic = false,
     Theme = "Darker",
     MinimizeKey = Enum.KeyCode.LeftControl,
@@ -183,6 +183,186 @@ end
 
 -- Load settings on startup
 local settings = loadSettings()
+
+---------------------------------------------------------------------------
+
+local screenGui = game:GetService("CoreGui"):FindFirstChild("ScreenGui")
+if screenGui then
+    screenGui.IgnoreGuiInset = true
+    print("IgnoreGuiInset set to true for ScreenGui.")
+else
+    warn("ScreenGui not found in CoreGui.")
+end
+
+
+local function makeButtonsInvisible(parent)
+    for _, child in ipairs(parent:GetChildren()) do
+        if child:IsA("TextButton") then
+            child.Visible = false
+        elseif child:IsA("Frame") then
+            makeButtonsInvisible(child) -- Recursively check nested frames
+        end
+    end
+end
+
+local screenGui = game:GetService("CoreGui"):FindFirstChild("ScreenGui")
+if screenGui then
+    makeButtonsInvisible(screenGui)
+else
+    warn("ScreenGui not found in CoreGui.")
+end
+
+local function setFontToFredokaOne(parent)
+    for _, child in ipairs(parent:GetChildren()) do
+        if child:IsA("TextLabel") or child:IsA("TextButton") then
+            child.Font = Enum.Font.FredokaOne
+        elseif child:IsA("Frame") or child:IsA("ScrollingFrame") then
+            -- Recursively check nested frames or scrolling frames
+            setFontToFredokaOne(child)
+        end
+    end
+end
+
+local screenGui = game:GetService("CoreGui"):FindFirstChild("ScreenGui")
+if screenGui then
+    setFontToFredokaOne(screenGui)
+else
+    warn("ScreenGui not found in CoreGui.")
+end
+--------------------------------------------------------
+--TEXT GRADIENT
+local RunService = game:GetService("RunService")
+
+-- Define rainbow colors
+local colors = {
+    Color3.new(1, 0, 0),   -- Red
+    Color3.new(1, 0.5, 0), -- Orange
+    Color3.new(1, 1, 0),   -- Yellow
+    Color3.new(0, 1, 0),   -- Green
+    Color3.new(0, 1, 1),   -- Cyan
+    Color3.new(0, 0, 1),   -- Blue
+    Color3.new(0.5, 0, 1), -- Purple
+}
+
+local totalSteps = 300 -- Increased steps for slower transition
+local animationSpeed = 0.05 -- Slower update speed
+local step = 0
+
+-- Function to interpolate colors
+local function interpolateColors(colors, step, totalSteps)
+    local totalColors = #colors
+    local progress = step / totalSteps
+    local keypoints = {}
+
+    for i = 1, totalColors do
+        local currentIndex = ((progress + (i - 1) / totalColors) % 1) * totalColors
+        local lowerIndex = math.floor(currentIndex) + 1
+        local upperIndex = (lowerIndex % totalColors) + 1
+
+        local lerpFactor = currentIndex % 1
+        local startColor = colors[lowerIndex]
+        local endColor = colors[upperIndex]
+        local interpolatedColor = startColor:Lerp(endColor, lerpFactor)
+
+        table.insert(keypoints, ColorSequenceKeypoint.new((i - 1) / (totalColors - 1), interpolatedColor))
+    end
+
+    return ColorSequence.new(keypoints)
+end
+
+-- Function to apply UIGradient and update font
+local function applyRainbowEffect(parent)
+    for _, child in ipairs(parent:GetChildren()) do
+        if child:IsA("TextLabel") or child:IsA("TextButton") then
+            -- Update the font to FredokaOne
+            child.Font = Enum.Font.FredokaOne
+
+            -- Create and apply UIGradient
+            local gradient = Instance.new("UIGradient")
+            gradient.Parent = child
+            gradient.Name = "RainbowGradient"
+
+            -- Animate the gradient
+            RunService.RenderStepped:Connect(function()
+                step = (step + animationSpeed) % totalSteps
+                gradient.Color = interpolateColors(colors, step, totalSteps)
+            end)
+        elseif child:IsA("Frame") or child:IsA("ScrollingFrame") then
+            -- Recursively apply to nested frames
+            applyRainbowEffect(child)
+        end
+    end
+end
+
+-- Locate the ScreenGui and apply the effect
+local screenGui = game:GetService("CoreGui"):FindFirstChild("ScreenGui")
+if screenGui then
+    applyRainbowEffect(screenGui)
+    print("Rainbow gradient effect applied to all text under ScreenGui.")
+else
+    warn("ScreenGui not found in CoreGui.")
+end
+---------------------------------------------------
+-- UI STROKE
+-- Define rainbow colors
+local colors = {
+    Color3.new(1, 0, 0),   -- Red
+    Color3.new(1, 0.5, 0), -- Orange
+    Color3.new(1, 1, 0),   -- Yellow
+    Color3.new(0, 1, 0),   -- Green
+    Color3.new(0, 1, 1),   -- Cyan
+    Color3.new(0, 0, 1),   -- Blue
+    Color3.new(0.5, 0, 1), -- Purple
+}
+
+local totalSteps = 300 -- Slower transition for rainbow gradient
+local animationSpeed = 1 -- Speed of animation
+local step = 0
+
+-- Function to interpolate between two colors
+local function interpolateColors(colors, step, totalSteps)
+    local progress = step / totalSteps
+    local index = math.floor(progress * #colors) + 1
+    local nextIndex = (index % #colors) + 1
+    local lerpFactor = (progress * #colors) % 1
+
+    local startColor = colors[index]
+    local endColor = colors[nextIndex]
+    return startColor:Lerp(endColor, lerpFactor)
+end
+
+-- Locate the nested Frame
+local screenGui = game:GetService("CoreGui"):FindFirstChild("ScreenGui")
+if screenGui then
+    local parentFrame = screenGui:GetChildren()[2] -- Get the second child
+    if parentFrame and parentFrame:IsA("Frame") then
+        local targetFrame = parentFrame:FindFirstChild("Frame") -- Find the nested Frame
+        if targetFrame and targetFrame:IsA("Frame") then
+            -- Create UIStroke for the outline
+            local stroke = Instance.new("UIStroke")
+            stroke.Parent = targetFrame
+            stroke.Thickness = 3 -- Outline thickness
+            stroke.Name = "RainbowOutline"
+
+            -- Animate the stroke color
+            RunService.RenderStepped:Connect(function()
+                step = (step + animationSpeed) % totalSteps
+                stroke.Color = interpolateColors(colors, step, totalSteps)
+            end)
+
+            print("Rainbow gradient outline added to the nested Frame.")
+        else
+            warn("Nested Frame not found or is not a Frame.")
+        end
+    else
+        warn("Parent Frame not found or is not a Frame.")
+    end
+else
+    warn("ScreenGui not found in CoreGui.")
+end
+
+
+
 -------------------------------------------------------------------------
 
 -- Parent to CoreGui TopBar
