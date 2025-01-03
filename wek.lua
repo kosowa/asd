@@ -1,4 +1,4 @@
---v5.4
+--v5.5
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -917,6 +917,12 @@ do
         Content = "NIGGRO"
     })
 
+    local disable3dState = settings["disable3d"] or false
+    local Toggledisable3d = Tabs.Optimize:AddToggle("disable3d", {
+        Title = "Disable 3d When blackscreen",
+        Default = disable3dState,
+    })
+
     local BlackScreenState = settings["BlackScreen"] or false
     local ToggleBlackScreen = Tabs.Optimize:AddToggle("BlackScreen", {
         Title = "Black Screen",
@@ -972,16 +978,41 @@ do
         Default = DeleteEnemyState,
     })
 
+    Toggledisable3d:OnChanged(function(isEnabled)
+        disable3dState = isEnabled
+        settings["disable3d"] = isEnabled
+        saveSettings(settings)
+
+        if disable3dState then
+            Window:Dialog({
+                Title = "ATTENTION!",
+                Content = "TURN THIS OFF IF YOU'RE CRASHING",
+                Buttons = {
+                    {
+                        Title = "YES DADDY",
+                        Callback = function()
+                            print("Confirmed the dialog.")
+                        end
+                    }
+                }
+            })
+        end
+    end)
+
     ToggleBlackScreen:OnChanged(function(isEnabled)
         BlackScreenState = isEnabled
         settings["BlackScreen"] = isEnabled
         saveSettings(settings)
     
         if BlackScreenState then
+            if disable3dState == true then
+                game:GetService("RunService"):Set3dRenderingEnabled(false)
+            end
             blackFrame.Visible = true
             enableFreeCam()
             updateText()
         else
+            game:GetService("RunService"):Set3dRenderingEnabled(true)
             blackFrame.Visible = false
             disableFreeCam()
         end
