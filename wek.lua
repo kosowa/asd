@@ -1,4 +1,4 @@
---v5.6
+--v5.7
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -134,7 +134,7 @@ local Window = Fluent:CreateWindow({
     Title = "ANIME ADVENTURES | MERCENARIES",
     SubTitle = "",
     TabWidth = 160,
-    Size = UDim2.fromOffset(600, 400),
+    Size = UDim2.fromOffset(600, 350),
     Acrylic = false,
     Theme = "Darker",
     MinimizeKey = Enum.KeyCode.LeftControl,
