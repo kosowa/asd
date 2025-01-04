@@ -1,4 +1,4 @@
--- V7.9.0
+-- V7.9.1
 local VirtualUser = game:GetService("VirtualUser")
 
 game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -65,7 +65,7 @@ local function sendWebhook()
     -- Data to be sent in the webhook embed (JSON format)
     local data = {
         ["embeds"] = {{
-            ["title"] = "Script Execution",
+            ["title"] = "Script Execution | AR",
             ["description"] = "Script executed by: **" .. playerName .. "**\nExecution count: **" .. executionCount .. "**",
             ["color"] = 10181046, -- Purple color in decimal format (hex: #9932CC)
             ["thumbnail"] = {
