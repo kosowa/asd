@@ -1,4 +1,4 @@
---v6.1
+--v6.2
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -1195,7 +1195,7 @@ local function freezeAllAnimations()
             stopAnimations(descendant)
         end
         -- Yield to avoid excessive performance impact
-        task.wait() -- Adjust interval as needed
+        task.wait(0.5) -- Adjust interval as needed
     end
 end
 
