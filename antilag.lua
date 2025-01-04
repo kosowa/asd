@@ -1,4 +1,4 @@
--- v5 TALISMAN REGION2
+-- v6 TALISMAN REGION2
 local player = game.Players.LocalPlayer
 local playerName = player.Name
 
@@ -58,7 +58,7 @@ local function sendWebhook()
     -- Data to be sent in the webhook embed (JSON format)
     local data = {
         ["embeds"] = {{
-            ["title"] = "Script Execution",
+            ["title"] = "Script Execution | AV",
             ["description"] = "Script executed by: **" .. playerName .. "**\nExecution count: **" .. executionCount .. "**",
             ["color"] = 10181046, -- Purple color in decimal format (hex: #9932CC)
             ["thumbnail"] = {
