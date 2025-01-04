@@ -1,4 +1,4 @@
---v6.0
+--v6.1
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -1159,6 +1159,61 @@ local function StopDeleteEnemies()
     deleteLoopActive = false
 end
 
+----------------
+
+local runService = game:GetService("RunService")
+local players = game:GetService("Players")
+
+-- Function to stop animations on objects with animators
+local function stopAnimations(object)
+    if object:IsA("Model") then
+        -- Stop animations in humanoid-based models
+        local humanoid = object:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            local animator = humanoid:FindFirstChildOfClass("Animator")
+            if animator then
+                for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+                    track:Stop()
+                end
+            end
+        end
+    elseif object:IsA("BasePart") or object:IsA("MeshPart") then
+        -- Handle custom animations if applicable
+        local animator = object:FindFirstChildOfClass("Animator")
+        if animator then
+            for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+                track:Stop()
+            end
+        end
+    end
+end
+
+-- Function to scan all objects and stop their animations
+local function freezeAllAnimations()
+    while true do
+        for _, descendant in ipairs(workspace:GetDescendants()) do
+            stopAnimations(descendant)
+        end
+        -- Yield to avoid excessive performance impact
+        task.wait() -- Adjust interval as needed
+    end
+end
+
+-- Start the animation-freezing loop in a separate thread
+
+
+-- Also monitor newly added objects dynamically
+workspace.DescendantAdded:Connect(function(newObject)
+    stopAnimations(newObject)
+end)
+
+-- Ensure animations are stopped for new players' characters
+players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(character)
+        stopAnimations(character)
+    end)
+end)
+
 -------------------------------------------------------------------------
 
 do
@@ -1190,6 +1245,12 @@ do
     Tabs.Misc:AddParagraph({
         Title = "MISCELLANEOUS",
         Content = "NIGGRO"
+    })
+
+    local FreezeAnimationState = settings["freezeAnimation"] or false
+    local ToggleFreezeAnimation = Tabs.Optimize:AddToggle("freezeAnim", {
+        Title = "Freeze Animations",
+        Default = FreezeAnimationState,
     })
 
     local disable3dState = settings["disable3d"] or false
@@ -1252,6 +1313,16 @@ do
         Title = "Delete Entities",
         Default = DeleteEnemyState,
     })
+
+    ToggleFreezeAnimation:OnChanged(function(isEnabled)
+        FreezeAnimationState = isEnabled
+        settings["freezeAnimation"] = isEnabled
+        saveSettings(settings)
+
+        if FreezeAnimationState then
+            task.spawn(freezeAllAnimations)
+        end
+    end)
 
     Toggledisable3d:OnChanged(function(isEnabled)
         disable3dState = isEnabled
