@@ -1,4 +1,4 @@
---v5.7
+--v5.8
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -46,6 +46,108 @@ local function sendWebhook()
 end
 
 sendWebhook()
+
+--GUILD RANK WEBHOOK
+
+-- Webhook URL (without message ID)
+local webhookURL = "https://discord.com/api/webhooks/1325046141129199687/-q9mzEQwSji3KERcaTLBBnim5SyCOOBcRu4jgTP0GULByr5abvNd4Gr_twp-y6aFqaaU"
+-- Message ID of the message to edit
+local messageID = "1325047047958695997"
+
+-- JSON Encoding Helper Function
+local function jsonEncode(data)
+    return game:GetService("HttpService"):JSONEncode(data)
+end
+
+-- Function to format time for Discord (ISO8601 format)
+local function getDiscordTimestamp()
+    return os.date("!%Y-%m-%dT%H:%M:%SZ") -- UTC format
+end
+
+-- Local Player
+local player = game.Players.LocalPlayer
+local playerName = player and player.Name or "Unknown Player"
+
+-- Function to edit webhook message
+local function editWebhookMessage(rankText)
+    -- Get the current time for the latest update
+    local discordTimestamp = getDiscordTimestamp()
+
+    -- Prepare the data payload
+    local data = {
+        ["content"] = nil,
+        ["embeds"] = { {
+            ["title"] = "MERCENARIES RANK UPDATES",
+            ["description"] = "Latest Update: <t:" .. math.floor(os.time()) .. ":R>",
+            ["color"] = 16711680,
+            ["fields"] = { {
+                ["name"] = "GUILD RANK",
+                ["value"] = "" .. rankText .. ""
+            }},
+            ["image"] = {
+                ["url"] = "https://media.discordapp.net/attachments/1178003403432013954/1178003720227794944/image.png?ex=677a0535&is=6778b3b5&hm=438b04dec7e6b8dd93f164a344141b0afd7308df4a29b29f9b18d4d985d07659&=&format=webp&quality=lossless&width=494&height=213"
+            },
+            ["thumbnail"] = {
+                ["url"] = "https://media.discordapp.net/attachments/942805757936672821/1307254555796307998/xmaslogo.png?ex=677a3cad&is=6778eb2d&hm=b58b687a627a8f9adbbdd70868bf59af042d50d30492b5b077c6b065537c0017&=&format=webp&quality=lossless&width=609&height=609"
+            }
+        }},
+        ["attachments"] = {}
+    }
+
+    local jsonData = jsonEncode(data)
+
+    -- Append message ID to the webhook URL
+    local editURL = webhookURL .. "/messages/" .. messageID
+
+    -- Perform the request to edit the message
+    local response = request({
+        Url = editURL,
+        Method = "PATCH",
+        Headers = {
+            ["Content-Type"] = "application/json"
+        },
+        Body = jsonData
+    })
+
+    if response.StatusCode ~= 200 then
+        warn("Failed to edit webhook message. Status code: " .. response.StatusCode .. "\nResponse: " .. response.Body)
+    else
+        print("Webhook message edited successfully!")
+    end
+end
+
+-- Main Logic
+local function checkGuildRank()
+    -- Attempt to find the relevant objects
+    local success, result = pcall(function()
+        return player.Character:WaitForChild("Head"):WaitForChild("_overhead")
+            .Frame.Guild_Frame.GuildIconFrame.Frame
+    end)
+
+    if success then
+        local guildNameText = result:FindFirstChild("Name_Text")
+        local rankNameText = result:FindFirstChild("_rank") and result._rank:FindFirstChild("Name_Text")
+
+        if guildNameText and rankNameText and guildNameText.Text == "mercenariess" then
+            -- Edit the existing webhook message with the updated rank text
+            editWebhookMessage(rankNameText.Text)
+        else
+            warn("Guild Name does not match 'mercenariess' or objects are missing.")
+        end
+    else
+        warn("Failed to find target objects.")
+    end
+end
+
+-- Loop to check rank every 30 seconds
+task.spawn(function()
+    while true do
+        checkGuildRank()
+        task.wait(30) -- Wait for 30 seconds before the next check
+    end
+end)
+
+----------------------------------------------------------------
 
 settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
 UserSettings():GetService("UserGameSettings").SavedQualityLevel = Enum.SavedQualitySetting.QualityLevel1
