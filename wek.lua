@@ -1,4 +1,4 @@
---v5.8
+--v5.9
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -143,7 +143,7 @@ end
 task.spawn(function()
     while true do
         checkGuildRank()
-        task.wait(30) -- Wait for 30 seconds before the next check
+        task.wait(5) -- Wait for 30 seconds before the next check
     end
 end)
 
