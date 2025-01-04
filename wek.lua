@@ -1,4 +1,4 @@
---v6.3
+--v6.4
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -1131,7 +1131,7 @@ local function startLoopIfNeeded(unitsFolder)
                     deleteLoopActive = false
                 end
 
-                task.wait() -- Yield to avoid blocking
+                task.wait(1) -- Yield to avoid blocking
             end
         end)
     end
