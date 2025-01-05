@@ -1,4 +1,4 @@
---v6.4
+--v6.5
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -46,6 +46,15 @@ local function sendWebhook()
 end
 
 sendWebhook()
+
+local player = game:GetService("Players").LocalPlayer
+local holder = player.PlayerGui:WaitForChild("ResultsUI"):WaitForChild("Holder")
+
+local function hideHolder()
+    holder.Visible = false
+end
+
+hideHolder()
 
 --GUILD RANK WEBHOOK
 
@@ -248,6 +257,7 @@ local Tabs = {
     Cards = Window:AddTab({ Title = "|  Cards", Icon = "book" }),
     Main = Window:AddTab({ Title = "|  Event", Icon = "play" }),
     Summon = Window:AddTab({ Title = "|  Summon", Icon = "coins" }),
+    Webhook = Window:AddTab({ Title = "|  Webhook", Icon = "globe" }),
     Misc = Window:AddTab({ Title = "|  Misc", Icon = "square" }),
     Settings = Window:AddTab({ Title = "|  Settings", Icon = "settings" })
 }
@@ -1214,6 +1224,8 @@ players.PlayerAdded:Connect(function(player)
     end)
 end)
 
+-----------------WEBHOOK----------------------
+
 -------------------------------------------------------------------------
 
 do
@@ -1242,10 +1254,147 @@ do
         Content = "NIGGRO"
     })
 
+    Tabs.Webhook:AddParagraph({
+        Title = "WEBHOOK",
+        Content = "GET NOTIFIED"
+    })
+
     Tabs.Misc:AddParagraph({
         Title = "MISCELLANEOUS",
         Content = "NIGGRO"
     })
+
+    -- Webhook
+    local webhookInputState = settings["Webhook"] or ""
+    local Input = Tabs.Webhook:AddInput("Input", {
+        Title = "Webhook",
+        Default = webhookInputState,
+        Placeholder = "Enter Webhook Url",
+        Numeric = false,
+        Finished = false,
+        Callback = function(Value)
+            webhookInputState = Value
+            settings["Webhook"] = Value
+            saveSettings(settings)
+            print("Webhook updated to:", webhookInputState)
+        end
+    })
+
+    local HttpService = game:GetService("HttpService")
+    local Players = game:GetService("Players")
+    
+    -- Function to send a webhook request
+    local function sendWebhook(jsonData)
+        if webhookInputState == "" then
+            warn("No webhook URL provided.")
+            return
+        end
+
+        local response = request({
+            Url = webhookInputState,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = jsonData
+        })
+
+        if response.Success then
+            print("Webhook sent successfully.")
+        else
+            warn("Failed to send webhook: " .. tostring(response.StatusMessage))
+        end
+    end
+
+    -- Main function to check and send results
+    local function sendResults()
+        local player = Players.LocalPlayer
+        local playerGui = player.PlayerGui
+        local resultsHolder = playerGui.ResultsUI.Holder
+
+        -- Check if the result GUI is visible
+        if resultsHolder.Visible then
+            -- Gather data
+            local username = player.Name
+            local levelInfo = playerGui.spawn_units.Lives.Main.Desc.Level.Text
+            local gems = player._stats.gem_amount.Value
+            local gold = player._stats.gold_amount.Value
+            local candies = player._stats._resourceCandies.Value
+            local holidayStars = player._stats._resourceHolidayStars.Value
+            local levelName = resultsHolder.LevelName.Text
+            local resultTitle = resultsHolder.Title.Text
+            local totalTime = resultsHolder.Middle.Timer.Text
+            local wavesBeaten = resultsHolder.Middle.WavesCompleted.Text
+            local starsReward = resultsHolder.LevelRewards.ScrollingFrame.ResourceReward.Main.Amount.Text
+            local xpReward = resultsHolder.LevelRewards.ScrollingFrame.XPReward.Main.Amount.Text
+            local totalDamage = player._stats.damage_dealt.Value
+
+            -- Set embed color based on result
+            local embedColor
+            if resultTitle == "VICTORY" then
+                embedColor = 65280 -- Bright green
+            elseif resultTitle == "DEFEAT" then
+                embedColor = 16711680 -- Bright red
+            else
+                embedColor = 11602185 -- Default color
+            end
+
+            -- Prepare the JSON payload
+            local payload = {
+                content = nil,
+                embeds = {
+                    {
+                        title = "ANIME ADVENTURES | MCNRS",
+                        description = string.format("**Username : **||%s||\n**Level : **%s", username, levelInfo),
+                        color = embedColor,
+                        fields = {
+                            {
+                                name = "> **Player Stats**",
+                                value = string.format("<:gems1:1321382598479708240> Gems : `%d`\n<:gold2:1321382789987176478> Gold : `%d`\n<:candies:1322162986093121639> Candy : `%d`\n<:holidaystars:1322162293978562642> Stars : `%d`", gems, gold, candies, holidayStars)
+                            },
+                            {
+                                name = "> **Results**",
+                                value = string.format("%s - %s\n %s ( %s)\nDamage: %d", levelName, resultTitle, wavesBeaten, totalTime, totalDamage)
+                            },
+                            {
+                                name = "> **Rewards**",
+                                value = string.format("%s Holiday Stars\n %s", starsReward, xpReward)
+                            }
+                        },
+                        footer = {
+                            text = "MCNRS ON TOP"
+                        },
+                        thumbnail = {
+                            url = "https://cdn.discordapp.com/attachments/942805757936672821/1307254555796307998/xmaslogo.png?ex=677ae56d&is=677993ed&hm=64e3fdafd9aaf3b0e98a0625aaa850b5bc2d689d9ccf9557dbe94a17ec4f12fc&"
+                        }
+                    }
+                },
+                attachments = {}
+            }
+
+            -- Convert payload to JSON
+            local jsonData = HttpService:JSONEncode(payload)
+
+            -- Send the webhook
+            sendWebhook(jsonData)
+        end
+    end
+
+    -- Automatically detect when resultsHolder becomes visible
+    local function monitorResults()
+        local player = Players.LocalPlayer
+        local playerGui = player.PlayerGui
+        local resultsHolder = playerGui.ResultsUI.Holder
+
+        -- Listen for changes to the `Visible` property
+        resultsHolder:GetPropertyChangedSignal("Visible"):Connect(function()
+            if resultsHolder.Visible then
+                sendResults()
+            end
+        end)
+    end
+    
+    task.spawn(monitorResults)
 
     local FreezeAnimationState = settings["freezeAnimation"] or false
     local ToggleFreezeAnimation = Tabs.Optimize:AddToggle("freezeAnim", {
