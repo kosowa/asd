@@ -1,4 +1,4 @@
---v6.6
+--v6.7
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -158,8 +158,8 @@ end)
 
 ----------------------------------------------------------------
 
---settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
---UserSettings():GetService("UserGameSettings").SavedQualityLevel = Enum.SavedQualitySetting.QualityLevel1
+settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+UserSettings():GetService("UserGameSettings").SavedQualityLevel = Enum.SavedQualitySetting.QualityLevel1
 settings().Rendering.EagerBulkExecution = false
 settings().Network.IncomingReplicationLag = -1000
 
@@ -242,7 +242,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME ADVENTURES | MERCENARIES",
+    Title = "ANIME ADVENTURES V6.7 | MERCENARIES",
     SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(600, 350),
@@ -753,53 +753,61 @@ end
 -------------------------------------------------------------------------
 
 function configureFocusWave()
-    -- credit from : Bocchi World
     getgenv().FocusWave = 5 -- Priority limit wave
     getgenv().PriorityCards = { -- Priority tags when wave = FocusWave
-        "+ Range I",
-        "- Cooldown I",
+        "+ Enemy Speed I",
+        "+ Enemy Regen I",
+        "- Yen I",
+        "- Yen II",
+        "- Yen III",
+        "+ Cooldown I",
         "+ Attack I",
+        "+ Range I",
         "+ Gain 2 Random Effects Tier 1",
-        "- Cooldown II",
-        "+ Range II",
+        "+ Cooldown II",
         "+ Attack II",
+        "+ Range II",
         "+ Gain 2 Random Effects Tier 2",
-        "- Cooldown III",
+        "+ Cooldown III",
         "+ Range III",
         "+ Attack III",
         "+ Gain 2 Random Effects Tier 3"
     }
     getgenv().Cards = { -- All cards after FocusWave wave ends
-    "+ Gain 2 Random Curses Tier 3",
-    "+ Gain 2 Random Curses Tier 2",
-    "+ Gain 2 Random Curses Tier 1",
-    "+ Boss Damage I",
-    "+ Boss Damage II",
-    "+ Boss Damage III",
-    "+ Enemy Shield III",
-    "+ Enemy Shield II",
-    "+ Enemy Shield I",
-    "+ Range I",
-    "+ Cooldown I",
-    "+ Attack I",
-    "+ Gain 2 Random Effects Tier 1",
-    "+ Cooldown II",
-    "+ Attack II",
-    "+ Gain 2 Random Effects Tier 2",
-    "+ Cooldown III",
-    "+ Range II",
-    "+ Range III",
-    "+ Attack III",
-    "+ Gain 2 Random Effects Tier 3",
-    "+ Explosive Deaths I",
-    "+ Explosive Deaths II",
-    "+ Explosive Deaths III",
-    "+ Enemy Regen I",
-    "+ Enemy Regen II",
-    "+ Enemy Regen III",
-    "+ New Path"
+        "- Boss Damage I",
+        "- Boss Damage II",
+        "- Boss Damage III",
+        "- Yen I",
+        "- Yen II",
+        "- Yen III",
+        "+ Explosive Deaths III",
+        "+ Gain 2 Random Curses Tier 3",
+        "+ Enemy Speed III",
+        "+ Gain 2 Random Curses Tier 2",
+        "+ Enemy Speed II",
+        "+ Enemy Health II",
+        "+ Gain 2 Random Curses Tier 1",
+        "+ Enemy Health I",
+        "+ Enemy Speed I",
+        "+ Enemy Regen I",
+        "+ Enemy Regen II",
+        "+ Enemy Regen III",
+        "+ Cooldown I",
+        "+ Attack I",
+        "+ Range I",
+        "+ Gain 2 Random Effects Tier 1",
+        "+ Cooldown II",
+        "+ Attack II",
+        "+ Range II",
+        "+ Gain 2 Random Effects Tier 2",
+        "+ Cooldown III",
+        "+ Range III",
+        "+ Attack III",
+        "+ Gain 2 Random Effects Tier 3",
+        "+ New Path"
     }
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Bocchi-World/Bocchi-Main/refs/heads/main/pickcard.lua"))()
+    -- Priority from bottom to top in all items
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Ayanok0ji/rvxploit-hub/refs/heads/main/pickcard.lua"))()
 end
 
 -------------------------------------------------------------------------
