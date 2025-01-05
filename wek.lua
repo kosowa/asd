@@ -1,4 +1,4 @@
---v6.5
+--v6.6
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -1141,7 +1141,7 @@ local function startLoopIfNeeded(unitsFolder)
                     deleteLoopActive = false
                 end
 
-                task.wait(1) -- Yield to avoid blocking
+                task.wait() -- Yield to avoid blocking
             end
         end)
     end
@@ -1205,7 +1205,7 @@ local function freezeAllAnimations()
             stopAnimations(descendant)
         end
         -- Yield to avoid excessive performance impact
-        task.wait(1) -- Adjust interval as needed
+        task.wait() -- Adjust interval as needed
     end
 end
 
@@ -1345,7 +1345,7 @@ do
                 embeds = {
                     {
                         title = "ANIME ADVENTURES | MCNRS",
-                        description = string.format("**Username : **||%s||\n**Level : **%s", username, levelInfo),
+                        description = string.format("**Username : **||%s||\n%s", username, levelInfo),
                         color = embedColor,
                         fields = {
                             {
@@ -1354,11 +1354,11 @@ do
                             },
                             {
                                 name = "> **Results**",
-                                value = string.format("%s - %s\n %s ( %s)\nDamage: %d", levelName, resultTitle, wavesBeaten, totalTime, totalDamage)
+                                value = string.format("%s - %s\n%s ( %s)\nDamage: %d", levelName, resultTitle, wavesBeaten, totalTime, totalDamage)
                             },
                             {
                                 name = "> **Rewards**",
-                                value = string.format("%s Holiday Stars\n %s", starsReward, xpReward)
+                                value = string.format("%s Holiday Stars\n%s", starsReward, xpReward)
                             }
                         },
                         footer = {
