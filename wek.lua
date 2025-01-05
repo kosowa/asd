@@ -158,8 +158,8 @@ end)
 
 ----------------------------------------------------------------
 
-settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
-UserSettings():GetService("UserGameSettings").SavedQualityLevel = Enum.SavedQualitySetting.QualityLevel1
+--settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+--UserSettings():GetService("UserGameSettings").SavedQualityLevel = Enum.SavedQualitySetting.QualityLevel1
 settings().Rendering.EagerBulkExecution = false
 settings().Network.IncomingReplicationLag = -1000
 
