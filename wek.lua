@@ -1,4 +1,4 @@
---v6.7
+--v7.7
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -242,7 +242,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME ADVENTURES V6.7 | MERCENARIES",
+    Title = "ANIME ADVENTURES 7.7 | MERCENARIES",
     SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(600, 350),
@@ -982,7 +982,7 @@ local function runAntilag()
             check(des[i])
         end
 
-        wait(0.3)
+        wait(10)
         removeDups(workspace:GetChildren())
         wait(600)
     end
@@ -1179,58 +1179,33 @@ end
 
 ----------------
 
-local runService = game:GetService("RunService")
-local players = game:GetService("Players")
-
--- Function to stop animations on objects with animators
-local function stopAnimations(object)
-    if object:IsA("Model") then
-        -- Stop animations in humanoid-based models
-        local humanoid = object:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            local animator = humanoid:FindFirstChildOfClass("Animator")
-            if animator then
-                for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
-                    track:Stop()
-                end
-            end
-        end
-    elseif object:IsA("BasePart") or object:IsA("MeshPart") then
-        -- Handle custom animations if applicable
-        local animator = object:FindFirstChildOfClass("Animator")
-        if animator then
-            for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
-                track:Stop()
-            end
+-- Function to destroy all Animators, AnimationControllers, and Animations
+local function destroyAnimations()
+    -- Helper function to destroy an object if it matches the criteria
+    local function destroyObject(object)
+        if object:IsA("Animator") then
+            object:Destroy()
+        elseif object:IsA("AnimationController") then
+            object:Destroy()
+        elseif object:IsA("Animation") then
+            object:Destroy()
         end
     end
-end
 
--- Function to scan all objects and stop their animations
-local function freezeAllAnimations()
-    while true do
-        for _, descendant in ipairs(workspace:GetDescendants()) do
-            stopAnimations(descendant)
-        end
-        -- Yield to avoid excessive performance impact
-        task.wait() -- Adjust interval as needed
+    -- Destroy all existing objects matching the criteria
+    for _, object in pairs(game:GetDescendants()) do
+        destroyObject(object)
     end
-end
 
--- Start the animation-freezing loop in a separate thread
-
-
--- Also monitor newly added objects dynamically
-workspace.DescendantAdded:Connect(function(newObject)
-    stopAnimations(newObject)
-end)
-
--- Ensure animations are stopped for new players' characters
-players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Connect(function(character)
-        stopAnimations(character)
+    -- Dynamically monitor for new objects and destroy them
+    game.DescendantAdded:Connect(function(newObject)
+        -- Process the new object dynamically
+        task.defer(function()
+            destroyObject(newObject)
+        end)
     end)
-end)
+
+end
 
 -----------------WEBHOOK----------------------
 
@@ -1477,7 +1452,7 @@ do
         saveSettings(settings)
 
         if FreezeAnimationState then
-            task.spawn(freezeAllAnimations)
+            task.spawn(destroyAnimations)
         end
     end)
 
@@ -1632,10 +1607,9 @@ do
         saveSettings(settings)
     
         if DeleteEnemyState then
-            StartDeleteEnemies()
             Window:Dialog({
                 Title = "ATTENTION!",
-                Content = "DO NOT USE DELETE ENTITIES WHEN RECORDING MACRO",
+                Content = "NOT WORKING ATM",
                 Buttons = {
                     {
                         Title = "YES DADDY",
