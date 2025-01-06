@@ -1,4 +1,4 @@
---v7.7
+--v7.8
 -- Webhook
 local webhookURL = "https://discord.com/api/webhooks/1277219875865100340/ETF457JFBBhmqxuJ2kUvFn52zzSUIVeIhdHh-9MgDCr_r-mJVVOFsXClNAekZwTQmVg4"
 
@@ -242,7 +242,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 ------------------------------------------------------------------------------------
 
 local Window = Fluent:CreateWindow({
-    Title = "ANIME ADVENTURES 7.7 | MERCENARIES",
+    Title = "ANIME ADVENTURES 7.8 | MERCENARIES",
     SubTitle = "",
     TabWidth = 160,
     Size = UDim2.fromOffset(600, 350),
@@ -757,14 +757,10 @@ function configureFocusWave()
     getgenv().PriorityCards = { -- Priority tags when wave = FocusWave
         "+ Enemy Speed I",
         "+ Enemy Regen I",
-        "- Yen I",
-        "- Yen II",
-        "- Yen III",
         "+ Cooldown I",
         "+ Attack I",
         "+ Range I",
         "+ Gain 2 Random Effects Tier 1",
-        "+ Cooldown II",
         "+ Attack II",
         "+ Range II",
         "+ Gain 2 Random Effects Tier 2",
@@ -774,29 +770,23 @@ function configureFocusWave()
         "+ Gain 2 Random Effects Tier 3"
     }
     getgenv().Cards = { -- All cards after FocusWave wave ends
+        "+ Gain 2 Random Curses Tier 3",
+        "+ Gain 2 Random Curses Tier 2",
+        "+ Gain 2 Random Curses Tier 1",
         "- Boss Damage I",
         "- Boss Damage II",
         "- Boss Damage III",
-        "- Yen I",
-        "- Yen II",
-        "- Yen III",
         "+ Explosive Deaths III",
-        "+ Gain 2 Random Curses Tier 3",
         "+ Enemy Speed III",
-        "+ Gain 2 Random Curses Tier 2",
         "+ Enemy Speed II",
         "+ Enemy Health II",
-        "+ Gain 2 Random Curses Tier 1",
         "+ Enemy Health I",
         "+ Enemy Speed I",
         "+ Enemy Regen I",
         "+ Enemy Regen II",
         "+ Enemy Regen III",
-        "+ Cooldown I",
-        "+ Attack I",
         "+ Range I",
         "+ Gain 2 Random Effects Tier 1",
-        "+ Cooldown II",
         "+ Attack II",
         "+ Range II",
         "+ Gain 2 Random Effects Tier 2",
