@@ -1,4 +1,4 @@
---#3
+--#4
 getgenv().FocusWave = 5
 getgenv().PriorityCards = {
     "+ Random Curses III",
@@ -36,12 +36,12 @@ getgenv().Cards = {
     "+ Random Curses I",
     "+ Explosive Deaths II",
     "+ Explosive Deaths III",
-    "- Active Cooldown III",
-    "- Active Cooldown II",
     "- Active Cooldown I",
+    "- Active Cooldown II",
+    "- Active Cooldown III",
     "+ Enemy Shield II",
-    "+ Enemy Health III",
     "+ Enemy Speed III",
+    "+ Enemy Health III",
     "+ Yen I",
     "+ Yen II",
     "+ Yen III",
@@ -58,6 +58,7 @@ getgenv().Cards = {
     "+ Random Blessings I",
     "+ Random Blessings II",
     "+ Random Blessings III",
+    "+ Double Range",
     "+ Double Attack",
     "+ Enemy Shield I",
     "+ Explosive Deaths I",
