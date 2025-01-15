@@ -1,4 +1,4 @@
---#5
+--#6
 getgenv().FocusWave = 5
 getgenv().PriorityCards = {
     "+ Random Curses III",
@@ -36,6 +36,7 @@ getgenv().Cards = {
     "+ Random Curses I",
     "+ Explosive Deaths II",
     "+ Explosive Deaths III",
+    "+ Enemy Speed II",
     "+ Enemy Speed III",
     "- Active Cooldown I",
     "- Active Cooldown II",
@@ -45,11 +46,11 @@ getgenv().Cards = {
     "+ Yen I",
     "+ Yen II",
     "+ Yen III",
-    "+ Attack I",
     "- Cooldown I",
+    "+ Attack I",
     "+ Range I",
-    "+ Attack II",
     "- Cooldown II",
+    "+ Attack II",
     "- Cooldown III",
     "+ Range II",
     "+ Boss Damage I",
@@ -66,7 +67,6 @@ getgenv().Cards = {
     "+ Enemy Speed I",
     "+ Enemy Regen I",
     "+ Enemy Health II",
-    "+ Enemy Speed II",
     "+ Enemy Regen II",
     "+ Enemy Shield III",
     "+ Range III",
@@ -74,4 +74,19 @@ getgenv().Cards = {
     "+ Enemy Regen III",    
     "+ New Path"
 }
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Ayanok0ji/rvxploit-hub/refs/heads/main/pickcard.lua"))()
+local success1, errorMsg1 = pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Bocchi-World/Bocchi-Main/refs/heads/main/pickcard.lua"))()
+end)
+if success1 then
+    print("done")
+else
+    warn("false1")
+end
+local success2, errorMsg2 = pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Ngducok/doing-some-shit/refs/heads/main/hey.lua"))()
+end)
+if success2 then
+    print("done")
+else
+    warn("false2")
+end
