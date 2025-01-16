@@ -1,4 +1,4 @@
---#7
+--#8
 getgenv().FocusWave = 5
 getgenv().PriorityCards = {
     "+ Random Curses III",
@@ -74,4 +74,4 @@ getgenv().Cards = {
     "+ Enemy Regen III",    
     "+ New Path"
 }
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Bocchi-World/Bocchi-Main/refs/heads/main/loader.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Ayanok0ji/rvxploit-hub/refs/heads/main/pickcard.lua"))()
