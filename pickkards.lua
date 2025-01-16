@@ -1,5 +1,4 @@
---#6
-getgenv().FPS = true
+--#7
 getgenv().FocusWave = 5
 getgenv().PriorityCards = {
     "+ Random Curses III",
