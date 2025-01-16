@@ -1,4 +1,5 @@
 --#6
+getgenv().FPS = true
 getgenv().FocusWave = 5
 getgenv().PriorityCards = {
     "+ Random Curses III",
@@ -74,19 +75,4 @@ getgenv().Cards = {
     "+ Enemy Regen III",    
     "+ New Path"
 }
-local success1, errorMsg1 = pcall(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Bocchi-World/Bocchi-Main/refs/heads/main/pickcard.lua"))()
-end)
-if success1 then
-    print("done")
-else
-    warn("false1")
-end
-local success2, errorMsg2 = pcall(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Ngducok/doing-some-shit/refs/heads/main/hey.lua"))()
-end)
-if success2 then
-    print("done")
-else
-    warn("false2")
-end
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Bocchi-World/Bocchi-Main/refs/heads/main/loader.lua"))()
