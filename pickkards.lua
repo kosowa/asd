@@ -1,4 +1,4 @@
---#8
+--#9
 repeat task.wait(5) until game:IsLoaded()
 getgenv().FocusWave = 5
 getgenv().PriorityCards = {
@@ -75,4 +75,19 @@ getgenv().Cards = {
     "+ Enemy Regen III",    
     "+ New Path"
 }
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Ayanok0ji/rvxploit-hub/refs/heads/main/pickcard.lua"))()
+local success1, errorMsg1 = pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Bocchi-World/Bocchi-Main/refs/heads/main/pickcard.lua"))()
+end)
+if success1 then
+    print("done")
+else
+    warn("false1")
+end
+local success2, errorMsg2 = pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Ngducok/doing-some-shit/refs/heads/main/hey.lua"))()
+end)
+if success2 then
+    print("done")
+else
+    warn("false2")
+end
