@@ -24,7 +24,7 @@ local function sendBanner()
         warn("NewArea UI missing")
         return
     end
-    task.wait(2)
+    task.wait(3)
 
     -- Find Summon GUI
     local summonGui = LocalPlayer.PlayerGui:FindFirstChild("SummonGUI")
@@ -82,7 +82,7 @@ local function sendBanner()
         embeds = {
             {
                 title = "Anime Adventures Banner",
-                description = "Checked at: " .. timeSent,
+                description = timeSent,
                 color = 16769280,
                 fields = {
                     {
