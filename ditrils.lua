@@ -1,3 +1,15 @@
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+UserInputService.JumpRequest:Connect(function()
+    if humanoid then
+        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
 -- Services
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -16,14 +28,14 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "CustomUI"
 ScreenGui.Parent = CoreGui
 
-local function createButton(text, position, size)
+local function createButton(text, position, size, parent)
     local button = Instance.new("TextButton")
     button.Size = size or UDim2.new(0, 50, 0, 50) -- Default to square 50x50
     button.Position = position
     button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.Text = text
-    button.Parent = ScreenGui
+    button.Parent = parent or ScreenGui
     button.Font = Enum.Font.FredokaOne
     button.TextSize = 10
     button.AutoButtonColor = true
@@ -58,6 +70,18 @@ local NightVisionButton = createButton("NV", UDim2.new(baseX, -buttonSize*4 - sp
 local ThirdPersonButton = createButton("TP", UDim2.new(baseX, -buttonSize*3 - spacing*3, baseY, spacing))
 local NoclipButton = createButton("NOC", UDim2.new(baseX, -buttonSize*2 - spacing*2, baseY, spacing))
 local FlashlightButton = createButton("FL", UDim2.new(baseX, -buttonSize - spacing, baseY, spacing))
+
+-- Create separate UI for the Toggle Button
+local ToggleGui = Instance.new("ScreenGui")
+ToggleGui.Name = "ToggleUI"
+ToggleGui.Parent = CoreGui
+
+local ToggleButton = createButton("GUI", UDim2.new(0, 10, 1, -60), UDim2.new(0, 50, 0, 40), ToggleGui)
+
+-- Toggle visibility function
+ToggleButton.MouseButton1Click:Connect(function()
+    ScreenGui.Enabled = not ScreenGui.Enabled
+end)
 
 --------------------------
 -- DYNAMIC TIME DISPLAY
@@ -461,7 +485,7 @@ local function toggleFlashlight()
         if not flashlight then
             flashlight = Instance.new("PointLight")
             flashlight.Brightness = 2
-            flashlight.Range = 20
+            flashlight.Range = 50
             flashlight.Color = Color3.fromRGB(255, 255, 200)
             flashlight.Parent = LocalPlayer.Character:FindFirstChild("Head") or LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
         end
