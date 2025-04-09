@@ -1,11 +1,14 @@
 local TeleportService = game:GetService("TeleportService")
 
+game.Loaded:Wait()
+
 if _G.SafeExecute then
     return
 end
 _G.SafeExecute = true
 
 local scriptToExecute = [[
+    game.Loaded:Wait()
     if _G.SafeExecute then return end
     _G.SafeExecute = true
     loadstring(game:HttpGet("https://raw.githubusercontent.com/kosowa/asd/refs/heads/main/hntrsmain.lua"))()
