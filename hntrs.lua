@@ -1,7 +1,5 @@
 local TeleportService = game:GetService("TeleportService")
 
-game.Loaded:Wait()
-
 if _G.SafeExecute then
     return
 end
