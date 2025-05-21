@@ -1,0 +1,36 @@
+local CoreGui = game:GetService("CoreGui")
+
+if CoreGui:FindFirstChild("PlaceVersionGui") then
+    CoreGui.PlaceVersionGui:Destroy()
+end
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "PlaceVersionGui"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.Parent = CoreGui
+
+local textLabel = Instance.new("TextLabel")
+textLabel.Size = UDim2.new(0, 260, 0, 36)
+textLabel.Position = UDim2.new(0, 10, 0, 80)
+textLabel.BackgroundTransparency = 0.2
+textLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.Font = Enum.Font.FredokaOne
+textLabel.TextSize = 20
+textLabel.TextXAlignment = Enum.TextXAlignment.Center
+textLabel.Text = "Place Version: Loading..."
+textLabel.Parent = screenGui
+
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = textLabel
+
+
+local function updatePlaceVersion()
+    local version = game.PlaceVersion
+    textLabel.Text = "Place Version: " .. tostring(version)
+end
+
+updatePlaceVersion()
