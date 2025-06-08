@@ -1,3 +1,4 @@
+--1
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
 local players = game:GetService("Players")
@@ -180,7 +181,7 @@ end
 
 -- Create dropdown UI
 PetPredictDropdown = Tabs.Secret:Dropdown({
-	Title = "Egg Pet Names List",
+	Title = "Egg Pet Names List (ready to hatch only)",
 	Desc = getPetNameEggNameDesc(),
 	Value = {},
 	Multi = true,
@@ -195,7 +196,7 @@ PetPredictDropdown = Tabs.Secret:Dropdown({
 PetNeededState = settings["PetNeeded"] or {}
 
 PetNeededDropdown = Tabs.Secret:Dropdown({
-	Title = "Pet Needed",
+	Title = "Desire Pet",
 	Value = PetNeededState,
 	Multi = true,
 	AllowNone = true,
@@ -228,8 +229,41 @@ Tabs.Secret:Toggle({
 	end,
 })
 
--- Server hop logic
+
 task.spawn(function()
+	local HttpService = game:GetService("HttpService")
+
+	local function sendWebhookNotification(petName)
+		--this webhookUrl is from players inputed webhook, only them can access
+		local url = settings["WebhookUrl"]
+		if not url or url == "" then return end
+
+		local discordId = settings["DiscordUserID"]
+		local content = discordId and ("<@" .. discordId .. ">") or ""
+
+		local data = {
+			content = content,
+			embeds = {{
+				title = "🎉 Pet Found!",
+				description = "A desired pet has been detected in the egg list.",
+				color = 65280,
+				fields = {
+					{ name = "Pet Name", value = petName, inline = true },
+				},
+				footer = { text = "Pet ESP System" },
+				timestamp = DateTime.now():ToIsoDate(),
+			}},
+		}
+
+		local success, err = pcall(function()
+			HttpService:PostAsync(url, HttpService:JSONEncode(data), Enum.HttpContentType.ApplicationJson)
+		end)
+
+		if not success then
+			warn("Failed to send webhook:", err)
+		end
+	end
+
 	while task.wait(10) do
 		if settings["ServerHopNeedPet"] then
 			local found = false
@@ -238,6 +272,9 @@ task.spawn(function()
 					found = true
 					settings["ServerHopNeedPet"] = false
 					saveSettings(settings)
+
+					--this is not from my webhook.I dont get any data from u
+					sendWebhookNotification(data.pet)
 
 					WindUI:Notify({
 						Title = "Desire Pet Detected",
