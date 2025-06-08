@@ -190,3 +190,78 @@ PetPredictDropdown = Tabs.Secret:Dropdown({
 		refreshPetPredictHighlights(selected)
 	end,
 })
+
+-- === Pet Needed Dropdown ===
+PetNeededState = settings["PetNeeded"] or {}
+
+PetNeededDropdown = Tabs.Secret:Dropdown({
+	Title = "Pet Needed",
+	Value = PetNeededState,
+	Multi = true,
+	AllowNone = true,
+	Values = {
+		"Queen Bee",
+		"Dragonfly",
+		"Polar Bear",
+		"Disco Bee",
+		"Butterfly",
+		"Raccoon",
+		"Red Fox",
+	},
+	Callback = function(selected)
+		settings["PetNeeded"] = selected
+		saveSettings(settings)
+	end,
+})
+
+-- === Server Hop Toggle ===
+PetNeededServerHopState = settings["ServerHopNeedPet"] or false
+
+Tabs.Secret:Toggle({
+	Title = "Server Hop Desire Pet",
+	Value = PetNeededServerHopState,
+	Icon = "check",
+	Type = "Checkbox",
+	Callback = function(val)
+		settings["ServerHopNeedPet"] = val
+		saveSettings(settings)
+	end,
+})
+
+-- Server hop logic
+task.spawn(function()
+	while task.wait(10) do
+		if settings["ServerHopNeedPet"] then
+			local found = false
+			for _, data in pairs(eggInfoList) do
+				if table.find(settings["PetNeeded"] or {}, data.pet) then
+					found = true
+					settings["ServerHopNeedPet"] = false
+					saveSettings(settings)
+
+					WindUI:Notify({
+						Title = "Desire Pet Detected",
+						Icon = "check",
+						Duration = 5, 
+					})
+
+					print("[SERVER HOP] Desired pet found! Cancelling server hop.")
+					break
+				end
+			end
+
+			if not found then
+				WindUI:Notify({
+					Title = "No Desire Pet Detected",
+					Icon = "x",
+					Duration = 5, 
+				})
+                task.wait(5)
+
+				local TeleportService = game:GetService("TeleportService")
+				local placeId = game.PlaceId
+				TeleportService:Teleport(placeId)
+			end
+		end
+	end
+end)
