@@ -303,6 +303,7 @@ end)
 
 -- DISCLAIMER: I dont get any data or information from them
 -- DISCLAIMER: only user can see their URL
+local PetWebhookUrl = settings["PetWebhookUrl"] or ""
 local PetWebhookUrlInput = Tabs.Secret:Input({
 	Title = "Webhook URL",
 	Value = PetWebhookUrl,
@@ -316,6 +317,7 @@ local PetWebhookUrlInput = Tabs.Secret:Input({
 })
 
 -- DISCLAIMER: only user can see their USERID
+local PetDiscordUserID = settings["PetDiscordUserID"] or ""
 local PetDiscordUserIDInput = Tabs.Secret:Input({
 	Title = "Discord User ID",
 	Value = PetDiscordUserID,
