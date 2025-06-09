@@ -1,3 +1,4 @@
+--3
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
 local players = game:GetService("Players")
@@ -188,9 +189,8 @@ old = hookfunction(getconnections(replicatedStorage.GameEvents.EggReadyToHatch_R
 	return old(objectId, petName)
 end))
 
+-----------------------------------------------------
 
------------------------------------
--- === Pet Needed Dropdown ===
 PetNeededState = settings["PetNeeded"] or {}
 
 PetNeededDropdown = Tabs.Secret:Dropdown({
@@ -213,9 +213,8 @@ PetNeededDropdown = Tabs.Secret:Dropdown({
 	end,
 })
 
--- === Server Hop Toggle ===
-PetNeededServerHopState = settings["ServerHopNeedPet"] or false
 
+PetNeededServerHopState = settings["ServerHopNeedPet"] or false
 Tabs.Secret:Toggle({
 	Title = "Server Hop Desire Pet",
 	Value = PetNeededServerHopState,
@@ -227,15 +226,14 @@ Tabs.Secret:Toggle({
 	end,
 })
 
-
 task.spawn(function()
 	local HttpService = game:GetService("HttpService")
 
 	local function sendWebhookNotification(petName)
-		local url = settings["WebhookUrl"]
+		local url = PetWebhookUrl
 		if not url or url == "" then return end
 
-		local discordId = settings["DiscordUserID"]
+		local discordId = PetDiscordUserID
 		local content = discordId and ("<@" .. discordId .. ">") or ""
 
 		local data = {
@@ -299,3 +297,30 @@ task.spawn(function()
 		end
 	end
 end)
+
+-- DISCLAIMER: I dont get any data or information from them
+-- DISCLAIMER: only user can see their URL
+local PetWebhookUrlInput = Tabs.Secret:Input({
+	Title = "Webhook URL",
+	Value = PetWebhookUrl,
+	PlaceholderText = "Enter URL...",
+	ClearTextOnFocus = false,
+	Callback = function(Text)
+		settings["PetWebhookUrl"] = Text
+		saveSettings(settings)
+		PetWebhookUrl = Text
+	end
+})
+
+-- DISCLAIMER: only user can see their USERID
+local PetDiscordUserIDInput = Tabs.Secret:Input({
+	Title = "Discord User ID",
+	Value = PetDiscordUserID,
+	PlaceholderText = "Enter ID...",
+	ClearTextOnFocus = false,
+	Callback = function(Text)
+		settings["PetDiscordUserID"] = Text
+		saveSettings(settings)
+		PetDiscordUserID = Text
+	end
+})
