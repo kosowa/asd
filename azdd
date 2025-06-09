@@ -301,6 +301,12 @@ task.spawn(function()
 	end
 end)
 
+Section = Tabs.Secret:Section({ 
+    Title = "EGG PET WEBHOOK NOTIFIER",
+    TextXAlignment = "Left",
+    TextSize = 15,
+})
+
 -- DISCLAIMER: I dont get any data or information from them
 -- DISCLAIMER: only user can see their URL
 local PetWebhookUrl = settings["PetWebhookUrl"] or ""
