@@ -1,19 +1,20 @@
---1
+--2
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
 local players = game:GetService("Players")
 local localPlayer = players.LocalPlayer
 
--- Get hatchFunction and internal data
 local hatchFunction = getupvalue(getupvalue(getconnections(replicatedStorage.GameEvents.PetEggService.OnClientEvent)[1].Function, 1), 2)
 local eggModels = getupvalue(hatchFunction, 1)
 local eggPets = getupvalue(hatchFunction, 2)
 
--- Tables
 local activeEggs = {}
 local eggInfoList = {}
 
--- Get object by UUID
+local activeHighlights = {}
+
+local petParagraph = nil
+
 local function getObjectFromId(objectId)
 	for _, eggModel in pairs(eggModels) do
 		if eggModel:GetAttribute("OBJECT_UUID") == objectId then
@@ -22,78 +23,6 @@ local function getObjectFromId(objectId)
 	end
 end
 
--- Update hatched pet info
-local function UpdateEggPetName(objectId, petName)
-	local object = getObjectFromId(objectId)
-	if not object then return end
-
-	local eggName = object:GetAttribute("EggName")
-	for _, data in pairs(eggInfoList) do
-		if data.id == objectId then
-			data.pet = petName
-			refreshPetPredictDropdown()
-			return
-		end
-	end
-end
-
--- Store egg info
-local function RegisterEgg(object)
-	if object:GetAttribute("OWNER") ~= localPlayer.Name then return end
-
-	local eggName = object:GetAttribute("EggName")
-	local petName = eggPets[object:GetAttribute("OBJECT_UUID")]
-	local objectId = object:GetAttribute("OBJECT_UUID")
-	if not objectId then return end
-
-	activeEggs[objectId] = object
-
-	table.insert(eggInfoList, {
-		egg = eggName,
-		pet = petName or "?",
-		id = objectId,
-	})
-	refreshPetPredictDropdown()
-end
-
--- Cleanup
-local function RemoveEgg(object)
-	if object:GetAttribute("OWNER") ~= localPlayer.Name then return end
-	local objectId = object:GetAttribute("OBJECT_UUID")
-	activeEggs[objectId] = nil
-end
-
--- Setup existing eggs
-for _, object in collectionService:GetTagged("PetEggServer") do
-	task.spawn(RegisterEgg, object)
-end
-
--- Connect future eggs
-collectionService:GetInstanceAddedSignal("PetEggServer"):Connect(RegisterEgg)
-collectionService:GetInstanceRemovedSignal("PetEggServer"):Connect(RemoveEgg)
-
--- Hook hatch event
-local old
-old = hookfunction(getconnections(replicatedStorage.GameEvents.EggReadyToHatch_RE.OnClientEvent)[1].Function, newcclosure(function(objectId, petName)
-	UpdateEggPetName(objectId, petName)
-	return old(objectId, petName)
-end))
-
--- === UI Code ===
-
--- Get dropdown values (pet names with duplicates)
-local function getAllPetNamesWithDuplicates()
-	local list = {}
-	for _, data in pairs(eggInfoList) do
-		if data.pet and data.pet ~= "?" then
-			table.insert(list, data.pet)
-		end
-	end
-	-- Return empty list if none found
-	return list or {}
-end
-
--- Get dropdown description text (petname + eggname)
 local function getPetNameEggNameDesc()
 	local lines = {}
 	for _, data in pairs(eggInfoList) do
@@ -101,41 +30,18 @@ local function getPetNameEggNameDesc()
 			table.insert(lines, data.pet .. " (" .. data.egg .. ")")
 		end
 	end
-	-- Return empty string if none found
-	if #lines == 0 then
-		return ""
-	end
-	return table.concat(lines, "\n")
+	return #lines > 0 and table.concat(lines, "\n") or "No pets yet"
 end
-
--- Reference to dropdown for updates
-local PetPredictDropdown = nil
-
-function refreshPetPredictDropdown()
-	if PetPredictDropdown then
-		local values = getAllPetNamesWithDuplicates()
-		PetPredictDropdown:SetValues(values)
-		PetPredictDropdown:SetDesc(getPetNameEggNameDesc())
-	end
-end
-
--- Highlight and ESP management
-local activeHighlights = {}
 
 local function clearAllHighlights()
-	for _, highlightData in pairs(activeHighlights) do
-		if highlightData.Highlight then
-			highlightData.Highlight:Destroy()
-		end
-		if highlightData.Billboard then
-			highlightData.Billboard:Destroy()
-		end
+	for _, h in pairs(activeHighlights) do
+		if h.Highlight then h.Highlight:Destroy() end
+		if h.Billboard then h.Billboard:Destroy() end
 	end
 	activeHighlights = {}
 end
 
 local function createHighlight(object, petName)
-	-- Highlight
 	local highlight = Instance.new("Highlight")
 	highlight.Adornee = object
 	highlight.FillColor = Color3.fromRGB(255, 255, 0)
@@ -143,7 +49,6 @@ local function createHighlight(object, petName)
 	highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
 	highlight.Parent = object
 
-	-- ESP Label
 	local billboard = Instance.new("BillboardGui")
 	billboard.Adornee = object
 	billboard.Size = UDim2.new(0, 100, 0, 30)
@@ -167,31 +72,93 @@ local function createHighlight(object, petName)
 	}
 end
 
-function refreshPetPredictHighlights(selectedPets)
+local function refreshPetPredictParagraph()
+	if petParagraph then
+		petParagraph:SetDesc(getPetNameEggNameDesc())
+	end
+
 	clearAllHighlights()
 	for _, data in pairs(eggInfoList) do
-		if table.find(selectedPets, data.pet) then
-			local eggObject = activeEggs[data.id]
-			if eggObject then
-				createHighlight(eggObject, data.pet)
+		if data.pet and data.pet ~= "?" then
+			local obj = activeEggs[data.id]
+			if obj then
+				createHighlight(obj, data.pet)
 			end
 		end
 	end
 end
 
--- Create dropdown UI
-PetPredictDropdown = Tabs.Secret:Dropdown({
-	Title = "Egg Pet Names List (ready to hatch only)",
+
+petParagraph = Tabs.Secret:Paragraph({
+	Title = "EGG PET NAMES LIST",
 	Desc = getPetNameEggNameDesc(),
-	Value = {},
-	Multi = true,
-	AllowNone = true,
-	Values = getAllPetNamesWithDuplicates(),
-	Callback = function(selected)
-		refreshPetPredictHighlights(selected)
-	end,
+	Image = "egg",
+	Color = "Grey",
 })
 
+
+local function UpdateEggPetName(objectId, petName)
+	local object = getObjectFromId(objectId)
+	if not object then return end
+	for _, data in pairs(eggInfoList) do
+		if data.id == objectId then
+			data.pet = petName
+			refreshPetPredictParagraph()
+			return
+		end
+	end
+end
+
+local function RegisterEgg(object)
+	if object:GetAttribute("OWNER") ~= localPlayer.Name then return end
+
+	local eggName = object:GetAttribute("EggName")
+	local objectId = object:GetAttribute("OBJECT_UUID")
+	if not objectId then return end
+
+	local petName = eggPets[objectId] or "?"
+
+	activeEggs[objectId] = object
+	table.insert(eggInfoList, {
+		egg = eggName,
+		pet = petName,
+		id = objectId,
+	})
+
+	task.defer(refreshPetPredictParagraph)
+end
+
+local function RemoveEgg(object)
+	if object:GetAttribute("OWNER") ~= localPlayer.Name then return end
+	local objectId = object:GetAttribute("OBJECT_UUID")
+	activeEggs[objectId] = nil
+
+	for i, data in ipairs(eggInfoList) do
+		if data.id == objectId then
+			table.remove(eggInfoList, i)
+			break
+		end
+	end
+
+	task.defer(refreshPetPredictParagraph)
+end
+
+
+for _, obj in collectionService:GetTagged("PetEggServer") do
+	task.spawn(RegisterEgg, obj)
+end
+
+collectionService:GetInstanceAddedSignal("PetEggServer"):Connect(RegisterEgg)
+collectionService:GetInstanceRemovedSignal("PetEggServer"):Connect(RemoveEgg)
+
+local old
+old = hookfunction(getconnections(replicatedStorage.GameEvents.EggReadyToHatch_RE.OnClientEvent)[1].Function, newcclosure(function(objectId, petName)
+	UpdateEggPetName(objectId, petName)
+	return old(objectId, petName)
+end))
+
+
+-----------------------------------
 -- === Pet Needed Dropdown ===
 PetNeededState = settings["PetNeeded"] or {}
 
@@ -234,7 +201,6 @@ task.spawn(function()
 	local HttpService = game:GetService("HttpService")
 
 	local function sendWebhookNotification(petName)
-		--this webhookUrl is from players inputed webhook, only them can access
 		local url = settings["WebhookUrl"]
 		if not url or url == "" then return end
 
@@ -273,7 +239,7 @@ task.spawn(function()
 					settings["ServerHopNeedPet"] = false
 					saveSettings(settings)
 
-					--this is not from my webhook.I dont get any data from u
+					--this is not from my webhook, i dont get any data from yours
 					sendWebhookNotification(data.pet)
 
 					WindUI:Notify({
@@ -293,7 +259,7 @@ task.spawn(function()
 					Icon = "x",
 					Duration = 5, 
 				})
-                task.wait(5)
+                task.wait(3)
 
 				local TeleportService = game:GetService("TeleportService")
 				local placeId = game.PlaceId
