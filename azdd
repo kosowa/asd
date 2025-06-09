@@ -1,4 +1,3 @@
---2
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
 local players = game:GetService("Players")
@@ -23,11 +22,26 @@ local function getObjectFromId(objectId)
 	end
 end
 
+local function formatTime(seconds)
+	seconds = math.max(0, seconds or 0)
+	local mins = math.floor(seconds / 60)
+	local secs = math.floor(seconds % 60)
+	return string.format("%d:%02d", mins, secs)
+end
+
 local function getPetNameEggNameDesc()
 	local lines = {}
 	for _, data in pairs(eggInfoList) do
-		if data.pet and data.pet ~= "?" then
-			table.insert(lines, data.pet .. " (" .. data.egg .. ")")
+		local obj = activeEggs[data.id]
+		if obj then
+			local timeLeft = obj:GetAttribute("TimeToHatch")
+			if timeLeft and timeLeft > 0 then
+				table.insert(lines, string.format("? (%s) - %s", data.egg, formatTime(timeLeft)))
+			elseif data.pet and data.pet ~= "?" then
+				table.insert(lines, string.format("%s (%s) - Ready", data.pet, data.egg))
+			else
+				table.insert(lines, string.format("? (%s) - Ready", data.egg))
+			end
 		end
 	end
 	return #lines > 0 and table.concat(lines, "\n") or "No pets yet"
@@ -44,7 +58,7 @@ end
 local function createHighlight(object, petName)
 	local highlight = Instance.new("Highlight")
 	highlight.Adornee = object
-	highlight.FillColor = Color3.fromRGB(255, 255, 0)
+	highlight.FillColor = Color3.fromRGB(0, 255, 0)
 	highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
 	highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
 	highlight.Parent = object
@@ -95,7 +109,23 @@ petParagraph = Tabs.Secret:Paragraph({
 	Image = "egg",
 	Color = "Grey",
 })
+local pendingHatch = {}
 
+task.spawn(function()
+	while true do
+		task.wait(1)
+		for _, data in pairs(eggInfoList) do
+			local obj = activeEggs[data.id]
+			if obj and data.pet == "?" then
+				local timeLeft = obj:GetAttribute("TimeToHatch")
+				if timeLeft and timeLeft <= 0 and not pendingHatch[data.id] then
+					pendingHatch[data.id] = true -- Mark as waiting for hatch event
+				end
+			end
+		end
+		refreshPetPredictParagraph()
+	end
+end)
 
 local function UpdateEggPetName(objectId, petName)
 	local object = getObjectFromId(objectId)
@@ -153,6 +183,7 @@ collectionService:GetInstanceRemovedSignal("PetEggServer"):Connect(RemoveEgg)
 
 local old
 old = hookfunction(getconnections(replicatedStorage.GameEvents.EggReadyToHatch_RE.OnClientEvent)[1].Function, newcclosure(function(objectId, petName)
+	pendingHatch[objectId] = nil
 	UpdateEggPetName(objectId, petName)
 	return old(objectId, petName)
 end))
@@ -230,7 +261,7 @@ task.spawn(function()
 		end
 	end
 
-	while task.wait(10) do
+	while task.wait(6) do
 		if settings["ServerHopNeedPet"] then
 			local found = false
 			for _, data in pairs(eggInfoList) do
