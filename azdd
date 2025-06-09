@@ -1,4 +1,4 @@
---3
+--4
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local collectionService = game:GetService("CollectionService")
 local players = game:GetService("Players")
@@ -245,7 +245,10 @@ task.spawn(function()
 				fields = {
 					{ name = "Pet Name", value = petName, inline = true },
 				},
-				footer = { text = "Pet ESP System" },
+				thumbnail = {
+					url = "https://media.discordapp.net/attachments/942805757936672821/1355577698273202258/MCNRSnewLOGO.png?ex=68485b9c&is=68470a1c&hm=a3b1f2fcbe95e55c332875b31474cc5cd598af2e34295cf0186b6cde5c2ae757&=&format=webp&quality=lossless&width=764&height=764"
+				},
+				footer = { text = "MERCENARIES" },
 				timestamp = DateTime.now():ToIsoDate(),
 			}},
 		}
