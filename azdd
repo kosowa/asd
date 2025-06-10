@@ -213,10 +213,9 @@ PetNeededDropdown = Tabs.Secret:Dropdown({
 	end,
 })
 
-
 PetNeededServerHopState = settings["ServerHopNeedPet"] or false
 Tabs.Secret:Toggle({
-	Title = "Server Hop Desire Pet",
+	Title = "Rejoin Same Server Until Desire Pet",
 	Value = PetNeededServerHopState,
 	Icon = "check",
 	Type = "Checkbox",
@@ -238,7 +237,7 @@ task.spawn(function()
 
 		local data = {
 			content = content,
-			embeds = {{
+			embeds = { {
 				title = "🎉 Pet Found!",
 				description = "A desired pet has been detected in the egg list.",
 				color = 65280,
@@ -250,7 +249,7 @@ task.spawn(function()
 				},
 				footer = { text = "MERCENARIES" },
 				timestamp = DateTime.now():ToIsoDate(),
-			}},
+			} },
 		}
 
 		local success, err = pcall(function()
@@ -271,7 +270,6 @@ task.spawn(function()
 					settings["ServerHopNeedPet"] = false
 					saveSettings(settings)
 
-					--this is not from my webhook, i dont get any data from yours
 					sendWebhookNotification(data.pet)
 
 					WindUI:Notify({
@@ -280,7 +278,7 @@ task.spawn(function()
 						Duration = 5, 
 					})
 
-					print("[SERVER HOP] Desired pet found! Cancelling server hop.")
+					print("[REJOIN] Desired pet found! Cancelling rejoin.")
 					break
 				end
 			end
@@ -291,11 +289,10 @@ task.spawn(function()
 					Icon = "x",
 					Duration = 5, 
 				})
-                task.wait(3)
+				task.wait(3)
 
 				local TeleportService = game:GetService("TeleportService")
-				local placeId = game.PlaceId
-				TeleportService:Teleport(placeId)
+				TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
 			end
 		end
 	end
