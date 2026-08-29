@@ -1,14 +1,3 @@
-if getgenv().MercenariesLoaded then
-    return
-end
-getgenv().MercenariesLoaded = true
-
-if not game:IsLoaded() then
-    game.Loaded:Wait()
-end
-
-task.wait(math.random())
-
 local loaders = {
     [35789249] = "https://raw.githubusercontent.com/kosowa02/v2/refs/heads/main/gago", -- GaG
     [36015593] = "https://api.luarmor.net/files/v3/loaders/3dd0d7e4978bbd5e49aa2662068ab413.lua", -- Hunty Zombies
